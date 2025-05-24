@@ -16,14 +16,17 @@ Azure NetApp Files (ANF) provides robust cloud storage capabilities with NFS and
 ## Azure NetApp Files REST API Operations
 
 ### Account Management
+
 - Create/Update/Delete Accounts
 - Configure Active Directory and Encryption
 
 ### Capacity Pool Management
+
 - Create/Update/Delete Pools
 - Monitor Pool Utilization
 
 ### Volume Management
+
 - Create/Update/Delete Volumes
 - Volume Snapshots
 - Fast Clone Operations
@@ -33,6 +36,7 @@ Azure NetApp Files (ANF) provides robust cloud storage capabilities with NFS and
 ## Python MCP Server-Client Architecture
 
 ### Components
+
 - **Authentication:** Azure AD Integration
 - **REST API Proxy:** Simplifies complex operations
 - **Policy Engine:** AI-based rules and approvals
@@ -40,6 +44,7 @@ Azure NetApp Files (ANF) provides robust cloud storage capabilities with NFS and
 - **Client Interface:** Python CLI or HTTP API
 
 ### Example Endpoint
+
 ```python
 @app.post("/mcp/volumes/{account}/{pool}/{volume}/autoscale")
 def autoscale_volume(account: str, pool: str, volume: str, approval: bool = False):
@@ -55,6 +60,7 @@ def autoscale_volume(account: str, pool: str, volume: str, approval: bool = Fals
 - **Execution Agent:** Automated MCP calls based on approvals
 
 ### Agentic Workflow
+
 1. **Observe:** Monitoring agent detects issues
 2. **Communicate:** Notification agent alerts admin via Teams
 3. **Decide:** Admin approves or rejects via Teams
@@ -62,6 +68,7 @@ def autoscale_volume(account: str, pool: str, volume: str, approval: bool = Fals
 5. **Feedback:** Confirmation returned to admin
 
 ## Key Use Cases
+
 - **Autoscaling:** Proactively manage volume capacity
 - **QoS Adjustment:** Optimize volume performance dynamically
 - **Natural Language Provisioning:** Simplify cloning, snapshotting, and recovery via Teams
