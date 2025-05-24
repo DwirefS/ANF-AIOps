@@ -1,10 +1,28 @@
-# ANF-AIOps
+# ANF‑AIOps
 
-**Azure NetApp Files AI Operations (ANF-AIOps)** provides an AI‑driven Management Control Plane (MCP) and automation toolkit for Azure NetApp Files.  
+AI‑driven Management Control Plane for **Azure NetApp Files**.
 
-- **MCP Server** — Python FastAPI micro‑service running in Azure Container Apps  
-- **Terraform IaC** — deploys container app, managed identity, logging  
-- **Python SDK** — simple client wrapper for the MCP API  
-- **Workflows** — examples for Copilot agents (Azure AI Foundry) & Logic Apps  
+```
+.
+├── mcp_server/        # FastAPI micro‑service
+│   ├── routers/       # Accounts & Pools endpoints (more to come)
+│   └── app.py
+├── tests/             # Pytest unit tests (no live Azure hit)
+├── infra/             # (placeholder) Terraform IaC
+├── requirements.txt   # Runtime + dev deps
+└── Dockerfile         # Container image
+```
 
-> **Status:** Initial skeleton. Extend modules, endpoints, and workflows to fit your environment.
+## Local quick‑start
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+export MCP_API_KEY=changeme
+export AZURE_SUBSCRIPTION_ID=dummy
+export AZURE_RESOURCE_GROUP=dummy
+
+pytest                # run unit tests
+uvicorn mcp_server.app:app --reload
+```
