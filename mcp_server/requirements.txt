@@ -3,3 +3,4 @@ uvicorn[standard]
 azure-identity
 azure-mgmt-netapp
 python-dotenv
+httpx

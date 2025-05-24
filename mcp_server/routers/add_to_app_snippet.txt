@@ -1,0 +1,4 @@
+# append to existing app.py import section:
+from routers import pools  # noqa
+app.include_router(pools.router)
+

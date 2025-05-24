@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+httpx
+azure-identity
+azure-mgmt-netapp
+pytest
+pytest-respx
+
