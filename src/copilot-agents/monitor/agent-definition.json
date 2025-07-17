@@ -1,0 +1,129 @@
+{
+  "name": "ANF-Monitor",
+  "description": "Monitoring and analytics agent for Azure NetApp Files",
+  "version": "1.0.0",
+  "type": "monitor",
+  "capabilities": [
+    "real-time-monitoring",
+    "predictive-analytics",
+    "anomaly-detection",
+    "capacity-planning"
+  ],
+  "configuration": {
+    "pollingInterval": 60000,
+    "metricsRetention": 2592000,
+    "alertThresholds": {
+      "capacityWarning": 80,
+      "capacityCritical": 90,
+      "iopsWarning": 5000,
+      "iopsCritical": 8000,
+      "latencyWarning": 10,
+      "latencyCritical": 20
+    }
+  },
+  "monitoringTasks": [
+    {
+      "name": "VolumeHealthCheck",
+      "description": "Monitor volume health and performance",
+      "schedule": "*/5 * * * *",
+      "metrics": [
+        "VolumeConsumedSize",
+        "VolumeAllocatedSize",
+        "ReadIops",
+        "WriteIops",
+        "ReadThroughput",
+        "WriteThroughput",
+        "AverageReadLatency",
+        "AverageWriteLatency"
+      ],
+      "actions": {
+        "onThresholdExceeded": "createAlert",
+        "onAnomaly": "investigateAndNotify"
+      }
+    },
+    {
+      "name": "CapacityForecast",
+      "description": "Predict future capacity needs",
+      "schedule": "0 */6 * * *",
+      "algorithm": "timeseries-ml",
+      "actions": {
+        "onPredictedShortage": "recommendExpansion"
+      }
+    },
+    {
+      "name": "CostAnalysis",
+      "description": "Analyze storage costs and optimization opportunities",
+      "schedule": "0 0 * * *",
+      "metrics": [
+        "StorageUtilization",
+        "PerformanceTierUsage",
+        "SnapshotCount",
+        "BackupSize"
+      ],
+      "actions": {
+        "onOptimizationFound": "generateReport"
+      }
+    }
+  ],
+  "alertRules": [
+    {
+      "name": "HighCapacityUsage",
+      "condition": "VolumeConsumedSize > 90% of VolumeAllocatedSize",
+      "severity": "critical",
+      "actions": ["notifyOwner", "createIncident", "suggestRemediation"]
+    },
+    {
+      "name": "PerformanceDegradation",
+      "condition": "AverageLatency > baseline + 50%",
+      "severity": "warning",
+      "actions": ["analyzeRoot Cause", "notifyOps"]
+    },
+    {
+      "name": "UnusualActivity",
+      "condition": "anomalyScore > 0.8",
+      "severity": "info",
+      "actions": ["logEvent", "trackPattern"]
+    }
+  ],
+  "integrations": {
+    "azureMonitor": {
+      "enabled": true,
+      "workspaceId": "${LOG_ANALYTICS_WORKSPACE_ID}"
+    },
+    "applicationInsights": {
+      "enabled": true,
+      "instrumentationKey": "${APP_INSIGHTS_KEY}"
+    },
+    "mcpServer": {
+      "endpoint": "${MCP_SERVER_ENDPOINT}",
+      "tools": [
+        "anf_get_volume_metrics",
+        "anf_check_volume_health"
+      ]
+    }
+  },
+  "reporting": {
+    "dashboards": [
+      {
+        "name": "Executive Overview",
+        "widgets": ["capacity-trend", "cost-analysis", "performance-summary"]
+      },
+      {
+        "name": "Operations Dashboard",
+        "widgets": ["real-time-metrics", "alert-summary", "volume-health"]
+      }
+    ],
+    "scheduledReports": [
+      {
+        "name": "Weekly Performance Report",
+        "schedule": "0 9 * * MON",
+        "recipients": ["ops-team@company.com"]
+      },
+      {
+        "name": "Monthly Cost Report",
+        "schedule": "0 9 1 * *",
+        "recipients": ["finance@company.com"]
+      }
+    ]
+  }
+}

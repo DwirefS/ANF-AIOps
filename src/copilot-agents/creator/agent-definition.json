@@ -1,0 +1,156 @@
+{
+  "name": "ANF-Creator",
+  "description": "Resource creation agent for Azure NetApp Files",
+  "version": "1.0.0",
+  "type": "creator",
+  "capabilities": [
+    "volume-creation",
+    "pool-creation",
+    "snapshot-creation",
+    "replication-setup"
+  ],
+  "configuration": {
+    "validationRules": {
+      "volumeName": "^[a-zA-Z][a-zA-Z0-9-]{0,63}$",
+      "minVolumeSize": 100,
+      "maxVolumeSize": 102400,
+      "supportedProtocols": ["NFSv3", "NFSv4.1", "CIFS"],
+      "supportedServiceLevels": ["Standard", "Premium", "Ultra"]
+    },
+    "defaults": {
+      "serviceLevel": "Standard",
+      "snapshotDirectoryVisible": true,
+      "exportPolicy": {
+        "rules": [{
+          "ruleIndex": 1,
+          "unixReadWrite": true,
+          "unixReadOnly": false,
+          "cifs": false,
+          "nfsv3": true,
+          "nfsv41": false,
+          "allowedClients": "10.0.0.0/16"
+        }]
+      }
+    }
+  },
+  "creationWorkflows": {
+    "createVolume": {
+      "steps": [
+        {
+          "name": "validateInput",
+          "actions": [
+            "validateNamingConvention",
+            "checkSizeConstraints",
+            "verifySubnetAccess"
+          ]
+        },
+        {
+          "name": "checkPrerequisites",
+          "actions": [
+            "verifyPoolCapacity",
+            "checkQuotaAvailability",
+            "validateNetworkConfig"
+          ]
+        },
+        {
+          "name": "applyBestPractices",
+          "actions": [
+            "selectOptimalServiceLevel",
+            "configureSecuritySettings",
+            "setPerformanceParameters"
+          ]
+        },
+        {
+          "name": "createResource",
+          "actions": [
+            "invokeANFAPI",
+            "waitForProvisioning",
+            "verifyCreation"
+          ]
+        },
+        {
+          "name": "postCreation",
+          "actions": [
+            "configureMonitoring",
+            "applyTags",
+            "documentResource"
+          ]
+        }
+      ]
+    },
+    "createPool": {
+      "steps": [
+        {
+          "name": "validatePoolConfig",
+          "actions": [
+            "validateServiceLevel",
+            "checkMinimumSize",
+            "verifyAccountLimits"
+          ]
+        },
+        {
+          "name": "calculateRequirements",
+          "actions": [
+            "estimateThroughput",
+            "calculateCost",
+            "determineQosType"
+          ]
+        },
+        {
+          "name": "createPool",
+          "actions": [
+            "invokePoolCreationAPI",
+            "monitorProgress",
+            "validatePoolHealth"
+          ]
+        }
+      ]
+    }
+  },
+  "templates": {
+    "standardVolume": {
+      "serviceLevel": "Standard",
+      "usageThreshold": 1024,
+      "protocolTypes": ["NFSv3"],
+      "tags": {
+        "environment": "production",
+        "managedBy": "ANF-AIops"
+      }
+    },
+    "highPerformanceVolume": {
+      "serviceLevel": "Ultra",
+      "usageThreshold": 4096,
+      "protocolTypes": ["NFSv4.1"],
+      "kerberosEnabled": true,
+      "tags": {
+        "environment": "production",
+        "workload": "database",
+        "managedBy": "ANF-AIops"
+      }
+    }
+  },
+  "integrations": {
+    "mcpServer": {
+      "endpoint": "${MCP_SERVER_ENDPOINT}",
+      "tools": [
+        "anf_create_volume",
+        "anf_create_pool",
+        "anf_create_snapshot"
+      ]
+    },
+    "approvalSystem": {
+      "enabled": true,
+      "thresholds": {
+        "volumeSize": 10240,
+        "poolSize": 100,
+        "serviceLevel": "Ultra"
+      }
+    }
+  },
+  "security": {
+    "requireApproval": true,
+    "allowedUsers": ["${ALLOWED_CREATORS}"],
+    "auditAllActions": true,
+    "encryptSensitiveData": true
+  }
+}

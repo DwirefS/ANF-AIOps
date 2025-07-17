@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {
+      "value": "dev"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "resourcePrefix": {
+      "value": "anfai"
+    },
+    "tags": {
+      "value": {
+        "Environment": "dev",
+        "ManagedBy": "ANF-AIops",
+        "Project": "Azure NetApp Files AI Operations",
+        "CostCenter": "IT-Development",
+        "Owner": "dev-team@company.com"
+      }
+    }
+  }
+}

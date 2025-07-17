@@ -1,0 +1,152 @@
+{
+  "name": "ANF-Orchestrator",
+  "description": "Master orchestrator agent for Azure NetApp Files operations",
+  "version": "1.0.0",
+  "type": "orchestrator",
+  "capabilities": [
+    "multi-agent-coordination",
+    "workflow-management",
+    "context-preservation",
+    "error-handling"
+  ],
+  "configuration": {
+    "timeout": 300000,
+    "retryPolicy": {
+      "maxRetries": 3,
+      "backoffMultiplier": 2
+    },
+    "contextWindow": 10,
+    "enableLogging": true
+  },
+  "intents": [
+    {
+      "name": "CreateStorage",
+      "description": "Create new storage resources",
+      "examples": [
+        "Create a new volume",
+        "Set up a capacity pool",
+        "Provision storage for my application"
+      ],
+      "requiredAgents": ["creator", "monitor"],
+      "workflow": "create-storage-workflow"
+    },
+    {
+      "name": "OptimizePerformance",
+      "description": "Optimize storage performance",
+      "examples": [
+        "Improve volume performance",
+        "Optimize my storage",
+        "Increase IOPS"
+      ],
+      "requiredAgents": ["monitor", "modifier"],
+      "workflow": "optimize-performance-workflow"
+    },
+    {
+      "name": "ManageCosts",
+      "description": "Optimize storage costs",
+      "examples": [
+        "Reduce storage costs",
+        "Find cost savings",
+        "Optimize spending"
+      ],
+      "requiredAgents": ["monitor", "modifier", "notifier"],
+      "workflow": "cost-optimization-workflow"
+    }
+  ],
+  "workflows": {
+    "create-storage-workflow": {
+      "steps": [
+        {
+          "id": "validate-request",
+          "agent": "self",
+          "action": "validateStorageRequest",
+          "onError": "abort"
+        },
+        {
+          "id": "check-quota",
+          "agent": "monitor",
+          "action": "checkAvailableQuota",
+          "onError": "notify-and-abort"
+        },
+        {
+          "id": "create-resource",
+          "agent": "creator",
+          "action": "createStorageResource",
+          "onError": "rollback"
+        },
+        {
+          "id": "verify-creation",
+          "agent": "monitor",
+          "action": "verifyResourceHealth",
+          "onError": "alert"
+        },
+        {
+          "id": "notify-completion",
+          "agent": "notifier",
+          "action": "sendCompletionNotification",
+          "onError": "log"
+        }
+      ]
+    },
+    "optimize-performance-workflow": {
+      "steps": [
+        {
+          "id": "analyze-metrics",
+          "agent": "monitor",
+          "action": "analyzePerformanceMetrics",
+          "onError": "abort"
+        },
+        {
+          "id": "generate-recommendations",
+          "agent": "self",
+          "action": "generateOptimizationPlan",
+          "onError": "abort"
+        },
+        {
+          "id": "request-approval",
+          "agent": "notifier",
+          "action": "requestUserApproval",
+          "onError": "abort"
+        },
+        {
+          "id": "apply-changes",
+          "agent": "modifier",
+          "action": "applyPerformanceOptimizations",
+          "onError": "rollback"
+        },
+        {
+          "id": "verify-improvements",
+          "agent": "monitor",
+          "action": "verifyPerformanceGains",
+          "onError": "alert"
+        }
+      ]
+    }
+  },
+  "errorHandling": {
+    "strategies": {
+      "abort": {
+        "action": "stopWorkflow",
+        "notify": true
+      },
+      "rollback": {
+        "action": "revertChanges",
+        "notify": true
+      },
+      "retry": {
+        "action": "retryStep",
+        "maxAttempts": 3
+      },
+      "alert": {
+        "action": "createAlert",
+        "severity": "high"
+      }
+    }
+  },
+  "security": {
+    "authentication": "oauth2",
+    "authorization": "rbac",
+    "encryption": "tls1.3",
+    "auditLogging": true
+  }
+}

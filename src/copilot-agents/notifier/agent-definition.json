@@ -1,0 +1,170 @@
+{
+  "name": "ANF-Notifier",
+  "description": "Notification and communication agent for Azure NetApp Files operations",
+  "version": "1.0.0",
+  "type": "notifier",
+  "capabilities": [
+    "teams-notifications",
+    "email-alerts",
+    "adaptive-cards",
+    "incident-management"
+  ],
+  "configuration": {
+    "channels": {
+      "teams": {
+        "enabled": true,
+        "webhookUrl": "${TEAMS_WEBHOOK_URL}",
+        "defaultChannel": "anf-operations"
+      },
+      "email": {
+        "enabled": true,
+        "smtpServer": "${SMTP_SERVER}",
+        "from": "anf-aiops@company.com"
+      },
+      "incidents": {
+        "enabled": true,
+        "system": "ServiceNow",
+        "endpoint": "${INCIDENT_API_ENDPOINT}"
+      }
+    },
+    "templates": {
+      "alertTemplate": "adaptive-card",
+      "reportTemplate": "html-email",
+      "incidentTemplate": "servicenow-standard"
+    }
+  },
+  "notificationRules": [
+    {
+      "name": "CriticalAlert",
+      "triggers": ["capacity > 90%", "service_down", "security_breach"],
+      "channels": ["teams", "email", "incident"],
+      "priority": "P1",
+      "escalation": {
+        "initialDelay": 0,
+        "escalationDelay": 900,
+        "maxEscalations": 3
+      }
+    },
+    {
+      "name": "WarningAlert",
+      "triggers": ["capacity > 80%", "performance_degradation"],
+      "channels": ["teams", "email"],
+      "priority": "P2",
+      "escalation": {
+        "initialDelay": 1800,
+        "escalationDelay": 3600,
+        "maxEscalations": 2
+      }
+    },
+    {
+      "name": "InfoNotification",
+      "triggers": ["task_completed", "report_ready", "maintenance_scheduled"],
+      "channels": ["teams"],
+      "priority": "P3",
+      "escalation": null
+    }
+  ],
+  "adaptiveCards": {
+    "volumeCreated": {
+      "type": "AdaptiveCard",
+      "version": "1.4",
+      "body": [
+        {
+          "type": "TextBlock",
+          "text": "✅ Volume Created Successfully",
+          "weight": "Bolder",
+          "size": "Large"
+        },
+        {
+          "type": "FactSet",
+          "facts": [
+            {"title": "Volume Name", "value": "${volumeName}"},
+            {"title": "Size", "value": "${size} GB"},
+            {"title": "Service Level", "value": "${serviceLevel}"},
+            {"title": "Mount Path", "value": "${mountPath}"}
+          ]
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.OpenUrl",
+              "title": "View in Portal",
+              "url": "${portalUrl}"
+            },
+            {
+              "type": "Action.Submit",
+              "title": "Configure Monitoring",
+              "data": {"action": "configureMonitoring", "volumeId": "${volumeId}"}
+            }
+          ]
+        }
+      ]
+    },
+    "capacityAlert": {
+      "type": "AdaptiveCard",
+      "version": "1.4",
+      "body": [
+        {
+          "type": "TextBlock",
+          "text": "⚠️ Capacity Warning",
+          "weight": "Bolder",
+          "size": "Large",
+          "color": "Warning"
+        },
+        {
+          "type": "TextBlock",
+          "text": "Volume ${volumeName} is at ${usagePercent}% capacity",
+          "wrap": true
+        },
+        {
+          "type": "Graph",
+          "data": "${capacityTrend}",
+          "height": "100px"
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.Submit",
+              "title": "Increase Capacity",
+              "style": "positive",
+              "data": {"action": "increaseCapacity", "volumeId": "${volumeId}"}
+            },
+            {
+              "type": "Action.Submit",
+              "title": "Analyze Usage",
+              "data": {"action": "analyzeUsage", "volumeId": "${volumeId}"}
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "escalationChains": {
+    "operations": [
+      {"level": 1, "contacts": ["ops-oncall@company.com"]},
+      {"level": 2, "contacts": ["ops-lead@company.com", "ops-backup@company.com"]},
+      {"level": 3, "contacts": ["ops-manager@company.com", "cto@company.com"]}
+    ],
+    "security": [
+      {"level": 1, "contacts": ["security-oncall@company.com"]},
+      {"level": 2, "contacts": ["security-lead@company.com", "ciso@company.com"]}
+    ]
+  },
+  "reporting": {
+    "dailySummary": {
+      "enabled": true,
+      "time": "09:00",
+      "recipients": ["anf-team@company.com"],
+      "includeMetrics": ["volumeCount", "totalCapacity", "alerts", "changes"]
+    },
+    "weeklyReport": {
+      "enabled": true,
+      "dayOfWeek": "Monday",
+      "time": "09:00",
+      "recipients": ["management@company.com"],
+      "includeMetrics": ["costAnalysis", "performanceTrends", "capacityForecast"]
+    }
+  }
+}

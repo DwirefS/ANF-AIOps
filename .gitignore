@@ -1,5 +1,106 @@
-__pycache__/
+# Environment files
 .env
-.terraform/
+.env.local
+.env.*.local
+*.env
+
+# Azure credentials
+*.pfx
+*.cer
+*.key
+*.pem
+appsettings.Development.json
+local.settings.json
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build outputs
+bin/
+obj/
+out/
+dist/
+build/
+*.dll
+*.exe
+*.pdb
+
+# Package directories
+node_modules/
+packages/
+.pnp.*
+.yarn/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+pip-log.txt
+
+# Terraform
 *.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+!examples.tfvars
+
+# Azure Functions
+local.settings.json
+.funcignore
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Test outputs
+coverage/
+.nyc_output/
+*.coverage
+.coverage.*
+htmlcov/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+.cache/
+tmp/
+
+# Security - Never commit these
+*.pfx
+*.p12
+*.key
+*.pem
+*.crt
+*.cer
+secrets/
+credentials/
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Documentation build
+docs/_build/
+site/
+
+# Deployment packages
 *.zip
+*.tar.gz
+*.tgz
+
+# Azure specific
+.azure/
+*.PublishSettings
