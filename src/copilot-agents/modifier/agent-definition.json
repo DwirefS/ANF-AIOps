@@ -1,0 +1,225 @@
+{
+  "name": "ANF-Modifier",
+  "description": "Modification and maintenance agent for Azure NetApp Files resources",
+  "version": "1.0.0",
+  "author": {
+    "name": "Dwiref Sharma",
+    "email": "DwirefS@SapientEdge.com"
+  },
+  "type": "modifier",
+  "capabilities": [
+    "volume-resizing",
+    "performance-tuning",
+    "configuration-updates",
+    "policy-management",
+    "maintenance-operations"
+  ],
+  "configuration": {
+    "changeValidation": {
+      "requireApproval": true,
+      "approvalThresholds": {
+        "volumeResize": {
+          "percentIncrease": 50,
+          "absoluteIncrease": 10240
+        },
+        "serviceLevelChange": ["Premium", "Ultra"],
+        "costIncrease": 20
+      }
+    },
+    "maintenanceWindows": {
+      "preferred": "Saturday 02:00-06:00 UTC",
+      "blackoutDates": ["${BLACKOUT_DATES}"],
+      "emergencyOverride": true
+    },
+    "rollbackPolicy": {
+      "enabled": true,
+      "snapshotBefore": true,
+      "retentionHours": 24
+    }
+  },
+  "modificationWorkflows": {
+    "resizeVolume": {
+      "steps": [
+        {
+          "name": "validateRequest",
+          "actions": [
+            "checkCurrentUsage",
+            "validateNewSize",
+            "estimateCostImpact"
+          ]
+        },
+        {
+          "name": "prepareChange",
+          "actions": [
+            "createPreChangeSnapshot",
+            "notifyStakeholders",
+            "scheduleWindow"
+          ]
+        },
+        {
+          "name": "executeChange",
+          "actions": [
+            "resizeVolume",
+            "monitorProgress",
+            "validateNewSize"
+          ]
+        },
+        {
+          "name": "postChange",
+          "actions": [
+            "verifyPerformance",
+            "updateDocumentation",
+            "notifyCompletion"
+          ]
+        }
+      ],
+      "rollbackTriggers": [
+        "resizeFailed",
+        "performanceDegraded",
+        "mountIssues"
+      ]
+    },
+    "optimizePerformance": {
+      "steps": [
+        {
+          "name": "analyzeWorkload",
+          "actions": [
+            "collectMetrics",
+            "identifyPatterns",
+            "predictRequirements"
+          ]
+        },
+        {
+          "name": "generateOptimizations",
+          "actions": [
+            "calculateOptimalTier",
+            "suggestQoSSettings",
+            "estimateImprovements"
+          ]
+        },
+        {
+          "name": "applyOptimizations",
+          "actions": [
+            "updateServiceLevel",
+            "adjustQoSPolicy",
+            "modifyExportPolicy"
+          ]
+        },
+        {
+          "name": "validateResults",
+          "actions": [
+            "measurePerformance",
+            "compareBaseline",
+            "generateReport"
+          ]
+        }
+      ]
+    },
+    "applyPolicyUpdates": {
+      "steps": [
+        {
+          "name": "reviewPolicies",
+          "actions": [
+            "identifyAffectedResources",
+            "assessImpact",
+            "planImplementation"
+          ]
+        },
+        {
+          "name": "implementPolicies",
+          "actions": [
+            "updateSnapshotPolicies",
+            "modifyBackupSchedules",
+            "adjustRetentionRules"
+          ]
+        },
+        {
+          "name": "verifyCompliance",
+          "actions": [
+            "runComplianceCheck",
+            "documentChanges",
+            "reportStatus"
+          ]
+        }
+      ]
+    }
+  },
+  "optimizationStrategies": {
+    "costOptimization": {
+      "triggers": ["lowUtilization", "overProvisioned", "expensiveTier"],
+      "actions": [
+        "rightSizeVolumes",
+        "moveToCoolStorage",
+        "consolidateVolumes",
+        "adjustServiceLevels"
+      ]
+    },
+    "performanceOptimization": {
+      "triggers": ["highLatency", "throughputBottleneck", "iopsLimit"],
+      "actions": [
+        "upgradeServiceLevel",
+        "enableAcceleration",
+        "optimizeNetworking",
+        "adjustQoS"
+      ]
+    }
+  },
+  "maintenanceTasks": [
+    {
+      "name": "SnapshotCleanup",
+      "schedule": "0 2 * * *",
+      "actions": [
+        "identifyOldSnapshots",
+        "validateRetentionPolicy",
+        "deleteExpiredSnapshots",
+        "reportSpaceReclaimed"
+      ]
+    },
+    {
+      "name": "CapacityRebalancing",
+      "schedule": "0 3 * * SUN",
+      "actions": [
+        "analyzePoolUtilization",
+        "identifyImbalances",
+        "planRebalancing",
+        "executeRebalancing"
+      ]
+    },
+    {
+      "name": "ConfigurationDrift",
+      "schedule": "0 4 * * *",
+      "actions": [
+        "scanConfigurations",
+        "compareToBaseline",
+        "identifyDrift",
+        "autoCorrect"
+      ]
+    }
+  ],
+  "integrations": {
+    "mcpServer": {
+      "endpoint": "${MCP_SERVER_ENDPOINT}",
+      "tools": [
+        "anf_update_volume",
+        "anf_resize_volume",
+        "anf_update_pool",
+        "anf_create_snapshot_policy"
+      ]
+    },
+    "changeManagement": {
+      "system": "ServiceNow",
+      "autoCreateCR": true,
+      "requireApproval": ["Production", "Critical"]
+    }
+  },
+  "auditAndCompliance": {
+    "logAllChanges": true,
+    "retentionDays": 2555,
+    "complianceChecks": [
+      "validateEncryption",
+      "checkAccessControls",
+      "verifyBackups",
+      "auditChanges"
+    ]
+  }
+}

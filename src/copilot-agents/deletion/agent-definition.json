@@ -1,0 +1,251 @@
+{
+  "name": "ANF-Deletion",
+  "description": "Secure deletion and cleanup agent for Azure NetApp Files resources",
+  "version": "1.0.0",
+  "author": {
+    "name": "Dwiref Sharma",
+    "email": "DwirefS@SapientEdge.com"
+  },
+  "type": "deletion",
+  "capabilities": [
+    "safe-deletion",
+    "dependency-checking",
+    "data-archival",
+    "cleanup-validation",
+    "recovery-options"
+  ],
+  "configuration": {
+    "safetyChecks": {
+      "requireConfirmation": true,
+      "multiFactorApproval": true,
+      "minimumApprovers": 2,
+      "cooldownPeriod": 300
+    },
+    "deletionPolicy": {
+      "backupBeforeDelete": true,
+      "retentionPeriod": 30,
+      "softDeleteEnabled": true,
+      "permanentDeleteDelay": 7
+    },
+    "protectedResources": {
+      "patterns": ["*-prod-*", "*-critical-*", "*-backup-*"],
+      "requireOverride": true,
+      "overrideLevel": "executive"
+    }
+  },
+  "deletionWorkflows": {
+    "deleteVolume": {
+      "steps": [
+        {
+          "name": "preflightChecks",
+          "actions": [
+            "verifyVolumeIdentity",
+            "checkActiveConnections",
+            "scanForDependencies",
+            "assessDataCriticality"
+          ],
+          "failureAction": "abort"
+        },
+        {
+          "name": "dataProtection",
+          "actions": [
+            "createFinalSnapshot",
+            "exportMetadata",
+            "archiveConfigurations",
+            "generateRecoveryPackage"
+          ],
+          "failureAction": "abort"
+        },
+        {
+          "name": "approvalProcess",
+          "actions": [
+            "notifyApprovers",
+            "collectApprovals",
+            "validateAuthorization",
+            "logDecisionAudit"
+          ],
+          "timeout": 86400,
+          "failureAction": "abort"
+        },
+        {
+          "name": "gracefulShutdown",
+          "actions": [
+            "notifyConsumers",
+            "waitForDisconnection",
+            "unmountVolume",
+            "disableAccess"
+          ],
+          "timeout": 3600
+        },
+        {
+          "name": "executeDeletion",
+          "actions": [
+            "markForDeletion",
+            "initiatesoftDelete",
+            "updateInventory",
+            "releaseResources"
+          ],
+          "rollbackWindow": 300
+        },
+        {
+          "name": "postDeletion",
+          "actions": [
+            "verifyDeletion",
+            "updateCMDB",
+            "notifyStakeholders",
+            "archiveAuditLog"
+          ]
+        }
+      ],
+      "rollbackTriggers": [
+        "criticalDataFound",
+        "dependencyConflict",
+        "approvalRevoked",
+        "systemError"
+      ]
+    },
+    "deletePool": {
+      "steps": [
+        {
+          "name": "poolValidation",
+          "actions": [
+            "checkPoolEmpty",
+            "verifyNoActiveVolumes",
+            "assessFinancialImpact",
+            "validateAlternatives"
+          ],
+          "failureAction": "abort"
+        },
+        {
+          "name": "migrationOptions",
+          "actions": [
+            "identifyTargetPools",
+            "planVolumeMigration",
+            "estimateMigrationTime",
+            "getApprovalForMigration"
+          ]
+        },
+        {
+          "name": "executePoolDeletion",
+          "actions": [
+            "drainPool",
+            "deletePoolResource",
+            "updateCapacityPlanning",
+            "releaseBilling"
+          ]
+        }
+      ]
+    },
+    "bulkCleanup": {
+      "steps": [
+        {
+          "name": "identifyTargets",
+          "actions": [
+            "scanForOrphaned",
+            "checkLastAccess",
+            "calculateSpaceSavings",
+            "prioritizeCleanup"
+          ]
+        },
+        {
+          "name": "batchProcessing",
+          "actions": [
+            "groupByPriority",
+            "scheduleDelections",
+            "executeInBatches",
+            "trackProgress"
+          ]
+        },
+        {
+          "name": "reporting",
+          "actions": [
+            "generateCleanupReport",
+            "calculateCostSavings",
+            "updateDashboards",
+            "notifyManagement"
+          ]
+        }
+      ]
+    }
+  },
+  "recoveryOptions": {
+    "snapshotRecovery": {
+      "enabled": true,
+      "retentionDays": 30,
+      "automatedRecovery": false
+    },
+    "recyclebin": {
+      "enabled": true,
+      "capacity": "10TB",
+      "autoCleanupDays": 30
+    },
+    "disasterRecovery": {
+      "crossRegionBackup": true,
+      "rpoHours": 4,
+      "rtoHours": 8
+    }
+  },
+  "complianceAndAudit": {
+    "regulatoryCompliance": [
+      "GDPR",
+      "HIPAA",
+      "SOC2",
+      "ISO27001"
+    ],
+    "auditRequirements": {
+      "logRetention": 2555,
+      "immutableLogs": true,
+      "externalAudit": true
+    },
+    "dataPrivacy": {
+      "scrubPII": true,
+      "encryptArchives": true,
+      "secureWipe": true
+    }
+  },
+  "notifications": {
+    "deletionWarning": {
+      "advance": 86400,
+      "recipients": ["owners", "consumers", "admins"],
+      "channels": ["email", "teams", "sms"]
+    },
+    "deletionConfirmation": {
+      "immediate": true,
+      "includeDetails": true,
+      "recoveryInstructions": true
+    }
+  },
+  "integrations": {
+    "mcpServer": {
+      "endpoint": "${MCP_SERVER_ENDPOINT}",
+      "tools": [
+        "anf_delete_volume",
+        "anf_delete_pool",
+        "anf_delete_snapshot"
+      ]
+    },
+    "cmdb": {
+      "system": "ServiceNow",
+      "autoUpdate": true,
+      "syncInterval": 300
+    },
+    "backup": {
+      "system": "AzureBackup",
+      "triggerBeforeDelete": true,
+      "verifyBackup": true
+    }
+  },
+  "emergencyProcedures": {
+    "breakGlass": {
+      "enabled": true,
+      "requiresMFA": true,
+      "notifyCSuite": true,
+      "auditLevel": "maximum"
+    },
+    "disasterScenario": {
+      "pauseAllDeletions": true,
+      "preserveEverything": true,
+      "alertAllStakeholders": true
+    }
+  }
+}

@@ -60,6 +60,15 @@
     "netapp",
     "aiops"
   ],
-  "author": "Your Organization",
+  "author": {
+    "name": "Dwiref Sharma",
+    "email": "DwirefS@SapientEdge.com"
+  },
+  "contributors": [
+    {
+      "name": "Dwiref Sharma",
+      "email": "DwirefS@SapientEdge.com"
+    }
+  ],
   "license": "MIT"
 }

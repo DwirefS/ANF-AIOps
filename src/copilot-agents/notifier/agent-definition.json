@@ -2,6 +2,10 @@
   "name": "ANF-Notifier",
   "description": "Notification and communication agent for Azure NetApp Files operations",
   "version": "1.0.0",
+  "author": {
+    "name": "Dwiref Sharma",
+    "email": "DwirefS@SapientEdge.com"
+  },
   "type": "notifier",
   "capabilities": [
     "teams-notifications",

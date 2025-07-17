@@ -2,6 +2,10 @@
   "name": "ANF-Creator",
   "description": "Resource creation agent for Azure NetApp Files",
   "version": "1.0.0",
+  "author": {
+    "name": "Dwiref Sharma",
+    "email": "DwirefS@SapientEdge.com"
+  },
   "type": "creator",
   "capabilities": [
     "volume-creation",
