@@ -1,197 +1,209 @@
-# Azure NetApp Files AI-Ops Solution
+# ANF AI-Ops: Azure NetApp Files AI-Powered Operations
 
-## 🚀 Enterprise-Grade Storage Management through Natural Language
+An intelligent AI-Ops solution for Azure NetApp Files management integrated with Microsoft Teams and powered by Copilot agents.
 
-Transform your Azure NetApp Files operations with an intelligent AI-powered management platform that enables natural language interaction through Microsoft Teams, implementing enterprise-grade security, automated optimization, and predictive analytics.
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-- [Documentation](#documentation)
-- [Security](#security)
-- [Contributing](#contributing)
-- [License](#license)
+## Author
+**Dwiref Sharma** - DwirefS@SapientEdge.com
 
 ## Overview
 
-The ANF AI-Ops solution revolutionizes enterprise storage management by:
-- **Reducing operational overhead by 60-80%** through intelligent automation
-- **Cutting costs by 25-40%** with predictive analytics and automated optimization
-- **Achieving 99.99% uptime** through self-healing capabilities
-- **Enabling natural language management** accessible to all skill levels
-
-## Key Features
-
-### 🤖 Intelligent Agent Ecosystem
-- **Orchestrator Agent**: Coordinates complex multi-step operations
-- **Monitoring Agent**: Real-time performance and health tracking
-- **Creator Agent**: Automated provisioning with best practices
-- **Modifier Agent**: Dynamic configuration optimization
-- **Notification Agent**: Proactive alerts and status updates
-- **Security Agent**: Continuous compliance and threat monitoring
-
-### 🔒 Enterprise Security
-- Zero Trust architecture with defense in depth
-- End-to-end encryption (TLS 1.3 + AES-256)
-- Azure AD/Entra ID integration with MFA
-- Comprehensive audit logging and compliance reporting
-- SOC 2, ISO 27001, HIPAA, PCI-DSS compliance ready
-
-### 📊 Advanced Analytics
-- Predictive capacity planning with ML models
-- Automated performance optimization
-- Cost analysis and optimization recommendations
-- Anomaly detection and fraud prevention
-
-### 💬 Natural Language Interface
-- Microsoft Teams integration for conversational management
-- Context-aware command processing
-- Adaptive cards for rich interactions
-- Multi-language support
+This solution provides AI-powered operations management for Azure NetApp Files (ANF) through:
+- **Microsoft Teams Integration** for natural language operations
+- **MCP (Model Context Protocol) Server** for tool orchestration
+- **Copilot Agents** for automated workflows
+- **Azure Infrastructure** for scalable deployment
 
 ## Architecture
 
-```
-┌─────────────────────┐
-│   Microsoft Teams   │
-│   Natural Language  │
-└──────────┬──────────┘
-           │
-┌──────────▼──────────┐
-│  Copilot Studio     │
-│  Agent Orchestration│
-└──────────┬──────────┘
-           │
-┌──────────▼──────────┐
-│   API Management    │
-│  Security Gateway   │
-└──────────┬──────────┘
-           │
-┌──────────▼──────────┐
-│    MCP Server       │
-│  Container Apps     │
-└──────────┬──────────┘
-           │
-┌──────────▼──────────┐
-│ Azure NetApp Files  │
-│   REST APIs         │
-└─────────────────────┘
-```
+### Core Components
 
-## Prerequisites
+1. **MCP Server** (`/src/mcp-server/`)
+   - TypeScript-based server providing ANF management tools
+   - Handles volumes, pools, snapshots, monitoring, and security operations
+   - Integrates with Azure NetApp Files APIs
 
-- Azure Subscription with appropriate quotas
-- Azure NetApp Files service enabled
-- Microsoft Teams with admin consent
-- Azure AD/Entra ID tenant
-- Required Azure services:
-  - Azure Container Apps or Functions
-  - API Management
-  - Key Vault
-  - Monitor/Application Insights
-  - Copilot Studio license
+2. **Teams Bot** (`/src/teams-bot/`)
+   - Microsoft Teams bot for user interaction
+   - Natural language processing for ANF operations
+   - Authentication and authorization with Azure AD
+
+3. **Copilot Agents** (`/src/copilot-agents/`)
+   - **Orchestrator**: Master coordination agent
+   - **Monitor**: Real-time monitoring and analytics
+   - **Creator**: Resource creation workflows
+   - **Notifier**: Alert and notification management
+   - **Modifier**: Maintenance and optimization
+   - **Deletion**: Safe deletion with compliance
+
+4. **Azure Infrastructure** (`/src/infrastructure/bicep/`)
+   - Complete Bicep templates for Azure deployment
+   - Container Apps for MCP server hosting
+   - App Service for Teams bot
+   - API Management for secure gateway
+   - Key Vault for secrets management
 
 ## Quick Start
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/your-org/anf-aiops.git
-cd anf-aiops
+### Prerequisites
+
+- Azure subscription with NetApp Files enabled
+- Microsoft Teams app registration
+- Node.js 18+ and TypeScript
+- Azure CLI and Bicep
+
+### Deployment
+
+1. **Deploy Infrastructure**
+   ```bash
+   cd src/infrastructure/bicep
+   ./deploy.sh -e dev -l eastus
+   ```
+
+2. **Build and Deploy MCP Server**
+   ```bash
+   cd src/mcp-server
+   npm install
+   npm run build
+   # Deploy to Azure Container Apps
+   ```
+
+3. **Deploy Teams Bot**
+   ```bash
+   cd src/teams-bot
+   npm install
+   npm run build
+   # Deploy to Azure App Service
+   ```
+
+4. **Configure Copilot Agents**
+   - Deploy agent definitions from `/src/copilot-agents/`
+   - Configure with deployed MCP server endpoint
+
+## Features
+
+### ANF Management
+- **Volume Operations**: Create, resize, delete, list volumes
+- **Pool Management**: Capacity pool operations and optimization
+- **Snapshot Management**: Create, restore, and manage snapshots
+- **Performance Monitoring**: Real-time metrics and alerts
+- **Security Auditing**: Compliance and vulnerability scanning
+
+### AI-Powered Operations
+- **Natural Language Interface**: Teams chat for ANF operations
+- **Automated Workflows**: Copilot agents for routine tasks
+- **Predictive Analytics**: Capacity planning and optimization
+- **Intelligent Alerts**: Context-aware notifications
+
+### Security & Compliance
+- **Azure AD Integration**: Role-based access control
+- **Audit Logging**: Comprehensive operation tracking
+- **Secure Communication**: End-to-end encryption
+- **Compliance Reporting**: Regulatory compliance tools
+
+## Usage Examples
+
+### Teams Bot Commands
+```
+/anf list volumes
+/anf create volume myvolume 100GB
+/anf show metrics volume-id
+/anf help
 ```
 
-### 2. Configure Environment
-```bash
-cp config/examples/.env.example .env
-# Edit .env with your Azure credentials
+### Natural Language
+```
+"Show me all volumes in the production environment"
+"Create a new 500GB volume for the database"
+"What's the current capacity utilization?"
 ```
 
-### 3. Deploy Infrastructure
-```bash
-# Using Bicep
-az deployment sub create \
-  --location eastus \
-  --template-file infrastructure/bicep/main.bicep \
-  --parameters @infrastructure/bicep/parameters/dev.json
+## Configuration
 
-# Or using Terraform
-cd infrastructure/terraform
-terraform init
-terraform plan -var-file="environments/dev.tfvars"
-terraform apply -var-file="environments/dev.tfvars"
+### Environment Variables
+```bash
+# Teams Bot
+MICROSOFT_APP_ID=your-app-id
+MICROSOFT_APP_PASSWORD=your-app-password
+MCP_SERVER_URL=https://your-mcp-server.azurecontainerapps.io
+
+# MCP Server
+AZURE_SUBSCRIPTION_ID=your-subscription-id
+AZURE_TENANT_ID=your-tenant-id
+AZURE_CLIENT_ID=your-client-id
+AZURE_CLIENT_SECRET=your-client-secret
 ```
 
-### 4. Deploy MCP Server
-```bash
-# Build and deploy to Container Apps
-./scripts/deployment/deploy-mcp-server.sh
-```
-
-### 5. Configure Copilot Agents
-```bash
-# Import agents to Copilot Studio
-./scripts/deployment/import-copilot-agents.sh
-```
-
-## Documentation
-
-- [Architecture Overview](docs/architecture/overview.md)
-- [Deployment Guide](docs/deployment/complete-guide.md)
-- [Security Documentation](docs/security/security-overview.md)
-- [API Reference](docs/api/reference.md)
-- [Troubleshooting Guide](docs/troubleshooting/common-issues.md)
+### Infrastructure Parameters
+Update parameter files in `/src/infrastructure/bicep/environments/`:
+- `dev.parameters.json` - Development environment
+- `test.parameters.json` - Testing environment
+- `prod.parameters.json` - Production environment
 
 ## Project Structure
 
 ```
-anf-aiops/
-├── src/
-│   ├── mcp-server/        # MCP server implementation
-│   ├── copilot-agents/    # Agent definitions and logic
-│   ├── api-gateway/       # APIM policies and configs
-│   └── shared/           # Shared libraries and utilities
-├── infrastructure/
-│   ├── bicep/            # Bicep IaC templates
-│   └── terraform/        # Terraform IaC templates
-├── tests/
-│   ├── unit/            # Unit tests
-│   ├── integration/     # Integration tests
-│   └── e2e/            # End-to-end tests
-├── docs/               # Comprehensive documentation
-└── scripts/           # Deployment and maintenance scripts
+src/
+├── mcp-server/           # MCP server implementation
+│   ├── src/
+│   │   ├── tools/        # ANF management tools
+│   │   ├── config/       # Configuration management
+│   │   └── utils/        # Utilities and logging
+│   └── package.json
+├── teams-bot/            # Microsoft Teams bot
+│   ├── src/
+│   │   ├── bot/          # Bot implementation
+│   │   └── services/     # Auth, MCP, logging services
+│   └── package.json
+├── copilot-agents/       # Copilot agent definitions
+│   ├── orchestrator/     # Master coordination
+│   ├── monitor/          # Monitoring & analytics
+│   ├── creator/          # Resource creation
+│   ├── notifier/         # Alerts & notifications
+│   ├── modifier/         # Maintenance & optimization
+│   └── deletion/         # Safe deletion workflows
+└── infrastructure/       # Azure infrastructure
+    └── bicep/
+        ├── main.bicep    # Main template
+        ├── modules/      # Resource modules
+        └── environments/ # Environment parameters
 ```
 
-## Security
+## Development
 
-Security is our top priority. This solution implements:
-- Defense in depth with multiple security layers
-- Regular security audits and penetration testing
-- Automated vulnerability scanning
-- Compliance with major standards (SOC 2, ISO 27001, etc.)
+### MCP Server
+```bash
+cd src/mcp-server
+npm install
+npm run dev
+```
 
-For security concerns, please review our [Security Policy](SECURITY.md) or contact security@your-org.com
+### Teams Bot
+```bash
+cd src/teams-bot
+npm install
+npm run dev
+```
+
+### Infrastructure
+```bash
+cd src/infrastructure/bicep
+az deployment sub create --template-file main.bicep --parameters @environments/dev.parameters.json
+```
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
-- Code of Conduct
-- Development process
-- Pull request process
-- Coding standards
-
-## Support
-
-- 📧 Email: support@your-org.com
-- 📖 Documentation: [docs.your-org.com/anf-aiops](https://docs.your-org.com/anf-aiops)
-- 🐛 Issues: [GitHub Issues](https://github.com/your-org/anf-aiops/issues)
+1. Follow the project plan in `ProjectPlan.md`
+2. Review development guidelines in `CLAUDE.md`
+3. Ensure all changes align with the MCP architecture
+4. Test with both development and production environments
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
----
+## Support
 
-Built with ❤️ by the Azure Storage Team
+For issues and questions:
+- Review the project plan: `ProjectPlan.md`
+- Check development guidelines: `CLAUDE.md`
+- Contact: DwirefS@SapientEdge.com

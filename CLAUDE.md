@@ -4,108 +4,177 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-ANF-AIOps is an Azure NetApp Files (ANF) AIOps solution that integrates AI-powered operations management with Microsoft Teams. The project combines Azure Functions, Terraform infrastructure as code, and a RAG (Retrieval-Augmented Generation) system to provide intelligent management of Azure NetApp Files resources.
+ANF-AIOps is an Azure NetApp Files (ANF) AI-Ops solution that integrates AI-powered operations management with Microsoft Teams. The project uses a modern MCP (Model Context Protocol) architecture with Copilot agents for intelligent automation.
 
 ## Architecture
 
 The codebase is organized into the following major components:
 
-1. **agents/** - AI agent configurations and security controls for Teams integration
-   - Agent orchestration, monitoring, and security audit capabilities
-   - Teams integration components for user interaction
-   - Authentication and authorization policies
+1. **src/mcp-server/** - TypeScript-based MCP server for ANF operations
+   - Tools for managing volumes, pools, snapshots, monitoring, and security
+   - Integration with Azure NetApp Files APIs
+   - Comprehensive logging and error handling
 
-2. **functions/ANFServer/** - Azure Functions backend for ANF operations
-   - FunctionDefinitions: Core functions for managing Accounts, CapacityPools, Snapshots, and Volumes
-   - Middleware: JWT validation and security layers
-   - Models: Data models for ANF resources
-   - Security features: SecureResponseBuilder, AuthGuards, and PromptLibrary
+2. **src/teams-bot/** - Microsoft Teams bot for user interaction
+   - Natural language processing for ANF operations
+   - Authentication and authorization with Azure AD
+   - MCP client for communicating with the server
 
-3. **infra/** - Terraform infrastructure as code
-   - Complete Azure infrastructure definitions including APIM, Functions, KeyVault, Identity, and Network
-   - NetApp-specific infrastructure configurations
-   - Search and storage services for RAG implementation
+3. **src/copilot-agents/** - AI agent definitions for automated workflows
+   - Orchestrator: Master coordination agent
+   - Monitor: Real-time monitoring and analytics
+   - Creator: Resource creation workflows
+   - Notifier: Alert and notification management
+   - Modifier: Maintenance and optimization
+   - Deletion: Safe deletion with compliance
 
-4. **rag/** - Retrieval-Augmented Generation system
-   - Embedding utilities for document processing
-   - Vector storage schema and indexer functions
-   - Retriever library for intelligent document search
-
-5. **mcp/** - Microsoft Copilot Connector integration
-   - OpenAPI specifications for ANF operations
-   - Copilot connector configuration
-   - API testing collections
-
-6. **ci-cd/** - Continuous Integration/Deployment configurations
-   - Azure Pipelines and GitHub Actions workflows
-   - Bootstrap scripts for environment setup
+4. **src/infrastructure/bicep/** - Azure infrastructure as code
+   - Complete Bicep templates for all Azure resources
+   - Container Apps for MCP server hosting
+   - App Service for Teams bot
+   - API Management, Key Vault, Storage, and monitoring
 
 ## Development Commands
 
+### MCP Server Development
+```bash
+cd src/mcp-server
+npm install
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run lint       # Run linter
+```
+
+### Teams Bot Development
+```bash
+cd src/teams-bot
+npm install
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run lint       # Run linter
+```
+
 ### Infrastructure Deployment
 ```bash
-# Initialize Terraform
-cd infra
-terraform init
-
-# Plan infrastructure changes
-terraform plan -var-file="examples.tfvars"
-
-# Apply infrastructure changes
-terraform apply -var-file="examples.tfvars"
-```
-
-### Azure Functions Development
-```bash
-# Navigate to functions directory
-cd functions/ANFServer
-
-# Build the C# project (requires .NET SDK)
-dotnet build
-
-# Run functions locally (requires Azure Functions Core Tools)
-func start
-
-# Run tests (if present)
-dotnet test
-```
-
-### RAG System Setup
-```bash
-# Follow the setup guide
-cd rag
-# Refer to rag-setup-guide.md for detailed instructions
+cd src/infrastructure/bicep
+./deploy.sh -e dev -l eastus                    # Deploy to dev environment
+./deploy.sh -e prod -l eastus -s <subscription> # Deploy to production
 ```
 
 ## Key Development Considerations
 
-1. **Security-First Approach**: All functions include authentication guards and JWT validation. The PromptLibrary.cs manages secure AI prompts to prevent injection attacks.
+1. **MCP Architecture**: The system uses Model Context Protocol for tool orchestration between the Teams bot and ANF operations.
 
-2. **Multi-Component Architecture**: Changes often require coordination between:
-   - Azure Functions (C# backend logic)
-   - Terraform infrastructure (resource provisioning)
-   - Teams agents (user interface and interaction)
-   - RAG system (knowledge management)
+2. **TypeScript First**: All code is written in TypeScript with strict type checking enabled.
 
-3. **Azure NetApp Files Integration**: Core functionality revolves around managing ANF resources including:
-   - NetApp accounts
-   - Capacity pools
-   - Volumes
-   - Snapshots
+3. **Security-First Approach**: 
+   - All operations include authentication and authorization
+   - Azure Key Vault for secrets management
+   - Comprehensive audit logging
+   - Role-based access control
 
-4. **AI Operations**: The system integrates AI capabilities through:
-   - Agent orchestration for automated operations
-   - RAG for intelligent document retrieval
-   - Prompt management for secure AI interactions
+4. **Azure Integration**: Deep integration with Azure services:
+   - Azure NetApp Files for storage operations
+   - Azure AD for authentication
+   - Azure Monitor for logging and metrics
+   - Azure Container Apps for hosting
 
-5. **Teams Integration**: User interactions primarily occur through Microsoft Teams, with dedicated components for:
-   - Agent user interface
-   - Authentication flow
-   - Approval workflows
+5. **Copilot Agent Orchestration**: Six specialized agents handle different aspects:
+   - Each agent has specific capabilities and workflows
+   - JSON-based configuration for easy modification
+   - Integration with MCP server tools
 
 ## Testing and Validation
 
-- Use the Postman collection in `mcp/postman-collection.json` for API testing
-- Validate infrastructure changes with `terraform plan` before applying
-- Test Azure Functions locally using Azure Functions Core Tools
-- Ensure all security policies are maintained when modifying authentication flows
+### Local Development
+```bash
+# Test MCP server
+cd src/mcp-server
+npm test
+
+# Test Teams bot
+cd src/teams-bot
+npm test
+
+# Validate infrastructure
+cd src/infrastructure/bicep
+az deployment sub validate --template-file main.bicep --parameters @environments/dev.parameters.json
+```
+
+### Environment Testing
+- Use `dev.parameters.json` for development testing
+- Use `test.parameters.json` for integration testing
+- Use `prod.parameters.json` for production deployment
+
+## Important Instructions
+
+### File Organization
+- Keep all new components in the `/src/` directory
+- Follow the established TypeScript project structure
+- Use the existing logging and configuration patterns
+
+### Configuration Management
+- Environment-specific parameters go in `/src/infrastructure/bicep/environments/`
+- Application configuration in each component's config directory
+- Secrets managed through Azure Key Vault integration
+
+### Error Handling
+- Use the established logging patterns from utils/logger.ts
+- Follow the error handling patterns in the MCP tools
+- Ensure all Azure API calls have proper retry logic
+
+### Security
+- Never commit secrets or API keys
+- Use Azure managed identities where possible
+- Follow the authentication patterns established in the auth service
+- Ensure all user inputs are validated
+
+### Development Workflow
+1. Make changes to the appropriate component in `/src/`
+2. Test locally using the npm scripts
+3. Validate infrastructure changes with Bicep
+4. Deploy to dev environment first
+5. Test end-to-end functionality through Teams bot
+
+## File Structure Reference
+
+```
+src/
+├── mcp-server/
+│   ├── src/
+│   │   ├── tools/          # ANF management tools
+│   │   ├── config/         # Configuration management
+│   │   ├── utils/          # Logging and utilities
+│   │   └── types/          # TypeScript type definitions
+│   ├── package.json
+│   └── tsconfig.json
+├── teams-bot/
+│   ├── src/
+│   │   ├── bot/            # Bot implementation
+│   │   ├── services/       # Auth, MCP, logging services
+│   │   └── index.ts        # Entry point
+│   ├── package.json
+│   └── tsconfig.json
+├── copilot-agents/
+│   ├── orchestrator/       # Master coordination
+│   ├── monitor/           # Monitoring & analytics
+│   ├── creator/           # Resource creation
+│   ├── notifier/          # Alerts & notifications
+│   ├── modifier/          # Maintenance & optimization
+│   ├── deletion/          # Safe deletion workflows
+│   └── shared/            # Shared configurations
+└── infrastructure/
+    └── bicep/
+        ├── main.bicep      # Main template
+        ├── modules/        # Resource modules
+        ├── environments/   # Environment parameters
+        └── deploy.sh       # Deployment script
+```
+
+## Author Information
+
+**Author**: Dwiref Sharma  
+**Contact**: DwirefS@SapientEdge.com  
+**Project**: ANF AI-Ops Solution
+
+All code and documentation should maintain this authorship information.
