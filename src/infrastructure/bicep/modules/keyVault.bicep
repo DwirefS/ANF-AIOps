@@ -1,5 +1,5 @@
 // Key Vault Module
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param keyVaultName string
 param location string

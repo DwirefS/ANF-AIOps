@@ -1,6 +1,6 @@
 /**
  * Authentication Service for Teams Bot
- * Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+ * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
  */
 
 import { ConfidentialClientApplication } from '@azure/msal-node';

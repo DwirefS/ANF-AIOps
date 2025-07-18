@@ -174,7 +174,7 @@ src/
 ## Author Information
 
 **Author**: Dwiref Sharma  
-**Contact**: DwirefS@SapientEdge.com  
+**Contact**: DwirefS@SapientEdge.io  
 **Project**: ANF AI-Ops Solution
 
 All code and documentation should maintain this authorship information.

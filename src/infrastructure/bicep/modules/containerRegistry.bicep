@@ -1,5 +1,5 @@
 // Container Registry Module
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param registryName string
 param location string

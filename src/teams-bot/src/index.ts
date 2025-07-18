@@ -1,6 +1,6 @@
 /**
  * ANF AI-Ops Teams Bot Entry Point
- * Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+ * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
  */
 
 import express from 'express';

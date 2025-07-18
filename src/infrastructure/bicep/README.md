@@ -3,7 +3,7 @@
 This directory contains the Bicep templates for deploying the Azure NetApp Files AI-Ops solution infrastructure.
 
 ## Author
-Dwiref Sharma <DwirefS@SapientEdge.com>
+Dwiref Sharma <DwirefS@SapientEdge.io>
 
 ## Architecture Overview
 

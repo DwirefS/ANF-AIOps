@@ -1,5 +1,5 @@
 // Azure Cognitive Search Module for RAG
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param searchServiceName string
 param location string

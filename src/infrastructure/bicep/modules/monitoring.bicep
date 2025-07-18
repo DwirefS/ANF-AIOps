@@ -1,5 +1,5 @@
 // Monitoring Module - Log Analytics and Application Insights
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param workspaceName string
 param location string

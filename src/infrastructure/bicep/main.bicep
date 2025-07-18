@@ -1,5 +1,5 @@
 // Azure NetApp Files AI-Ops Infrastructure
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 targetScope = 'subscription'
 
@@ -143,7 +143,7 @@ module apiManagement './modules/apiManagement.bicep' = {
     apimName: '${projectName}-${environment}-apim'
     location: location
     environment: environment
-    publisherEmail: 'DwirefS@SapientEdge.com'
+    publisherEmail: 'DwirefS@SapientEdge.io'
     publisherName: 'Dwiref Sharma'
     subnetId: network.outputs.apimSubnetId
     mcpServerUrl: mcpServer.outputs.appUrl

@@ -1,5 +1,5 @@
 // Virtual Network Module
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param vnetName string
 param location string

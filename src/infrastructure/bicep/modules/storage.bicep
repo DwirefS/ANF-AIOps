@@ -1,5 +1,5 @@
 // Storage Account Module for Documents and RAG
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param storageAccountName string
 param location string

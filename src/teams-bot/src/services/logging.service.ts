@@ -1,6 +1,6 @@
 /**
  * Logging Service for Teams Bot
- * Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+ * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
  */
 
 import winston from 'winston';

@@ -1,5 +1,5 @@
 // API Management Module
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param apimName string
 param location string

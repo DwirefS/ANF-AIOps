@@ -1,5 +1,5 @@
 // Azure NetApp Files Account Module
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param accountName string
 param location string

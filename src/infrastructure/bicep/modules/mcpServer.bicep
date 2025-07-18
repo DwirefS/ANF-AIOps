@@ -1,5 +1,5 @@
 // MCP Server Container App Module
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param appName string
 param location string

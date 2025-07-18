@@ -5,7 +5,7 @@ A Model Context Protocol (MCP) server implementation for managing Azure NetApp F
 ## Author
 
 **Dwiref Sharma**  
-Email: DwirefS@SapientEdge.com
+Email: DwirefS@SapientEdge.io
 
 ## Overview
 

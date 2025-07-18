@@ -1,6 +1,6 @@
 /**
  * ANF AI-Ops Teams Bot
- * Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+ * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
  */
 
 import {

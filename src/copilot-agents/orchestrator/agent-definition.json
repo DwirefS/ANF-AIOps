@@ -1,18 +1,171 @@
 {
   "name": "ANF-Orchestrator",
-  "description": "Master orchestrator agent for Azure NetApp Files operations",
-  "version": "1.0.0",
+  "description": "Master orchestrator agent for comprehensive Azure NetApp Files operations with full REST API 2025-03-01 coverage",
+  "version": "2.0.0",
   "author": {
     "name": "Dwiref Sharma",
-    "email": "DwirefS@SapientEdge.com"
+    "email": "DwirefS@SapientEdge.io"
   },
   "type": "orchestrator",
   "capabilities": [
     "multi-agent-coordination",
-    "workflow-management",
+    "workflow-management", 
     "context-preservation",
-    "error-handling"
+    "error-handling",
+    "comprehensive-anf-api-access",
+    "enterprise-security-compliance",
+    "advanced-analytics",
+    "multi-environment-management",
+    "disaster-recovery-coordination",
+    "backup-vault-management"
   ],
+  "apiCoverage": {
+    "totalOperationGroups": 19,
+    "totalOperations": "200+",
+    "operationGroups": {
+      "1_accounts": {
+        "operations": 10,
+        "endpoints": [
+          "create-or-update", "delete", "get", "list", "update",
+          "change-key-vault", "get-change-key-vault-info", 
+          "renew-credentials", "transition-to-cmk", "list-by-subscription"
+        ]
+      },
+      "2_pools": {
+        "operations": 5,
+        "endpoints": ["create-or-update", "delete", "get", "list", "update"]
+      },
+      "3_volumes": {
+        "operations": 26,
+        "endpoints": [
+          "create-or-update", "delete", "get", "list", "update",
+          "authorize-replication", "break-replication", "delete-replication",
+          "list-replications", "replication-status", "resync-replication",
+          "revert", "pool-change", "relocate", "finalize-relocation",
+          "revert-relocation", "reset-cifs-password", "break-file-locks",
+          "authorize-external-replication", "finalize-external-replication",
+          "peer-external-cluster", "perform-replication-transfer",
+          "reestablish-replication", "re-initialize-replication",
+          "populate-availability-zone", "list-get-group-id-list-for-ldap-user"
+        ]
+      },
+      "4_snapshots": {
+        "operations": 8,
+        "endpoints": [
+          "create", "delete", "get", "list", "update", 
+          "restore-files", "revert-volume", "get-status"
+        ]
+      },
+      "5_backupPolicies": {
+        "operations": 5,
+        "endpoints": ["create", "delete", "get", "list", "update"]
+      },
+      "6_backupVaults": {
+        "operations": 7,
+        "endpoints": [
+          "create-or-update", "delete", "get", "list", "update",
+          "get-backup-status", "migrate-backups"
+        ]
+      },
+      "7_backups": {
+        "operations": 15,
+        "endpoints": [
+          "create", "delete", "get", "list", "update",
+          "get-latest-status", "get-volume-latest-restore-status",
+          "list-by-vault", "restore-files", "get-status",
+          "copy", "validate-restore", "export-metadata",
+          "restore-to-new-volume", "get-restore-status"
+        ]
+      },
+      "8_backupsUnderAccount": {
+        "operations": 9,
+        "endpoints": [
+          "list", "get", "delete", "get-status", "restore",
+          "copy", "update", "get-metrics", "list-dependencies"
+        ]
+      },
+      "9_backupsUnderBackupVault": {
+        "operations": 10,
+        "endpoints": [
+          "list", "get", "create", "delete", "update",
+          "restore", "move", "statistics", "validate-restore", "export-metadata"
+        ]
+      },
+      "10_backupsUnderVolume": {
+        "operations": 10,
+        "endpoints": [
+          "list", "get", "create", "delete", "update",
+          "get-latest-status", "get-configuration", "set-configuration",
+          "disable-backup", "get-history"
+        ]
+      },
+      "11_netAppResource": {
+        "operations": 10,
+        "endpoints": [
+          "check-name-availability", "check-file-path-availability",
+          "list-skus", "get-sku", "validate-network", "precheck",
+          "get-provider-status", "register-provider", "unregister-provider",
+          "get-metadata"
+        ]
+      },
+      "12_netAppResourceQuotaLimits": {
+        "operations": 6,
+        "endpoints": [
+          "list", "get", "check-availability", "usage",
+          "request-increase", "by-resource-type"
+        ]
+      },
+      "13_netAppResourceRegionInfos": {
+        "operations": 9,
+        "endpoints": [
+          "list", "get", "capabilities", "availability-zones",
+          "supported-vm-sizes", "network-features", "service-levels",
+          "protocols", "encryption-types"
+        ]
+      },
+      "14_netAppResourceUsages": {
+        "operations": 9,
+        "endpoints": [
+          "list", "get", "capacity-usage", "performance-usage",
+          "count-usage", "cost-usage", "account-usage",
+          "usage-trends", "export-usage"
+        ]
+      },
+      "15_operations": {
+        "operations": 7,
+        "endpoints": [
+          "list", "get", "by-version", "by-category",
+          "detailed", "search", "analytics"
+        ]
+      },
+      "16_snapshotPolicies": {
+        "operations": 9,
+        "endpoints": [
+          "create", "delete", "get", "list", "update",
+          "list-volumes", "assign-to-volume", "remove-from-volume", "get-status"
+        ]
+      },
+      "17_subvolumes": {
+        "operations": 8,
+        "endpoints": [
+          "create", "delete", "get", "list", "update",
+          "get-metadata", "resize", "change-permissions"
+        ]
+      },
+      "18_volumeGroups": {
+        "operations": 6,
+        "endpoints": [
+          "create", "delete", "get", "list", "update", "get-deployment-spec"
+        ]
+      },
+      "19_volumeQuotaRules": {
+        "operations": 6,
+        "endpoints": [
+          "create", "delete", "get", "list", "update", "get-usage"
+        ]
+      }
+    },
+  },
   "configuration": {
     "timeout": 300000,
     "retryPolicy": {
@@ -25,36 +178,206 @@
   "intents": [
     {
       "name": "CreateStorage",
-      "description": "Create new storage resources",
+      "description": "Create comprehensive storage resources with enterprise features",
       "examples": [
-        "Create a new volume",
-        "Set up a capacity pool",
-        "Provision storage for my application"
+        "Create a new volume with backup policy",
+        "Set up a capacity pool with QoS",
+        "Provision storage for SAP HANA with volume groups",
+        "Create encrypted volume with compliance tracking"
       ],
       "requiredAgents": ["creator", "monitor"],
-      "workflow": "create-storage-workflow"
+      "workflow": "create-storage-workflow",
+      "apiOperations": [
+        "anf_accounts_create_or_update",
+        "anf_pools_create_or_update", 
+        "anf_volumes_create_or_update",
+        "anf_backup_policies_create",
+        "anf_volume_groups_create",
+        "anf_snapshot_policies_create"
+      ],
+      "operationGroups": ["accounts", "pools", "volumes", "backupPolicies", "volumeGroups", "snapshotPolicies"]
+    },
+    {
+      "name": "ManageBackups",
+      "description": "Comprehensive backup and disaster recovery management",
+      "examples": [
+        "Set up backup policies for all volumes",
+        "Create backup vault with retention policies",
+        "Restore files from backup",
+        "Configure cross-region backup replication"
+      ],
+      "requiredAgents": ["creator", "monitor", "modifier"],
+      "workflow": "backup-management-workflow",
+      "apiOperations": [
+        "anf_backup_vaults_create_or_update",
+        "anf_backup_policies_create",
+        "anf_backups_create",
+        "anf_backups_restore_files",
+        "anf_volumes_authorize_replication",
+        "anf_backups_under_account_*",
+        "anf_backups_under_backup_vault_*",
+        "anf_backups_under_volume_*"
+      ],
+      "operationGroups": ["backupVaults", "backupPolicies", "backups", "backupsUnderAccount", "backupsUnderBackupVault", "backupsUnderVolume"]
     },
     {
       "name": "OptimizePerformance",
-      "description": "Optimize storage performance",
+      "description": "Optimize storage performance with advanced features",
       "examples": [
-        "Improve volume performance",
-        "Optimize my storage",
-        "Increase IOPS"
+        "Improve volume performance with tier optimization",
+        "Relocate volumes for better performance",
+        "Optimize QoS policies",
+        "Increase IOPS with service level changes"
       ],
       "requiredAgents": ["monitor", "modifier"],
-      "workflow": "optimize-performance-workflow"
+      "workflow": "optimize-performance-workflow",
+      "apiOperations": [
+        "anf_volumes_relocate",
+        "anf_volumes_finalize_relocation",
+        "anf_volumes_pool_change",
+        "anf_pools_update",
+        "anf_volumes_update",
+        "anf_netapp_resource_performance_usage",
+        "anf_netapp_resource_region_capabilities"
+      ],
+      "operationGroups": ["volumes", "pools", "netAppResourceUsages", "netAppResourceRegionInfos"]
     },
     {
       "name": "ManageCosts",
-      "description": "Optimize storage costs",
+      "description": "Comprehensive cost optimization with intelligent recommendations",
       "examples": [
-        "Reduce storage costs",
-        "Find cost savings",
-        "Optimize spending"
+        "Reduce storage costs with tiering",
+        "Find cost savings opportunities",
+        "Optimize spending with usage analytics",
+        "Right-size capacity pools"
       ],
       "requiredAgents": ["monitor", "modifier", "notifier"],
-      "workflow": "cost-optimization-workflow"
+      "workflow": "cost-optimization-workflow",
+      "apiOperations": [
+        "anf_netapp_resource_usages_list",
+        "anf_pools_update",
+        "anf_volumes_update",
+        "anf_netapp_resource_quota_limits_list",
+        "anf_netapp_resource_cost_usage",
+        "anf_netapp_resource_usage_trends"
+      ],
+      "operationGroups": ["pools", "volumes", "netAppResourceQuotaLimits", "netAppResourceUsages"]
+    },
+    {
+      "name": "ManageReplication",
+      "description": "Cross-region replication and disaster recovery",
+      "examples": [
+        "Set up cross-region replication",
+        "Break replication for DR testing",
+        "Resync replication after issues",
+        "Manage replication relationships"
+      ],
+      "requiredAgents": ["creator", "monitor", "modifier"],
+      "workflow": "replication-management-workflow",
+      "apiOperations": [
+        "anf_volumes_authorize_replication",
+        "anf_volumes_break_replication",
+        "anf_volumes_resync_replication",
+        "anf_volumes_list_replications",
+        "anf_volumes_replication_status"
+      ],
+      "operationGroups": ["volumes"]
+    },
+    {
+      "name": "ManageSnapshots",
+      "description": "Comprehensive snapshot management with policies",
+      "examples": [
+        "Create snapshot policies with schedules",
+        "Take manual snapshots",
+        "Restore from snapshots", 
+        "Manage snapshot retention"
+      ],
+      "requiredAgents": ["creator", "monitor"],
+      "workflow": "snapshot-management-workflow",
+      "apiOperations": [
+        "anf_snapshot_policies_create",
+        "anf_snapshots_create",
+        "anf_volumes_revert",
+        "anf_snapshots_restore_files"
+      ],
+      "operationGroups": ["snapshots", "snapshotPolicies", "volumes"]
+    },
+    {
+      "name": "ManageCompliance",
+      "description": "Security and compliance management",
+      "examples": [
+        "Run security compliance scan",
+        "Manage encryption keys",
+        "Audit access controls",
+        "Generate compliance reports"
+      ],
+      "requiredAgents": ["monitor", "notifier"],
+      "workflow": "compliance-management-workflow",
+      "apiOperations": [
+        "anf_accounts_change_key_vault",
+        "anf_accounts_transition_to_cmk",
+        "anf_accounts_get_change_key_vault_information",
+        "anf_netapp_resource_check_name_availability"
+      ],
+      "operationGroups": ["accounts", "netAppResource"]
+    },
+    {
+      "name": "ManageSubvolumes",
+      "description": "Advanced subvolume management for large-scale deployments",
+      "examples": [
+        "Create subvolumes with quotas",
+        "Manage subvolume permissions",
+        "Set up volume quota rules",
+        "Organize data with subvolume hierarchy"
+      ],
+      "requiredAgents": ["creator", "modifier"],
+      "workflow": "subvolume-management-workflow",
+      "apiOperations": [
+        "anf_subvolumes_create",
+        "anf_subvolumes_update",
+        "anf_volume_quota_rules_create",
+        "anf_volume_quota_rules_update"
+      ],
+      "operationGroups": ["subvolumes", "volumeQuotaRules"]
+    },
+    {
+      "name": "ManageVolumeGroups",
+      "description": "Application-specific volume group management",
+      "examples": [
+        "Create SAP HANA volume group",
+        "Set up Oracle database volumes",
+        "Deploy SQL Server volume configuration",
+        "Manage application-specific storage layouts"
+      ],
+      "requiredAgents": ["creator", "monitor"],
+      "workflow": "volume-group-management-workflow",
+      "apiOperations": [
+        "anf_volume_groups_create",
+        "anf_volume_groups_get",
+        "anf_volume_groups_list"
+      ],
+      "operationGroups": ["volumeGroups"]
+    },
+    {
+      "name": "TroubleshootIssues",
+      "description": "Comprehensive troubleshooting and maintenance",
+      "examples": [
+        "Break file locks on volumes",
+        "Reset CIFS passwords",
+        "Troubleshoot replication issues",
+        "Resolve performance problems"
+      ],
+      "requiredAgents": ["monitor", "modifier", "notifier"],
+      "workflow": "troubleshooting-workflow",
+      "apiOperations": [
+        "anf_volumes_break_file_locks",
+        "anf_volumes_reset_cifs_password",
+        "anf_volumes_replication_status",
+        "anf_accounts_renew_credentials",
+        "anf_operations_list",
+        "anf_operations_get"
+      ],
+      "operationGroups": ["volumes", "accounts", "operations"]
     }
   ],
   "workflows": {

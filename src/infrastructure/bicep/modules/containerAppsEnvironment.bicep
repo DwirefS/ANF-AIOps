@@ -1,5 +1,5 @@
 // Container Apps Environment Module
-// Author: Dwiref Sharma <DwirefS@SapientEdge.com>
+// Author: Dwiref Sharma <DwirefS@SapientEdge.io>
 
 param environmentName string
 param location string
