@@ -3,7 +3,7 @@
 **The world's most comprehensive and intelligent Azure NetApp Files management platform that combines human expertise with AI automation while maintaining the highest standards of security, compliance, and operational excellence.**
 
 ## Author
-**Dwiref Sharma** - DwirefS@SapientEdge.io
+**Dwiref Sharma** 
 
 ## Vision Statement
 
@@ -790,7 +790,7 @@ az bicep build --file main.bicep  # Validate templates
 ## Enterprise Support and Services
 
 ### 🆘 **Support Channels**
-- **Technical Support**: DwirefS@SapientEdge.io
+- **Technical Support**: 
 - **Documentation Issues**: Create GitHub issue with documentation label
 - **Feature Requests**: Submit detailed feature request via GitHub
 - **Security Concerns**: Contact security team directly for immediate response
