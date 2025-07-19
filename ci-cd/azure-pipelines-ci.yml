@@ -1,0 +1,353 @@
+# Azure Pipelines CI Configuration
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+      - feature/*
+  paths:
+    exclude:
+      - docs/*
+      - '*.md'
+      - LICENSE
+
+pr:
+  branches:
+    include:
+      - main
+      - develop
+
+variables:
+  - group: anf-aiops-ci
+  - name: buildConfiguration
+    value: 'Release'
+  - name: dotnetVersion
+    value: '8.0.x'
+  - name: nodeVersion
+    value: '18.x'
+  - name: azureFunctionPath
+    value: '$(System.DefaultWorkingDirectory)/functions/ANFServer'
+  - name: vmImage
+    value: 'ubuntu-latest'
+
+stages:
+  - stage: Build
+    displayName: 'Build and Test'
+    jobs:
+      - job: BuildFunctions
+        displayName: 'Build Azure Functions'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Setup .NET SDK'
+            inputs:
+              version: $(dotnetVersion)
+              packageType: sdk
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore NuGet packages'
+            inputs:
+              command: 'restore'
+              projects: '$(azureFunctionPath)/*.csproj'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build Functions'
+            inputs:
+              command: 'build'
+              projects: '$(azureFunctionPath)/*.csproj'
+              arguments: '--configuration $(buildConfiguration) --no-restore'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Run Unit Tests'
+            inputs:
+              command: 'test'
+              projects: '$(azureFunctionPath)/**/*Tests.csproj'
+              arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage" --settings $(azureFunctionPath)/coverlet.runsettings'
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 'Publish Code Coverage'
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: '$(Agent.TempDirectory)/**/coverage.cobertura.xml'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish Functions'
+            inputs:
+              command: 'publish'
+              publishWebProjects: false
+              projects: '$(azureFunctionPath)/*.csproj'
+              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/functions'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Functions Artifact'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/functions'
+              ArtifactName: 'functions-drop'
+
+      - job: BuildTypeScript
+        displayName: 'Build TypeScript Projects'
+        pool:
+          vmImage: $(vmImage)
+        strategy:
+          matrix:
+            RAG:
+              projectName: 'rag'
+              projectPath: 'rag'
+            MCPServer:
+              projectName: 'mcp-server'
+              projectPath: 'src/mcp-server'
+            TeamsBot:
+              projectName: 'teams-bot'
+              projectPath: 'src/teams-bot'
+        steps:
+          - task: NodeTool@0
+            displayName: 'Setup Node.js'
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - task: Cache@2
+            displayName: 'Cache npm packages'
+            inputs:
+              key: 'npm | "$(Agent.OS)" | $(projectPath)/package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(projectPath)/node_modules
+
+          - script: |
+              cd $(projectPath)
+              npm ci
+            displayName: 'Install dependencies'
+
+          - script: |
+              cd $(projectPath)
+              npm run lint || true
+            displayName: 'Run linting'
+
+          - script: |
+              cd $(projectPath)
+              npm test -- --coverage || true
+            displayName: 'Run tests'
+
+          - script: |
+              cd $(projectPath)
+              npm run build
+            displayName: 'Build project'
+
+          - task: PublishTestResults@2
+            displayName: 'Publish test results'
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '$(projectPath)/junit.xml'
+              failTaskOnFailedTests: false
+
+          - task: PublishCodeCoverageResults@1
+            displayName: 'Publish code coverage'
+            inputs:
+              codeCoverageTool: 'Cobertura'
+              summaryFileLocation: '$(projectPath)/coverage/cobertura-coverage.xml'
+
+          - task: CopyFiles@2
+            displayName: 'Copy build output'
+            inputs:
+              SourceFolder: '$(projectPath)/dist'
+              Contents: '**'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)/$(projectName)'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish build artifact'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(projectName)'
+              ArtifactName: '$(projectName)-drop'
+
+      - job: ValidateInfrastructure
+        displayName: 'Validate Infrastructure'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: TerraformInstaller@0
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: '1.5.7'
+
+          - script: |
+              cd infra
+              terraform fmt -check -recursive
+            displayName: 'Check Terraform formatting'
+
+          - script: |
+              cd infra
+              terraform init -backend=false
+            displayName: 'Initialize Terraform'
+
+          - script: |
+              cd infra
+              terraform validate
+            displayName: 'Validate Terraform'
+
+          - task: AzureCLI@2
+            displayName: 'Validate Bicep templates'
+            inputs:
+              azureSubscription: 'ANF-AIOps-ServiceConnection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                cd src/infrastructure/bicep
+                for file in $(find . -name "*.bicep"); do
+                  echo "Validating $file"
+                  az bicep build --file "$file"
+                done
+
+  - stage: SecurityScan
+    displayName: 'Security Scanning'
+    dependsOn: Build
+    jobs:
+      - job: SecurityAnalysis
+        displayName: 'Run Security Scans'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: CredScan@3
+            displayName: 'Run Credential Scanner'
+
+          - task: SdtReport@2
+            displayName: 'Create Security Report'
+            inputs:
+              GdnExportAllTools: true
+
+          - task: PublishSecurityAnalysisLogs@3
+            displayName: 'Publish Security Logs'
+            inputs:
+              ArtifactName: 'CodeAnalysisLogs'
+              ArtifactType: 'Container'
+
+          - task: PostAnalysis@2
+            displayName: 'Security Analysis Results'
+            inputs:
+              GdnBreakAllTools: false
+              GdnBreakGdnToolCredScan: true
+
+      - job: DependencyCheck
+        displayName: 'Dependency Vulnerability Check'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: dependency-check-build-task@6
+            displayName: 'OWASP Dependency Check'
+            inputs:
+              projectName: 'ANF-AIOps'
+              scanPath: '$(Build.SourcesDirectory)'
+              format: 'ALL'
+              failOnCVSS: '7'
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Dependency Check Results'
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/dependency-check-junit.xml'
+              testRunTitle: 'Dependency Check Results'
+
+  - stage: QualityGates
+    displayName: 'Quality Gates'
+    dependsOn: 
+      - Build
+      - SecurityScan
+    jobs:
+      - job: SonarQube
+        displayName: 'SonarQube Analysis'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: SonarQubePrepare@5
+            displayName: 'Prepare SonarQube analysis'
+            inputs:
+              SonarQube: 'SonarQube-ServiceConnection'
+              scannerMode: 'MSBuild'
+              projectKey: 'anf-aiops'
+              projectName: 'ANF-AIOps'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build for SonarQube'
+            inputs:
+              command: 'build'
+              projects: '**/*.csproj'
+
+          - task: SonarQubeAnalyze@5
+            displayName: 'Run SonarQube analysis'
+
+          - task: SonarQubePublish@5
+            displayName: 'Publish SonarQube results'
+            inputs:
+              pollingTimeoutSec: '300'
+
+      - job: QualityCheck
+        displayName: 'Quality Validation'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - script: |
+              echo "Checking build quality gates..."
+              # Add custom quality checks here
+            displayName: 'Custom Quality Checks'
+
+  - stage: Package
+    displayName: 'Package Artifacts'
+    dependsOn: QualityGates
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranch'], 'refs/heads/develop')))
+    jobs:
+      - job: CreatePackages
+        displayName: 'Create Deployment Packages'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download all artifacts'
+            inputs:
+              buildType: 'current'
+              downloadType: 'all'
+              downloadPath: '$(Build.ArtifactStagingDirectory)'
+
+          - task: ArchiveFiles@2
+            displayName: 'Create Functions package'
+            inputs:
+              rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/functions-drop'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/packages/functions-$(Build.BuildNumber).zip'
+
+          - task: ArchiveFiles@2
+            displayName: 'Create MCP Server package'
+            inputs:
+              rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/mcp-server-drop'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/packages/mcp-server-$(Build.BuildNumber).zip'
+
+          - task: ArchiveFiles@2
+            displayName: 'Create Teams Bot package'
+            inputs:
+              rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/teams-bot-drop'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/packages/teams-bot-$(Build.BuildNumber).zip'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish deployment packages'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/packages'
+              ArtifactName: 'deployment-packages'
+
+      - job: TagRepository
+        displayName: 'Tag Repository'
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - script: |
+              git config user.email "azure-pipelines@sapientedge.io"
+              git config user.name "Azure Pipelines"
+              git tag -a "build-$(Build.BuildNumber)" -m "Build $(Build.BuildNumber)"
+              git push origin "build-$(Build.BuildNumber)"
+            displayName: 'Create Git tag'

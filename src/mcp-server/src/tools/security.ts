@@ -1,3 +1,82 @@
+/**
+ * Azure NetApp Files Security and Compliance Management Tools
+ * 
+ * This module provides comprehensive security, compliance, and governance capabilities
+ * for Azure NetApp Files infrastructure. It includes audit logging, compliance checking,
+ * encryption management, access reviews, and vulnerability assessments.
+ * 
+ * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+ * 
+ * Security Features:
+ * - Comprehensive audit logging and forensic analysis
+ * - Real-time compliance monitoring against industry standards
+ * - Encryption status tracking (at-rest and in-transit)
+ * - Role-based access control (RBAC) reviews and recommendations
+ * - Vulnerability scanning and security posture assessment
+ * - Zero-trust security validation and monitoring
+ * - Automated security incident detection and response
+ * 
+ * Compliance Frameworks:
+ * - SOC 2 Type II compliance monitoring
+ * - HIPAA (Health Insurance Portability and Accountability Act)
+ * - ISO 27001 Information Security Management
+ * - PCI DSS (Payment Card Industry Data Security Standard)
+ * - GDPR (General Data Protection Regulation)
+ * - Custom organizational security policies
+ * 
+ * Audit and Governance:
+ * - Comprehensive activity logging and retention
+ * - Data access and modification tracking
+ * - Privileged operation monitoring
+ * - Automated compliance reporting
+ * - Security metrics and KPI tracking
+ * - Regulatory requirement mapping
+ * 
+ * Security Monitoring:
+ * - Real-time threat detection and alerting
+ * - Anomaly detection for unusual access patterns
+ * - Failed authentication attempt tracking
+ * - Data exfiltration monitoring
+ * - Insider threat detection
+ * - Security baseline drift detection
+ * 
+ * Usage Examples:
+ * ```typescript
+ * // Retrieve comprehensive audit logs
+ * const auditLogs = await getAuditLogs({
+ *   resourceGroup: 'rg-netapp-prod',
+ *   startTime: 'PT24H',
+ *   severity: 'Critical',
+ *   operation: 'Delete'
+ * });
+ * 
+ * // Perform compliance assessment
+ * const compliance = await checkCompliance({
+ *   resourceGroup: 'rg-netapp-prod',
+ *   policySetName: 'SOC2-Compliance',
+ *   includeDetails: true
+ * });
+ * 
+ * // Validate encryption configuration
+ * const encryption = await checkEncryptionStatus({
+ *   resourceId: '/subscriptions/.../netAppAccounts/account1'
+ * });
+ * 
+ * // Review access permissions
+ * const accessReview = await performAccessReview({
+ *   resourceGroup: 'rg-netapp-prod',
+ *   includeServicePrincipals: true
+ * });
+ * 
+ * // Security vulnerability assessment
+ * const vulnScan = await performVulnerabilityScan({
+ *   resourceGroup: 'rg-netapp-prod',
+ *   scanType: 'Full',
+ *   includeRecommendations: true
+ * });
+ * ```
+ */
+
 import { z } from 'zod';
 import { Tool } from '../types/tool.js';
 import { logger } from '../utils/logger.js';
@@ -5,46 +84,168 @@ import { LogsQueryClient } from '@azure/monitor-query';
 import { PolicyClient } from '@azure/arm-policy';
 import { KeyVaultSecretsClient } from '@azure/keyvault-secrets';
 
-// Audit log schema
+/**
+ * Zod schema for audit log retrieval with comprehensive filtering
+ * 
+ * Validates parameters for retrieving security audit logs including time ranges,
+ * operation filtering, user tracking, and severity-based filtering for forensic analysis.
+ */
 const auditLogSchema = z.object({
-  resourceGroup: z.string().min(1),
-  startTime: z.string().optional().default('PT24H'), // Default last 24 hours
-  resourceId: z.string().optional(),
-  operation: z.string().optional(),
-  user: z.string().optional(),
-  severity: z.enum(['Critical', 'Error', 'Warning', 'Informational']).optional(),
+  /** Azure resource group name for audit log scope */
+  resourceGroup: z.string()
+    .min(1, 'Resource group name is required')
+    .max(90, 'Resource group name must be 90 characters or less')
+    .regex(/^[a-zA-Z0-9-_.()]+$/, 'Invalid resource group name format'),
+  
+  /** Time range for audit log retrieval using ISO 8601 duration format (PT24H = 24 hours, P7D = 7 days) */
+  startTime: z.string()
+    .optional()
+    .default('PT24H')
+    .regex(/^P(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+S)?)?$/, 'Invalid ISO 8601 duration format'),
+  
+  /** Filter by specific Azure resource ID for targeted audit analysis */
+  resourceId: z.string()
+    .optional()
+    .regex(/^\/subscriptions\/[^\/]+\/resourceGroups\/[^\/]+\/providers\/Microsoft\.NetApp\//, 
+      'Invalid NetApp resource ID format'),
+  
+  /** Filter by specific operation type (e.g., 'Delete', 'Create', 'Update', 'Write') */
+  operation: z.string()
+    .optional()
+    .min(1, 'Operation filter cannot be empty'),
+  
+  /** Filter by user principal name or service principal for accountability tracking */
+  user: z.string()
+    .optional()
+    .min(1, 'User filter cannot be empty'),
+  
+  /** Filter by event severity level for prioritized security analysis */
+  severity: z.enum(['Critical', 'Error', 'Warning', 'Informational'], {
+    errorMap: () => ({ message: 'Severity must be Critical, Error, Warning, or Informational' })
+  }).optional(),
 });
 
-// Compliance check schema
+/**
+ * Zod schema for compliance assessment and policy validation
+ * 
+ * Validates parameters for comprehensive compliance checking against organizational
+ * and regulatory policies including SOC2, HIPAA, ISO27001, and custom frameworks.
+ */
 const complianceCheckSchema = z.object({
-  resourceGroup: z.string().min(1),
-  policySetName: z.string().optional(),
-  includeDetails: z.boolean().optional().default(true),
+  /** Azure resource group name for compliance assessment scope */
+  resourceGroup: z.string()
+    .min(1, 'Resource group name is required')
+    .max(90, 'Resource group name must be 90 characters or less'),
+  
+  /** Specific policy set or initiative name for targeted compliance checking */
+  policySetName: z.string()
+    .optional()
+    .min(1, 'Policy set name cannot be empty'),
+  
+  /** Include detailed compliance results and remediation guidance */
+  includeDetails: z.boolean()
+    .optional()
+    .default(true),
 });
 
-// Encryption status schema
+/**
+ * Zod schema for encryption status validation
+ * 
+ * Validates parameters for comprehensive encryption assessment including
+ * data-at-rest, data-in-transit, and key management configuration analysis.
+ */
 const encryptionStatusSchema = z.object({
-  resourceId: z.string().min(1),
+  /** Full Azure resource ID for encryption status assessment */
+  resourceId: z.string()
+    .min(1, 'Resource ID is required')
+    .regex(/^\/subscriptions\/[^\/]+\/resourceGroups\/[^\/]+\/providers\/Microsoft\.NetApp\//, 
+      'Invalid NetApp resource ID format'),
 });
 
-// Access review schema
+/**
+ * Zod schema for access control review and RBAC analysis
+ * 
+ * Validates parameters for comprehensive access review including user permissions,
+ * service principal analysis, and inherited permission evaluation.
+ */
 const accessReviewSchema = z.object({
-  resourceGroup: z.string().min(1),
-  includeServicePrincipals: z.boolean().optional().default(true),
-  includeInheritedPermissions: z.boolean().optional().default(true),
+  /** Azure resource group name for access review scope */
+  resourceGroup: z.string()
+    .min(1, 'Resource group name is required')
+    .max(90, 'Resource group name must be 90 characters or less'),
+  
+  /** Include service principals and application identities in access review */
+  includeServicePrincipals: z.boolean()
+    .optional()
+    .default(true),
+  
+  /** Include permissions inherited from parent scopes (subscription, management group) */
+  includeInheritedPermissions: z.boolean()
+    .optional()
+    .default(true),
 });
 
-// Vulnerability scan schema
+/**
+ * Zod schema for security vulnerability assessment
+ * 
+ * Validates parameters for comprehensive security scanning including configuration
+ * assessment, threat detection, and security posture evaluation.
+ */
 const vulnerabilityScanSchema = z.object({
-  resourceGroup: z.string().min(1),
-  scanType: z.enum(['Quick', 'Full', 'Custom']).optional().default('Quick'),
-  includeRecommendations: z.boolean().optional().default(true),
+  /** Azure resource group name for vulnerability assessment scope */
+  resourceGroup: z.string()
+    .min(1, 'Resource group name is required')
+    .max(90, 'Resource group name must be 90 characters or less'),
+  
+  /** Type of vulnerability scan to perform */
+  scanType: z.enum(['Quick', 'Full', 'Custom'], {
+    errorMap: () => ({ message: 'Scan type must be Quick (basic checks), Full (comprehensive), or Custom (configurable)' })
+  }).optional().default('Quick'),
+  
+  /** Include detailed remediation recommendations and implementation guidance */
+  includeRecommendations: z.boolean()
+    .optional()
+    .default(true),
 });
 
+/**
+ * Azure NetApp Files Security and Compliance Management Tools
+ * 
+ * Enterprise-grade security tool collection providing comprehensive security monitoring,
+ * compliance assessment, threat detection, and governance capabilities.
+ */
 export const securityTools: Tool[] = [
   {
     name: 'anf_audit_logs',
-    description: 'Retrieve security audit logs for ANF operations',
+    description: `Retrieve comprehensive security audit logs for Azure NetApp Files operations.
+    
+    Features:
+    - Complete activity logging with forensic-level detail
+    - Security event correlation and analysis
+    - Failed operation detection and alerting
+    - User accountability and access tracking
+    - Privileged operation monitoring
+    - Data access and modification logging
+    - Regulatory compliance audit trails
+    
+    Audit Capabilities:
+    - Administrative operations (Create, Update, Delete)
+    - Data access and file system operations
+    - Authentication and authorization events
+    - Configuration changes and policy modifications
+    - Network access and connection attempts
+    - Backup and recovery operations
+    
+    Compliance Support:
+    - SOC 2 Type II audit requirements
+    - HIPAA access logging and accountability
+    - ISO 27001 security event monitoring
+    - PCI DSS data access tracking
+    - GDPR data processing activity logs
+    
+    Security: All audit operations are authenticated and logged for compliance
+    RBAC: Requires 'Security Reader' or 'Log Analytics Reader' role
+    Retention: Audit logs are retained per organizational retention policies`,
     inputSchema: {
       type: 'object',
       properties: {

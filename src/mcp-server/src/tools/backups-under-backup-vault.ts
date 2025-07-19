@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Backups Under Backup Vault operations
 const BackupsUnderBackupVaultCommonSchemas = {
@@ -189,52 +190,132 @@ export const backupsUnderBackupVaultTools: Tool[] = [
   {
     name: 'anf_backups_under_backup_vault_list',
     description: 'List all backups within a specific backup vault with filtering options',
-    inputSchema: BackupsUnderBackupVaultListSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_get',
     description: 'Get detailed information about a specific backup in a backup vault',
-    inputSchema: BackupsUnderBackupVaultGetSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_create',
     description: 'Create a manual backup in a backup vault from a volume',
-    inputSchema: BackupsUnderBackupVaultCreateSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_delete',
     description: 'Delete a backup from a backup vault permanently',
-    inputSchema: BackupsUnderBackupVaultDeleteSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_update',
     description: 'Update backup metadata and properties in a backup vault',
-    inputSchema: BackupsUnderBackupVaultUpdateSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_restore',
     description: 'Restore data from a backup in a backup vault to a volume',
-    inputSchema: BackupsUnderBackupVaultRestoreSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultRestoreSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_restore is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_move',
     description: 'Move a backup between backup vaults within the same account',
-    inputSchema: BackupsUnderBackupVaultMoveSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultMoveSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_move is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_statistics',
     description: 'Get statistical information about backups in a backup vault',
-    inputSchema: BackupsUnderBackupVaultStatisticsSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultStatisticsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_statistics is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_validate_restore',
     description: 'Validate if a backup can be restored to a specific target',
-    inputSchema: BackupsUnderBackupVaultValidateRestoreSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultValidateRestoreSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_validate_restore is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_backup_vault_export_metadata',
     description: 'Export backup metadata from vault in various formats',
-    inputSchema: BackupsUnderBackupVaultExportMetadataSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultExportMetadataSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_export_metadata is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

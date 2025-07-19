@@ -27,7 +27,7 @@ export class AuthService {
     private msalClient: ConfidentialClientApplication;
     private logger = LoggingService.getInstance();
 
-    constructor(private config: BotConfiguration) {
+    constructor(config: BotConfiguration) {
         this.msalClient = new ConfidentialClientApplication({
             auth: {
                 clientId: config.clientId,
@@ -119,7 +119,7 @@ export class AuthService {
         }
     }
 
-    private async getUserRoles(userId: string, tenantId: string): Promise<string[]> {
+    private async getUserRoles(userId: string, _tenantId: string): Promise<string[]> {
         try {
             // In a real implementation, this would query Microsoft Graph API
             // For now, we'll implement a basic role assignment based on user ID
@@ -186,7 +186,7 @@ export class AuthService {
         return [...new Set(permissions)]; // Remove duplicates
     }
 
-    private getRequiredPermissions(action: string, resource?: string): string[] {
+    private getRequiredPermissions(action: string, _resource?: string): string[] {
         const permissionMap: Record<string, string[]> = {
             'volume:list': ['anf:read'],
             'volume:get': ['anf:read'],

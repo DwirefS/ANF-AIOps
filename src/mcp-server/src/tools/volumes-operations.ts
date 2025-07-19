@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Volumes operations
 const VolumesCommonSchemas = {
@@ -464,132 +465,340 @@ export const volumesOperationsTools: Tool[] = [
   {
     name: 'anf_volumes_create_or_update',
     description: 'Create or update a volume with comprehensive configuration options',
-    inputSchema: VolumesCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(VolumesCreateOrUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_delete',
     description: 'Delete a volume from the capacity pool',
-    inputSchema: VolumesDeleteSchema
+    inputSchema: wrapZodSchema(VolumesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_get',
     description: 'Get detailed information about a specific volume',
-    inputSchema: VolumesGetSchema
+    inputSchema: wrapZodSchema(VolumesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_list',
     description: 'List all volumes in a capacity pool',
-    inputSchema: VolumesListSchema
+    inputSchema: wrapZodSchema(VolumesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_update',
     description: 'Update volume properties including size and export policies',
-    inputSchema: VolumesUpdateSchema
+    inputSchema: wrapZodSchema(VolumesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_authorize_replication',
     description: 'Authorize replication for cross-region data protection',
-    inputSchema: VolumesAuthorizeReplicationSchema
+    inputSchema: wrapZodSchema(VolumesAuthorizeReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_authorize_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_break_replication',
     description: 'Break replication relationship for disaster recovery testing',
-    inputSchema: VolumesBreakReplicationSchema
+    inputSchema: wrapZodSchema(VolumesBreakReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_break_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_delete_replication',
     description: 'Delete replication configuration from volume',
-    inputSchema: VolumesDeleteReplicationSchema
+    inputSchema: wrapZodSchema(VolumesDeleteReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_delete_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_list_replications',
     description: 'List all replication relationships for a volume',
-    inputSchema: VolumesListReplicationsSchema
+    inputSchema: wrapZodSchema(VolumesListReplicationsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_list_replications is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_replication_status',
     description: 'Get current replication status and health',
-    inputSchema: VolumesReplicationStatusSchema
+    inputSchema: wrapZodSchema(VolumesReplicationStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_replication_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_resync_replication',
     description: 'Resynchronize replication after break operation',
-    inputSchema: VolumesResyncReplicationSchema
+    inputSchema: wrapZodSchema(VolumesResyncReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_resync_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_revert',
     description: 'Revert volume to a specific snapshot',
-    inputSchema: VolumesRevertSchema
+    inputSchema: wrapZodSchema(VolumesRevertSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_revert is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_pool_change',
     description: 'Move volume to a different capacity pool',
-    inputSchema: VolumesPoolChangeSchema
+    inputSchema: wrapZodSchema(VolumesPoolChangeSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_pool_change is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_relocate',
     description: 'Relocate volume to optimize performance',
-    inputSchema: VolumesRelocateSchema
+    inputSchema: wrapZodSchema(VolumesRelocateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_relocate is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_finalize_relocation',
     description: 'Finalize volume relocation process',
-    inputSchema: VolumesFinalizeRelocationSchema
+    inputSchema: wrapZodSchema(VolumesFinalizeRelocationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_finalize_relocation is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_revert_relocation',
     description: 'Revert volume relocation if issues occur',
-    inputSchema: VolumesRevertRelocationSchema
+    inputSchema: wrapZodSchema(VolumesRevertRelocationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_revert_relocation is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_reset_cifs_password',
     description: 'Reset CIFS password for SMB access',
-    inputSchema: VolumesResetCifsPasswordSchema
+    inputSchema: wrapZodSchema(VolumesResetCifsPasswordSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_reset_cifs_password is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_break_file_locks',
     description: 'Break file locks to resolve access issues',
-    inputSchema: VolumesBreakFileLocksSchema
+    inputSchema: wrapZodSchema(VolumesBreakFileLocksSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_break_file_locks is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_get_backup_status',
     description: 'Get current backup status for volume',
-    inputSchema: VolumesGetBackupStatusSchema
+    inputSchema: wrapZodSchema(VolumesGetBackupStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_get_backup_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_get_restore_status',
     description: 'Get current restore operation status',
-    inputSchema: VolumesGetRestoreStatusSchema
+    inputSchema: wrapZodSchema(VolumesGetRestoreStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_get_restore_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_populate_availability_zone',
     description: 'Populate availability zone information for volume',
-    inputSchema: VolumesPopulateAvailabilityZoneSchema
+    inputSchema: wrapZodSchema(VolumesPopulateAvailabilityZoneSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_populate_availability_zone is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_list_get_group_id_list_for_ldap_user',
     description: 'Get LDAP user group IDs for access control',
-    inputSchema: VolumesListGetGroupIdListForLdapUserSchema
+    inputSchema: wrapZodSchema(VolumesListGetGroupIdListForLdapUserSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_list_get_group_id_list_for_ldap_user is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_authorize_external_replication',
     description: 'Authorize external cluster replication',
-    inputSchema: VolumesAuthorizeExternalReplicationSchema
+    inputSchema: wrapZodSchema(VolumesAuthorizeExternalReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_authorize_external_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_finalize_external_replication',
     description: 'Finalize external replication setup',
-    inputSchema: VolumesFinalizeExternalReplicationSchema
+    inputSchema: wrapZodSchema(VolumesFinalizeExternalReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_finalize_external_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_peer_external_cluster',
     description: 'Establish peering with external NetApp cluster',
-    inputSchema: VolumesPeerExternalClusterSchema
+    inputSchema: wrapZodSchema(VolumesPeerExternalClusterSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_peer_external_cluster is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_re_initialize_replication',
     description: 'Re-initialize replication after major changes',
-    inputSchema: VolumesReInitializeReplicationSchema
+    inputSchema: wrapZodSchema(VolumesReInitializeReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_re_initialize_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

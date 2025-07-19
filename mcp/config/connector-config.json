@@ -1,0 +1,528 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Azure NetApp Files MCP Connector Configuration",
+  "description": "Environment configuration for Azure NetApp Files Microsoft Copilot Connector across different deployment stages",
+  "version": "1.0.0",
+  "author": "Dwiref Sharma <DwirefS@SapientEdge.io>",
+  "environments": {
+    "development": {
+      "name": "Development Environment",
+      "description": "Development environment for testing ANF AI-Ops connector",
+      "azure": {
+        "subscriptionId": "dev-subscription-id",
+        "tenantId": "your-tenant-id",
+        "location": "eastus",
+        "resourceGroup": "rg-anf-dev",
+        "environment": "dev"
+      },
+      "connector": {
+        "clientId": "dev-client-id",
+        "clientSecret": "dev-client-secret",
+        "redirectUri": "https://dev-anf-aiops.azurewebsites.net/auth/callback",
+        "baseUrl": "https://management.azure.com",
+        "apiVersion": "2025-03-01"
+      },
+      "endpoints": {
+        "apiManagement": "https://anf-apim-dev.azure-api.net",
+        "functionApp": "https://anf-functions-dev.azurewebsites.net",
+        "storageAccount": "anfstoragedev",
+        "keyVault": "https://anf-keyvault-dev.vault.azure.net",
+        "logAnalytics": "anf-logs-dev",
+        "applicationInsights": "anf-appinsights-dev"
+      },
+      "features": {
+        "debugMode": true,
+        "verboseLogging": true,
+        "rateLimiting": {
+          "enabled": true,
+          "requestsPerMinute": 100,
+          "burstAllowance": 20
+        },
+        "caching": {
+          "enabled": false,
+          "ttlSeconds": 300
+        },
+        "monitoring": {
+          "enabled": true,
+          "metricsLevel": "verbose",
+          "alerting": false
+        }
+      },
+      "security": {
+        "encryption": {
+          "inTransit": "TLS1.2",
+          "atRest": "AES256"
+        },
+        "authentication": {
+          "requireMFA": false,
+          "sessionTimeout": 3600
+        },
+        "ipWhitelist": {
+          "enabled": false,
+          "ranges": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+        }
+      },
+      "tags": {
+        "environment": "development",
+        "owner": "anf-aiops-team",
+        "purpose": "testing",
+        "costCenter": "development",
+        "project": "anf-aiops"
+      }
+    },
+    "testing": {
+      "name": "Testing Environment",
+      "description": "Testing environment for ANF AI-Ops connector validation",
+      "azure": {
+        "subscriptionId": "test-subscription-id",
+        "tenantId": "your-tenant-id", 
+        "location": "eastus2",
+        "resourceGroup": "rg-anf-test",
+        "environment": "test"
+      },
+      "connector": {
+        "clientId": "test-client-id",
+        "clientSecret": "test-client-secret",
+        "redirectUri": "https://test-anf-aiops.azurewebsites.net/auth/callback",
+        "baseUrl": "https://management.azure.com",
+        "apiVersion": "2025-03-01"
+      },
+      "endpoints": {
+        "apiManagement": "https://anf-apim-test.azure-api.net",
+        "functionApp": "https://anf-functions-test.azurewebsites.net",
+        "storageAccount": "anfstoragetest",
+        "keyVault": "https://anf-keyvault-test.vault.azure.net",
+        "logAnalytics": "anf-logs-test",
+        "applicationInsights": "anf-appinsights-test"
+      },
+      "features": {
+        "debugMode": false,
+        "verboseLogging": false,
+        "rateLimiting": {
+          "enabled": true,
+          "requestsPerMinute": 500,
+          "burstAllowance": 50
+        },
+        "caching": {
+          "enabled": true,
+          "ttlSeconds": 600
+        },
+        "monitoring": {
+          "enabled": true,
+          "metricsLevel": "standard",
+          "alerting": true
+        }
+      },
+      "security": {
+        "encryption": {
+          "inTransit": "TLS1.3",
+          "atRest": "AES256"
+        },
+        "authentication": {
+          "requireMFA": true,
+          "sessionTimeout": 1800
+        },
+        "ipWhitelist": {
+          "enabled": true,
+          "ranges": ["10.0.0.0/8", "172.16.0.0/12"]
+        }
+      },
+      "tags": {
+        "environment": "testing",
+        "owner": "anf-aiops-team",
+        "purpose": "validation",
+        "costCenter": "testing",
+        "project": "anf-aiops"
+      }
+    },
+    "staging": {
+      "name": "Staging Environment",
+      "description": "Pre-production staging environment for ANF AI-Ops connector",
+      "azure": {
+        "subscriptionId": "staging-subscription-id",
+        "tenantId": "your-tenant-id",
+        "location": "westus2",
+        "resourceGroup": "rg-anf-staging",
+        "environment": "staging"
+      },
+      "connector": {
+        "clientId": "staging-client-id",
+        "clientSecret": "staging-client-secret",
+        "redirectUri": "https://staging-anf-aiops.azurewebsites.net/auth/callback",
+        "baseUrl": "https://management.azure.com",
+        "apiVersion": "2025-03-01"
+      },
+      "endpoints": {
+        "apiManagement": "https://anf-apim-staging.azure-api.net",
+        "functionApp": "https://anf-functions-staging.azurewebsites.net",
+        "storageAccount": "anfstoragestaging",
+        "keyVault": "https://anf-keyvault-staging.vault.azure.net",
+        "logAnalytics": "anf-logs-staging",
+        "applicationInsights": "anf-appinsights-staging"
+      },
+      "features": {
+        "debugMode": false,
+        "verboseLogging": false,
+        "rateLimiting": {
+          "enabled": true,
+          "requestsPerMinute": 1000,
+          "burstAllowance": 100
+        },
+        "caching": {
+          "enabled": true,
+          "ttlSeconds": 1200
+        },
+        "monitoring": {
+          "enabled": true,
+          "metricsLevel": "standard",
+          "alerting": true
+        }
+      },
+      "security": {
+        "encryption": {
+          "inTransit": "TLS1.3",
+          "atRest": "AES256"
+        },
+        "authentication": {
+          "requireMFA": true,
+          "sessionTimeout": 1800
+        },
+        "ipWhitelist": {
+          "enabled": true,
+          "ranges": ["10.0.0.0/8", "172.16.0.0/12"]
+        }
+      },
+      "tags": {
+        "environment": "staging",
+        "owner": "anf-aiops-team",
+        "purpose": "pre-production",
+        "costCenter": "staging",
+        "project": "anf-aiops"
+      }
+    },
+    "production": {
+      "name": "Production Environment",
+      "description": "Production environment for ANF AI-Ops connector",
+      "azure": {
+        "subscriptionId": "prod-subscription-id",
+        "tenantId": "your-tenant-id",
+        "location": "eastus",
+        "resourceGroup": "rg-anf-prod",
+        "environment": "prod"
+      },
+      "connector": {
+        "clientId": "prod-client-id",
+        "clientSecret": "prod-client-secret",
+        "redirectUri": "https://anf-aiops.azurewebsites.net/auth/callback",
+        "baseUrl": "https://management.azure.com",
+        "apiVersion": "2025-03-01"
+      },
+      "endpoints": {
+        "apiManagement": "https://anf-apim-prod.azure-api.net",
+        "functionApp": "https://anf-functions-prod.azurewebsites.net",
+        "storageAccount": "anfstorageprod",
+        "keyVault": "https://anf-keyvault-prod.vault.azure.net",
+        "logAnalytics": "anf-logs-prod",
+        "applicationInsights": "anf-appinsights-prod"
+      },
+      "features": {
+        "debugMode": false,
+        "verboseLogging": false,
+        "rateLimiting": {
+          "enabled": true,
+          "requestsPerMinute": 10000,
+          "burstAllowance": 1000
+        },
+        "caching": {
+          "enabled": true,
+          "ttlSeconds": 1800
+        },
+        "monitoring": {
+          "enabled": true,
+          "metricsLevel": "detailed",
+          "alerting": true
+        }
+      },
+      "security": {
+        "encryption": {
+          "inTransit": "TLS1.3",
+          "atRest": "AES256"
+        },
+        "authentication": {
+          "requireMFA": true,
+          "sessionTimeout": 1800
+        },
+        "ipWhitelist": {
+          "enabled": true,
+          "ranges": ["10.0.0.0/8", "172.16.0.0/12"]
+        }
+      },
+      "tags": {
+        "environment": "production",
+        "owner": "anf-aiops-team",
+        "purpose": "production",
+        "costCenter": "production",
+        "project": "anf-aiops"
+      }
+    }
+  },
+  "global": {
+    "connector": {
+      "name": "Azure NetApp Files AI-Ops Connector",
+      "version": "1.0.0",
+      "description": "Microsoft Copilot Connector for Azure NetApp Files management",
+      "supportEmail": "DwirefS@SapientEdge.io",
+      "documentationUrl": "https://github.com/your-org/anf-aiops/tree/main/mcp"
+    },
+    "compliance": {
+      "standards": ["SOC2", "HIPAA", "ISO27001", "PCI-DSS", "GDPR"],
+      "dataRetention": {
+        "logs": "90 days",
+        "metrics": "1 year",
+        "auditTrail": "7 years"
+      },
+      "encryption": {
+        "minimumTlsVersion": "1.2",
+        "cipherSuites": ["TLS_AES_256_GCM_SHA384", "TLS_CHACHA20_POLY1305_SHA256"],
+        "keyRotationPeriod": "90 days"
+      }
+    },
+    "monitoring": {
+      "healthCheck": {
+        "interval": 30,
+        "timeout": 10,
+        "retries": 3
+      },
+      "performance": {
+        "responseTimeThreshold": 2000,
+        "throughputThreshold": 1000,
+        "errorRateThreshold": 0.01
+      },
+      "alerts": {
+        "channels": ["email", "teams", "sms"],
+        "escalationLevels": 3,
+        "acknowledgmentTimeout": 300
+      }
+    },
+    "backup": {
+      "enabled": true,
+      "frequency": "daily",
+      "retention": "30 days",
+      "crossRegion": true,
+      "encryption": true
+    },
+    "disaster_recovery": {
+      "rpo": "1 hour",
+      "rto": "4 hours",
+      "backupRegions": ["westus2", "eastus2"],
+      "testFrequency": "quarterly"
+    }
+  },
+  "teams_integration": {
+    "bot": {
+      "name": "ANF AI-Ops Assistant",
+      "description": "Intelligent assistant for Azure NetApp Files management",
+      "welcomeMessage": "Hello! I'm your ANF AI-Ops assistant. I can help you manage Azure NetApp Files resources using natural language. Try asking me to 'create a new volume' or 'show backup status'.",
+      "capabilities": [
+        "Create and manage NetApp accounts",
+        "Provision and configure capacity pools",
+        "Create and manage volumes with various protocols",
+        "Set up automated backup policies",
+        "Manage snapshots and point-in-time recovery",
+        "Configure cross-region replication",
+        "Monitor performance and usage",
+        "Optimize costs and resource allocation",
+        "Troubleshoot issues and resolve problems",
+        "Generate compliance and audit reports"
+      ],
+      "supportedCommands": [
+        "create account <name> in <location>",
+        "create pool <name> with <size> <service-level>",
+        "create volume <name> with <size> protocol <type>",
+        "create backup policy with <retention>",
+        "show usage for <resource>",
+        "list volumes in <pool>",
+        "create snapshot of <volume>",
+        "set up replication to <region>",
+        "show performance metrics",
+        "troubleshoot <issue>"
+      ]
+    },
+    "authentication": {
+      "ssoRequired": true,
+      "roleBasedAccess": true,
+      "permissions": {
+        "read": ["anf.accounts.read", "anf.pools.read", "anf.volumes.read"],
+        "write": ["anf.accounts.write", "anf.pools.write", "anf.volumes.write"],
+        "admin": ["anf.*.read", "anf.*.write", "anf.*.delete"]
+      }
+    },
+    "notifications": {
+      "enabled": true,
+      "channels": ["adaptive-cards", "mentions", "proactive-messages"],
+      "events": [
+        "resource-created",
+        "backup-completed",
+        "snapshot-created",
+        "replication-status-changed",
+        "quota-threshold-exceeded",
+        "operation-failed"
+      ]
+    }
+  },
+  "api_operations": {
+    "accounts": {
+      "supported": [
+        "anf_accounts_create_or_update",
+        "anf_accounts_delete", 
+        "anf_accounts_get",
+        "anf_accounts_list",
+        "anf_accounts_list_by_subscription",
+        "anf_accounts_update",
+        "anf_accounts_change_key_vault",
+        "anf_accounts_get_change_key_vault_information",
+        "anf_accounts_renew_credentials",
+        "anf_accounts_transition_to_cmk"
+      ],
+      "total": 10
+    },
+    "pools": {
+      "supported": [
+        "anf_pools_create_or_update",
+        "anf_pools_delete",
+        "anf_pools_get", 
+        "anf_pools_list",
+        "anf_pools_update"
+      ],
+      "total": 5
+    },
+    "volumes": {
+      "supported": [
+        "anf_volumes_create_or_update",
+        "anf_volumes_delete",
+        "anf_volumes_get",
+        "anf_volumes_list",
+        "anf_volumes_update",
+        "anf_volumes_authorize_replication",
+        "anf_volumes_break_replication",
+        "anf_volumes_delete_replication",
+        "anf_volumes_list_replications",
+        "anf_volumes_replication_status",
+        "anf_volumes_resync_replication",
+        "anf_volumes_revert",
+        "anf_volumes_pool_change",
+        "anf_volumes_relocate",
+        "anf_volumes_finalize_relocation",
+        "anf_volumes_revert_relocation",
+        "anf_volumes_reset_cifs_password",
+        "anf_volumes_break_file_locks"
+      ],
+      "total": 18
+    },
+    "snapshots": {
+      "supported": [
+        "anf_snapshots_create",
+        "anf_snapshots_delete",
+        "anf_snapshots_get",
+        "anf_snapshots_list",
+        "anf_snapshots_update",
+        "anf_snapshots_restore_files",
+        "anf_snapshots_revert_volume",
+        "anf_snapshots_get_status"
+      ],
+      "total": 8
+    },
+    "backup_policies": {
+      "supported": [
+        "anf_backup_policies_create",
+        "anf_backup_policies_delete",
+        "anf_backup_policies_get",
+        "anf_backup_policies_list",
+        "anf_backup_policies_update"
+      ],
+      "total": 5
+    },
+    "backup_vaults": {
+      "supported": [
+        "anf_backup_vaults_create_or_update",
+        "anf_backup_vaults_delete",
+        "anf_backup_vaults_get",
+        "anf_backup_vaults_list",
+        "anf_backup_vaults_update"
+      ],
+      "total": 5
+    },
+    "backups": {
+      "supported": [
+        "anf_backups_create",
+        "anf_backups_delete",
+        "anf_backups_get",
+        "anf_backups_list",
+        "anf_backups_update",
+        "anf_backups_restore_files"
+      ],
+      "total": 6
+    },
+    "netapp_resource": {
+      "supported": [
+        "anf_netapp_resource_check_name_availability",
+        "anf_netapp_resource_check_file_path_availability", 
+        "anf_netapp_resource_list_skus",
+        "anf_netapp_resource_get_sku",
+        "anf_netapp_resource_validate_network",
+        "anf_netapp_resource_quota_limits_list",
+        "anf_netapp_resource_quota_limits_get",
+        "anf_netapp_resource_region_infos_list",
+        "anf_netapp_resource_region_infos_get",
+        "anf_netapp_resource_usages_list"
+      ],
+      "total": 10
+    },
+    "operations": {
+      "supported": [
+        "anf_operations_list",
+        "anf_operations_get"
+      ],
+      "total": 2
+    },
+    "summary": {
+      "total_operation_groups": 9,
+      "total_operations": 69,
+      "api_version": "2025-03-01",
+      "coverage_percentage": 100
+    }
+  },
+  "deployment": {
+    "infrastructure": {
+      "terraform": {
+        "stateBackend": "azurerm",
+        "planFile": "anf-aiops.tfplan",
+        "varsFile": "terraform.tfvars"
+      },
+      "arm": {
+        "templateFile": "anf-aiops-template.json",
+        "parametersFile": "anf-aiops-parameters.json"
+      },
+      "bicep": {
+        "templateFile": "main.bicep",
+        "parametersFile": "main.parameters.json"
+      }
+    },
+    "cicd": {
+      "pipeline": "azure-pipelines.yml",
+      "triggers": ["main", "develop"],
+      "stages": ["build", "test", "deploy"],
+      "approvals": {
+        "staging": ["team-lead"],
+        "production": ["team-lead", "security-team"]
+      }
+    },
+    "testing": {
+      "unit": "jest",
+      "integration": "postman",
+      "e2e": "playwright",
+      "security": "sonarqube",
+      "performance": "k6"
+    }
+  }
+}

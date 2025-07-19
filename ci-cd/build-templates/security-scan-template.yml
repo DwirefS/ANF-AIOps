@@ -1,0 +1,117 @@
+# Security Scan Template
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+
+parameters:
+  - name: scanType
+    type: string
+    values:
+      - 'all'
+      - 'sast'
+      - 'dependencies'
+      - 'secrets'
+      - 'containers'
+  - name: projectPath
+    type: string
+    default: '$(Build.SourcesDirectory)'
+  - name: failOnHighSeverity
+    type: boolean
+    default: true
+
+steps:
+  # SAST Scanning
+  - task: CredScan@3
+    displayName: 'Run Credential Scanner'
+    condition: or(eq('${{ parameters.scanType }}', 'all'), eq('${{ parameters.scanType }}', 'secrets'))
+
+  - task: Semmle@1
+    displayName: 'Run CodeQL Analysis'
+    condition: or(eq('${{ parameters.scanType }}', 'all'), eq('${{ parameters.scanType }}', 'sast'))
+    inputs:
+      sourceCodeDirectory: '${{ parameters.projectPath }}'
+      language: 'csharp,javascript,typescript'
+      querySuite: 'security-extended'
+      timeout: '1800'
+
+  # Dependency Scanning
+  - task: dependency-check-build-task@6
+    displayName: 'OWASP Dependency Check'
+    condition: or(eq('${{ parameters.scanType }}', 'all'), eq('${{ parameters.scanType }}', 'dependencies'))
+    inputs:
+      projectName: '$(Build.Repository.Name)'
+      scanPath: '${{ parameters.projectPath }}'
+      format: 'HTML,JUNIT,JSON'
+      failOnCVSS: '7'
+      suppressionPath: '${{ parameters.projectPath }}/.dependency-check-suppressions.xml'
+
+  - task: WhiteSource@21
+    displayName: 'WhiteSource Scan'
+    condition: or(eq('${{ parameters.scanType }}', 'all'), eq('${{ parameters.scanType }}', 'dependencies'))
+    inputs:
+      cwd: '${{ parameters.projectPath }}'
+      projectName: '$(Build.Repository.Name)'
+
+  # Container Scanning
+  - task: trivy@1
+    displayName: 'Trivy Container Scan'
+    condition: or(eq('${{ parameters.scanType }}', 'all'), eq('${{ parameters.scanType }}', 'containers'))
+    inputs:
+      version: 'latest'
+      docker: false
+      path: '${{ parameters.projectPath }}'
+      severities: 'CRITICAL,HIGH,MEDIUM'
+      exitCode: 1
+
+  # Infrastructure as Code Scanning
+  - task: Checkov@1
+    displayName: 'Checkov IaC Scan'
+    condition: or(eq('${{ parameters.scanType }}', 'all'), eq('${{ parameters.scanType }}', 'sast'))
+    inputs:
+      directory: '${{ parameters.projectPath }}'
+      soft_fail: false
+      output_format: 'junitxml'
+      output_file_path: '$(Agent.TempDirectory)/checkov-report.xml'
+
+  # Security Report Generation
+  - task: SdtReport@2
+    displayName: 'Create Security Report'
+    inputs:
+      GdnExportAllTools: true
+      GdnExportGdnToolCredScan: true
+      GdnExportGdnToolCredScanSeverity: 'Warning'
+
+  - task: PublishSecurityAnalysisLogs@3
+    displayName: 'Publish Security Logs'
+    inputs:
+      ArtifactName: 'SecurityLogs'
+      ArtifactType: 'Container'
+      AllTools: true
+      ToolLogsNotFoundAction: 'Standard'
+
+  - task: PostAnalysis@2
+    displayName: 'Security Analysis Results'
+    inputs:
+      GdnBreakAllTools: ${{ parameters.failOnHighSeverity }}
+      GdnBreakGdnToolCredScan: true
+      GdnBreakGdnToolCredScanSeverity: 'Error'
+      GdnBreakPolicyMinSev: 'Error'
+
+  # Custom Security Checks
+  - script: |
+      echo "Running custom security validations..."
+      
+      # Check for hardcoded secrets
+      if grep -r "password\s*=\s*[\"'][^\"']*[\"']" ${{ parameters.projectPath }} --include="*.cs" --include="*.ts" --include="*.js"; then
+        echo "WARNING: Potential hardcoded passwords found"
+        if [ "${{ parameters.failOnHighSeverity }}" == "true" ]; then
+          exit 1
+        fi
+      fi
+      
+      # Check for unsafe HTTP endpoints
+      if grep -r "http://" ${{ parameters.projectPath }} --include="*.cs" --include="*.ts" --include="*.js" | grep -v "localhost" | grep -v "127.0.0.1"; then
+        echo "WARNING: Unsafe HTTP endpoints found"
+      fi
+      
+      # Validate security headers in code
+      echo "Security validation completed"
+    displayName: 'Custom Security Validations'

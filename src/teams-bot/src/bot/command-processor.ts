@@ -275,7 +275,7 @@ export class CommandProcessor {
   /**
    * Handle list commands (volumes, pools, snapshots)
    */
-  private async handleListCommand(command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
+  private async handleListCommand(command: ParsedCommand, _user: UserProfile): Promise<CommandResult> {
     try {
       switch (command.entity) {
         case 'volumes':
@@ -318,7 +318,7 @@ export class CommandProcessor {
   /**
    * Handle create commands
    */
-  private async handleCreateCommand(command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
+  private async handleCreateCommand(command: ParsedCommand, _user: UserProfile): Promise<CommandResult> {
     switch (command.entity) {
       case 'volume':
         return {
@@ -352,7 +352,7 @@ export class CommandProcessor {
   /**
    * Handle delete commands with safety checks
    */
-  private async handleDeleteCommand(command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
+  private async handleDeleteCommand(command: ParsedCommand, _user: UserProfile): Promise<CommandResult> {
     if (!command.entity || !command.parameters?.name) {
       return {
         success: false,
@@ -371,7 +371,7 @@ export class CommandProcessor {
   /**
    * Handle metrics and performance commands
    */
-  private async handleMetricsCommand(command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
+  private async handleMetricsCommand(command: ParsedCommand, _user: UserProfile): Promise<CommandResult> {
     try {
       const volumeId = command.parameters?.volume || command.parameters?.name;
       
@@ -398,7 +398,7 @@ export class CommandProcessor {
   /**
    * Handle resize commands
    */
-  private async handleResizeCommand(command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
+  private async handleResizeCommand(command: ParsedCommand, _user: UserProfile): Promise<CommandResult> {
     const volumeName = command.parameters?.volume || command.parameters?.name;
     const newSize = command.parameters?.size;
 
@@ -410,7 +410,7 @@ export class CommandProcessor {
     }
 
     try {
-      const result = await this.mcpService.resizeVolume(volumeName, parseInt(newSize));
+      await this.mcpService.resizeVolume(volumeName, parseInt(newSize));
       return {
         success: true,
         message: `✅ Successfully resized volume "${volumeName}" to ${newSize}GB`,
@@ -427,7 +427,7 @@ export class CommandProcessor {
   /**
    * Handle security commands
    */
-  private async handleSecurityCommand(command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
+  private async handleSecurityCommand(_command: ParsedCommand, _user: UserProfile): Promise<CommandResult> {
     try {
       const scanResult = await this.mcpService.scanVulnerabilities();
       return {
@@ -446,7 +446,7 @@ export class CommandProcessor {
   /**
    * Handle status commands
    */
-  private async handleStatusCommand(command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
+  private async handleStatusCommand(_command: ParsedCommand, user: UserProfile): Promise<CommandResult> {
     try {
       const volumes = await this.mcpService.listVolumes();
       const pools = await this.mcpService.listPools();
@@ -540,7 +540,7 @@ export class CommandProcessor {
   /**
    * Show volume metrics
    */
-  private async showVolumeMetrics(volumeId: string, context: TurnContext, user: UserProfile): Promise<void> {
+  private async showVolumeMetrics(volumeId: string, context: TurnContext, _user: UserProfile): Promise<void> {
     try {
       const metrics = await this.mcpService.getVolumeMetrics(volumeId);
       await context.sendActivity({
@@ -559,7 +559,7 @@ export class CommandProcessor {
   /**
    * Refresh volume list
    */
-  private async refreshVolumeList(context: TurnContext, user: UserProfile): Promise<void> {
+  private async refreshVolumeList(context: TurnContext, _user: UserProfile): Promise<void> {
     try {
       const volumes = await this.mcpService.listVolumes();
       await context.sendActivity({
@@ -578,7 +578,7 @@ export class CommandProcessor {
   /**
    * Estimate volume cost
    */
-  private async estimateVolumeCost(formData: any, context: TurnContext, user: UserProfile): Promise<void> {
+  private async estimateVolumeCost(formData: any, context: TurnContext, _user: UserProfile): Promise<void> {
     try {
       const sizeGB = parseInt(formData.sizeGB || '1000');
       const serviceLevel = formData.serviceLevel || 'Standard';

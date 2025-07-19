@@ -4,15 +4,11 @@
  */
 
 import {
-    ActivityHandler,
     ConversationState,
     UserState,
     TurnContext,
     MessageFactory,
-    CardFactory,
-    TeamsActivityHandler,
-    TeamsInfo,
-    ChannelInfo
+    TeamsActivityHandler
 } from 'botbuilder';
 import { MCPService } from '../services/mcp.service';
 import { AuthService, UserProfile } from '../services/auth.service';
@@ -36,20 +32,26 @@ export class ANFAIOpsBot extends TeamsActivityHandler {
         this.adaptiveCardService = new AdaptiveCardService();
         this.commandProcessor = new CommandProcessor(mcpService, authService);
 
-        this.onMessage(async (context, next) => {
+        this.onMessage(async (context: TurnContext, next: () => Promise<void>) => {
             await this.handleMessage(context);
             await next();
         });
 
-        this.onMembersAdded(async (context, next) => {
+        this.onMembersAdded(async (context: TurnContext, next: () => Promise<void>) => {
             await this.handleMembersAdded(context);
             await next();
         });
 
-        this.onTeamsCardAction(async (context, next) => {
+        // Handle card actions through the activity handler
+    }
+
+    // Override handleTeamsInvoke to handle card actions
+    protected async onInvokeActivity(context: TurnContext): Promise<any> {
+        if (context.activity.name === 'adaptiveCard/action') {
             await this.handleCardAction(context);
-            await next();
-        });
+            return { status: 200 };
+        }
+        return super.onInvokeActivity(context);
     }
 
     private async handleMessage(context: TurnContext): Promise<void> {
@@ -200,7 +202,7 @@ export class ANFAIOpsBot extends TeamsActivityHandler {
         }
     }
 
-    private async createVolumeFlow(context: TurnContext, user: UserProfile, parameters: any): Promise<void> {
+    private async createVolumeFlow(context: TurnContext, user: UserProfile, _parameters: any): Promise<void> {
         try {
             // Check authorization
             const isAuthorized = await this.authService.isAuthorized(user, 'volume:create');

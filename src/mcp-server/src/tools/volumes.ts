@@ -1,33 +1,136 @@
+/**
+ * Azure NetApp Files Volume Management Tools
+ * 
+ * This module provides comprehensive volume management capabilities for Azure NetApp Files,
+ * including creation, modification, deletion, and monitoring of storage volumes with enterprise-grade
+ * features such as export policies, snapshot management, and performance optimization.
+ * 
+ * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+ * 
+ * Security Features:
+ * - Input validation and sanitization using Zod schemas
+ * - Comprehensive error handling and logging
+ * - Support for NFSv3, NFSv4.1, and CIFS protocols
+ * - Export policy validation for secure access control
+ * - Resource tagging for governance and compliance
+ * 
+ * Performance Features:
+ * - Support for Standard, Premium, and Ultra service levels
+ * - Configurable throughput and capacity settings
+ * - Snapshot directory visibility controls
+ * - Protocol-specific optimizations
+ */
+
 import { z } from 'zod';
 import { Tool } from '../types/tool.js';
 import { logger } from '../utils/logger.js';
 import { NetAppManagementClient } from '@azure/arm-netapp';
 import { Volume } from '@azure/arm-netapp';
 
-// Volume creation schema
+/**
+ * Zod schema for volume creation with comprehensive validation
+ * 
+ * This schema validates all required and optional parameters for creating a new ANF volume,
+ * including capacity thresholds, protocol configurations, and security settings.
+ * 
+ * @remarks
+ * - usageThreshold: Minimum 100GB (107374182400 bytes) as per ANF requirements
+ * - serviceLevel: Determines performance characteristics (Standard: 16 MiB/s/TiB, Premium: 64 MiB/s/TiB, Ultra: 128 MiB/s/TiB)
+ * - protocolTypes: Array of supported access protocols, can be combined for multi-protocol access
+ * - exportPolicy: Defines NFS access rules including client IP ranges, permissions, and security settings
+ */
 const createVolumeSchema = z.object({
-  resourceGroup: z.string().min(1),
-  accountName: z.string().min(1),
-  poolName: z.string().min(1),
-  volumeName: z.string().min(1),
-  location: z.string().min(1),
-  serviceLevel: z.enum(['Standard', 'Premium', 'Ultra']),
-  creationToken: z.string().min(1),
-  usageThreshold: z.number().min(107374182400), // 100GB minimum in bytes
-  subnetId: z.string().min(1),
+  /** Azure resource group name containing the NetApp account */
+  resourceGroup: z.string().min(1, 'Resource group name is required'),
+  
+  /** NetApp account name that will contain the volume */
+  accountName: z.string().min(1, 'NetApp account name is required'),
+  
+  /** Capacity pool name where the volume will be created */
+  poolName: z.string().min(1, 'Capacity pool name is required'),
+  
+  /** 
+   * Unique volume name within the capacity pool
+   * Must be 1-64 characters, alphanumeric and hyphens only
+   */
+  volumeName: z.string().min(1, 'Volume name is required').max(64, 'Volume name must be 64 characters or less'),
+  
+  /** Azure region where the volume will be created (must match pool location) */
+  location: z.string().min(1, 'Location is required'),
+  
+  /** 
+   * Service level determining performance characteristics:
+   * - Standard: 16 MiB/s per TiB allocated
+   * - Premium: 64 MiB/s per TiB allocated  
+   * - Ultra: 128 MiB/s per TiB allocated
+   */
+  serviceLevel: z.enum(['Standard', 'Premium', 'Ultra'], {
+    errorMap: () => ({ message: 'Service level must be Standard, Premium, or Ultra' })
+  }),
+  
+  /** 
+   * Unique file path for volume mount (creation token)
+   * Used as the export path for NFS mounts
+   */
+  creationToken: z.string().min(1, 'Creation token is required'),
+  
+  /** 
+   * Volume capacity in bytes (minimum 100GB = 107374182400 bytes)
+   * Determines allocated throughput based on service level
+   */
+  usageThreshold: z.number().min(107374182400, 'Volume must be at least 100GB'),
+  
+  /** 
+   * Azure subnet resource ID where volume will be accessible
+   * Must be a delegated subnet for Microsoft.NetApp/volumes
+   */
+  subnetId: z.string().min(1, 'Subnet ID is required'),
+  
+  /** 
+   * Array of supported protocols for volume access
+   * Can combine multiple protocols for multi-protocol volumes
+   */
   protocolTypes: z.array(z.enum(['NFSv3', 'NFSv4.1', 'CIFS'])).optional(),
+  
+  /** 
+   * Controls visibility of .snapshot directory for NFS clients
+   * Default: true (recommended for backup/restore operations)
+   */
   snapshotDirectoryVisible: z.boolean().optional().default(true),
+  
+  /** 
+   * NFS export policy defining access rules for clients
+   * Each rule specifies allowed clients, permissions, and protocol settings
+   */
   exportPolicy: z.object({
     rules: z.array(z.object({
-      ruleIndex: z.number(),
+      /** Unique index for the export rule (1-5) */
+      ruleIndex: z.number().min(1).max(5),
+      
+      /** Allow Unix read-only access */
       unixReadOnly: z.boolean(),
+      
+      /** Allow Unix read-write access */
       unixReadWrite: z.boolean(),
+      
+      /** Enable CIFS/SMB access */
       cifs: z.boolean(),
+      
+      /** Enable NFSv3 access */
       nfsv3: z.boolean(),
+      
+      /** Enable NFSv4.1 access */
       nfsv41: z.boolean(),
-      allowedClients: z.string(),
+      
+      /** 
+       * Comma-separated list of allowed client IP addresses or CIDR ranges
+       * Examples: "10.0.0.0/24", "192.168.1.100", "0.0.0.0/0" (not recommended for production)
+       */
+      allowedClients: z.string().min(1, 'Allowed clients must be specified'),
     })),
   }).optional(),
+  
+  /** Resource tags for governance, cost tracking, and organization */
   tags: z.record(z.string()).optional(),
 });
 

@@ -50,7 +50,7 @@ async function main(): Promise<void> {
         const bot = new ANFAIOpsBot(conversationState, userState, mcpService, authService);
 
         // Health check endpoint
-        app.get('/health', (req, res) => {
+        app.get('/health', (_req, res) => {
             res.json({
                 status: 'healthy',
                 timestamp: new Date().toISOString(),

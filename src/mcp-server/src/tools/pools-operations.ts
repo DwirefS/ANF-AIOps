@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Pools operations
 const PoolsCommonSchemas = {
@@ -106,27 +107,67 @@ export const poolsOperationsTools: Tool[] = [
   {
     name: 'anf_pools_create_or_update',
     description: 'Create or update a capacity pool with service level, size, and QoS configuration',
-    inputSchema: PoolsCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(PoolsCreateOrUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_delete',
     description: 'Delete a capacity pool (must be empty of volumes)',
-    inputSchema: PoolsDeleteSchema
+    inputSchema: wrapZodSchema(PoolsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_get',
     description: 'Get detailed information about a specific capacity pool',
-    inputSchema: PoolsGetSchema
+    inputSchema: wrapZodSchema(PoolsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_list',
     description: 'List all capacity pools in a NetApp account',
-    inputSchema: PoolsListSchema
+    inputSchema: wrapZodSchema(PoolsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_update',
     description: 'Update capacity pool properties including size and tags',
-    inputSchema: PoolsUpdateSchema
+    inputSchema: wrapZodSchema(PoolsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_update is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

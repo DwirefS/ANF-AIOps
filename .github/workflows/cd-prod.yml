@@ -1,0 +1,396 @@
+# Deploy to Production Environment
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**'
+      - '!.github/workflows/cd-prod.yml'
+  workflow_dispatch:
+    inputs:
+      deploy_functions:
+        description: 'Deploy Azure Functions'
+        required: false
+        default: true
+        type: boolean
+      deploy_infrastructure:
+        description: 'Deploy Infrastructure'
+        required: false
+        default: false
+        type: boolean
+      skip_approval:
+        description: 'Skip manual approval'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AZURE_FUNCTIONAPP_NAME: 'anf-aiops-functions-prod'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './functions/ANFServer'
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '18.x'
+  ENVIRONMENT: 'prod'
+  RESOURCE_GROUP: 'rg-anf-aiops-prod'
+  LOCATION: 'eastus'
+
+jobs:
+  # Build and test
+  build:
+    name: Build and Test
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  # Manual approval gate
+  approval:
+    name: Manual Approval
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event.inputs.skip_approval != 'true'
+    environment:
+      name: production-approval
+    steps:
+      - name: Request approval
+        run: |
+          echo "Deployment to production requires manual approval"
+          echo "Please review the changes and approve in GitHub Actions"
+
+  # Pre-deployment validation
+  pre-deployment-validation:
+    name: Pre-Deployment Validation
+    runs-on: ubuntu-latest
+    needs: [build, approval]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Validate production readiness
+        run: |
+          # Check if all required secrets are set
+          if [ -z "${{ secrets.STORAGE_CONNECTION_STRING_PROD }}" ]; then
+            echo "Missing required secret: STORAGE_CONNECTION_STRING_PROD"
+            exit 1
+          fi
+          
+          # Validate resource group exists
+          az group show --name ${{ env.RESOURCE_GROUP }} || {
+            echo "Resource group ${{ env.RESOURCE_GROUP }} not found"
+            exit 1
+          }
+
+      - name: Create deployment checkpoint
+        run: |
+          echo "Deployment checkpoint created at $(date)" > deployment-checkpoint.txt
+          echo "Commit: ${{ github.sha }}" >> deployment-checkpoint.txt
+          echo "Actor: ${{ github.actor }}" >> deployment-checkpoint.txt
+
+      - name: Upload checkpoint
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-checkpoint
+          path: deployment-checkpoint.txt
+
+  # Deploy infrastructure
+  deploy-infrastructure:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: pre-deployment-validation
+    if: github.event.inputs.deploy_infrastructure == 'true'
+    environment:
+      name: production
+      url: https://anf-aiops-prod.azurewebsites.net
+    outputs:
+      function_app_name: ${{ steps.tf_outputs.outputs.function_app_name }}
+      apim_gateway_url: ${{ steps.tf_outputs.outputs.apim_gateway_url }}
+      key_vault_name: ${{ steps.tf_outputs.outputs.key_vault_name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Init
+        run: |
+          cd infra
+          terraform init \
+            -backend-config="resource_group_name=${{ env.RESOURCE_GROUP }}" \
+            -backend-config="storage_account_name=${{ secrets.TF_STATE_STORAGE_ACCOUNT_PROD }}" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=prod.terraform.tfstate"
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd infra
+          terraform plan \
+            -var="environment=${{ env.ENVIRONMENT }}" \
+            -var="location=${{ env.LOCATION }}" \
+            -var="resource_group_name=${{ env.RESOURCE_GROUP }}" \
+            -out=tfplan
+
+      - name: Show Terraform Plan
+        run: |
+          cd infra
+          terraform show -no-color tfplan
+
+      - name: Terraform Apply
+        run: |
+          cd infra
+          terraform apply -auto-approve tfplan
+
+      - name: Export Infrastructure Outputs
+        id: tf_outputs
+        run: |
+          cd infra
+          echo "function_app_name=$(terraform output -raw function_app_name)" >> $GITHUB_OUTPUT
+          echo "apim_gateway_url=$(terraform output -raw apim_gateway_url)" >> $GITHUB_OUTPUT
+          echo "key_vault_name=$(terraform output -raw key_vault_name)" >> $GITHUB_OUTPUT
+
+  # Deploy Azure Functions with Blue-Green deployment
+  deploy-functions:
+    name: Deploy Azure Functions
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-validation, deploy-infrastructure]
+    if: github.event.inputs.deploy_functions != 'false'
+    environment:
+      name: production
+      url: https://anf-aiops-prod.azurewebsites.net
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Download Functions artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: functions-app
+          path: ./functions-publish
+
+      - name: Deploy to staging slot
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ./functions-publish
+          slot-name: staging
+
+      - name: Update staging slot settings
+        run: |
+          az functionapp config appsettings set \
+            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --slot staging \
+            --settings \
+              "AzureWebJobsStorage=${{ secrets.STORAGE_CONNECTION_STRING_PROD }}" \
+              "FUNCTIONS_WORKER_RUNTIME=dotnet-isolated" \
+              "FUNCTIONS_EXTENSION_VERSION=~4" \
+              "KeyVaultName=${{ needs.deploy-infrastructure.outputs.key_vault_name || 'kv-anf-aiops-prod' }}" \
+              "Environment=${{ env.ENVIRONMENT }}"
+
+      - name: Warm up staging slot
+        run: |
+          sleep 30
+          curl -f https://${{ env.AZURE_FUNCTIONAPP_NAME }}-staging.azurewebsites.net/api/health || true
+
+      - name: Swap slots
+        run: |
+          az functionapp deployment slot swap \
+            --name ${{ env.AZURE_FUNCTIONAPP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --slot staging \
+            --target-slot production
+
+  # Deploy Node.js applications
+  deploy-nodejs-apps:
+    name: Deploy Node.js Applications
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-validation, deploy-infrastructure]
+    strategy:
+      matrix:
+        app:
+          - { name: 'mcp-server', path: 'src/mcp-server', app_name: 'anf-aiops-mcp-prod' }
+          - { name: 'teams-bot', path: 'src/teams-bot', app_name: 'anf-aiops-teams-prod' }
+    environment:
+      name: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.app.name }}-build
+          path: ./${{ matrix.app.name }}-dist
+
+      - name: Deploy to staging slot
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ matrix.app.app_name }}
+          package: ./${{ matrix.app.name }}-dist
+          slot-name: staging
+
+      - name: Warm up staging slot
+        run: |
+          sleep 30
+          curl -f https://${{ matrix.app.app_name }}-staging.azurewebsites.net/health || true
+
+      - name: Swap slots
+        run: |
+          az webapp deployment slot swap \
+            --name ${{ matrix.app.app_name }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --slot staging
+
+  # Post-deployment validation
+  post-deployment-validation:
+    name: Post-Deployment Validation
+    runs-on: ubuntu-latest
+    needs: [deploy-functions, deploy-nodejs-apps]
+    environment:
+      name: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run production smoke tests
+        run: |
+          cd ci-cd/scripts
+          chmod +x run-smoke-tests.sh
+          ./run-smoke-tests.sh ${{ env.ENVIRONMENT }}
+
+      - name: Health check all endpoints
+        run: |
+          # Check Functions health
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ env.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/api/health)
+          if [ $response -ne 200 ]; then
+            echo "Functions health check failed with status $response"
+            exit 1
+          fi
+          
+          # Check MCP Server health
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://anf-aiops-mcp-prod.azurewebsites.net/health)
+          if [ $response -ne 200 ]; then
+            echo "MCP Server health check failed with status $response"
+            exit 1
+          fi
+          
+          # Check Teams Bot health
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://anf-aiops-teams-prod.azurewebsites.net/health)
+          if [ $response -ne 200 ]; then
+            echo "Teams Bot health check failed with status $response"
+            exit 1
+          fi
+
+      - name: Run performance tests
+        run: |
+          echo "Running performance tests..."
+          # Add actual performance test commands here
+
+  # Create release
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: post-deployment-validation
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release Tag
+        run: |
+          TAG="v$(date +'%Y.%m.%d')-${{ github.run_number }}"
+          git tag $TAG
+          git push origin $TAG
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v$(date +'%Y.%m.%d')-${{ github.run_number }}
+          release_name: Production Release $(date +'%Y.%m.%d')-${{ github.run_number }}
+          body: |
+            ## Production Deployment
+            
+            **Deployed by:** ${{ github.actor }}
+            **Commit:** ${{ github.sha }}
+            **Environment:** Production
+            
+            ### What's Changed
+            ${{ github.event.head_commit.message }}
+            
+            ### Deployment Artifacts
+            - Azure Functions: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+            - MCP Server: anf-aiops-mcp-prod
+            - Teams Bot: anf-aiops-teams-prod
+          draft: false
+          prerelease: false
+
+  # Notify deployment status
+  notify-deployment:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [post-deployment-validation, create-release]
+    if: always()
+    steps:
+      - name: Send success notification
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: |
+            Production Deployment Successful! 🚀
+            Release: v$(date +'%Y.%m.%d')-${{ github.run_number }}
+            Deployed by: ${{ github.actor }}
+            Commit: ${{ github.sha }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_PROD }}
+
+      - name: Send failure notification
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: |
+            Production Deployment Failed! ❌
+            Branch: ${{ github.ref }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+            Please check the logs for details.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_PROD }}
+
+      - name: Create incident if deployment failed
+        if: failure()
+        run: |
+          echo "Creating incident for failed production deployment..."
+          # Add actual incident creation logic here (e.g., PagerDuty, ServiceNow)

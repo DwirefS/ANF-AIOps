@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for NetApp Resource Region Infos operations
 const NetAppResourceRegionInfosCommonSchemas = {
@@ -128,47 +129,119 @@ export const netAppResourceRegionInfosTools: Tool[] = [
   {
     name: 'anf_netapp_resource_region_infos_list',
     description: 'List all region information and capabilities for NetApp resources in a specific location',
-    inputSchema: NetAppResourceRegionInfosListSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionInfosListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_infos_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_infos_get',
     description: 'Get specific region information details by region info name',
-    inputSchema: NetAppResourceRegionInfosGetSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionInfosGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_infos_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_capabilities',
     description: 'Get detailed regional capabilities for NetApp resource features',
-    inputSchema: NetAppResourceRegionCapabilitiesSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionCapabilitiesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_capabilities is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_availability_zones',
     description: 'Get availability zones supported for NetApp resources in the region',
-    inputSchema: NetAppResourceRegionAvailabilityZonesSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionAvailabilityZonesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_availability_zones is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_supported_vm_sizes',
     description: 'Get supported virtual machine sizes for NetApp resources by service level',
-    inputSchema: NetAppResourceRegionSupportedVmSizesSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionSupportedVmSizesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_supported_vm_sizes is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_network_features',
     description: 'Get regional networking features and capabilities for NetApp resources',
-    inputSchema: NetAppResourceRegionNetworkFeaturesSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionNetworkFeaturesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_network_features is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_service_levels',
     description: 'Get available service level offerings in the region for NetApp resources',
-    inputSchema: NetAppResourceRegionServiceLevelsSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionServiceLevelsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_service_levels is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_protocols',
     description: 'Get supported protocols and protocol combinations in the region',
-    inputSchema: NetAppResourceRegionProtocolsSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionProtocolsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_protocols is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_encryption_types',
     description: 'Get supported encryption types and configurations in the region',
-    inputSchema: NetAppResourceRegionEncryptionTypesSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionEncryptionTypesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_encryption_types is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

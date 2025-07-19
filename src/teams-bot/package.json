@@ -1,55 +1,140 @@
 {
-  "name": "anf-aiops-teams-bot",
-  "version": "1.0.0",
-  "description": "Microsoft Teams bot for Azure NetApp Files AI-Ops operations",
+  "name": "@anf-aiops/teams-bot",
+  "version": "2.0.0",
+  "description": "Microsoft Teams bot for Azure NetApp Files AI operations",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "Dwiref Sharma <DwirefS@SapientEdge.io>",
+  "license": "MIT",
+  "homepage": "https://github.com/your-org/ANF-AIOps#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-org/ANF-AIOps.git",
+    "directory": "src/teams-bot"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/ANF-AIOps/issues"
+  },
+  "keywords": [
+    "teams",
+    "bot",
+    "azure",
+    "netapp",
+    "ai",
+    "automation",
+    "microsoft"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "build": "tsc",
+    "build:watch": "tsc --watch",
+    "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
-    "dev": "nodemon --exec ts-node src/index.ts",
+    "start:dev": "tsx src/index.ts",
     "test": "jest",
-    "lint": "eslint src --ext .ts",
-    "clean": "rimraf dist"
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "clean": "rimraf dist coverage",
+    "prepack": "npm run build",
+    "health": "curl -f http://localhost:3978/api/health || exit 1"
   },
-  "keywords": ["teams", "bot", "azure", "netapp", "ai-ops"],
-  "author": {
-    "name": "Dwiref Sharma",
-    "email": "DwirefS@SapientEdge.io"
-  },
-  "license": "MIT",
   "dependencies": {
-    "@azure/identity": "^4.0.1",
-    "@azure/keyvault-secrets": "^4.8.0",
-    "@azure/msal-node": "^2.6.6",
     "botbuilder": "^4.21.1",
     "botbuilder-azure": "^4.21.1",
+    "botbuilder-applicationinsights": "^4.21.1",
     "botframework-connector": "^4.21.1",
-    "adaptivecards": "^3.0.4",
+    "adaptivecards-templating": "^2.3.1",
     "adaptive-expressions": "^4.21.1",
+    "@azure/identity": "^4.0.1",
+    "@azure/keyvault-secrets": "^4.7.0",
+    "@azure/storage-blob": "^12.17.0",
     "express": "^4.18.2",
-    "axios": "^1.6.7",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
     "winston": "^3.11.0",
-    "dotenv": "^16.4.1",
-    "joi": "^17.12.1",
-    "moment": "^2.30.1",
-    "uuid": "^9.0.1"
+    "winston-azure-application-insights": "^4.0.0",
+    "dotenv": "^16.3.1",
+    "zod": "^3.22.4",
+    "uuid": "^9.0.1",
+    "axios": "^1.6.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "redis": "^4.6.10",
+    "node-cache": "^5.1.2",
+    "rate-limiter-flexible": "^4.0.1",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "@types/node": "^20.10.0",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.11.17",
-    "@types/uuid": "^9.0.8",
-    "@types/jest": "^29.5.12",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "eslint": "^8.56.0",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/morgan": "^1.9.9",
+    "@types/uuid": "^9.0.7",
+    "@types/lodash": "^4.14.202",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/jest": "^29.5.8",
+    "@types/supertest": "^2.0.16",
+    "typescript": "^5.3.2",
+    "tsx": "^4.6.0",
     "jest": "^29.7.0",
-    "nodemon": "^3.0.3",
+    "ts-jest": "^29.1.1",
+    "supertest": "^6.3.3",
+    "eslint": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^6.12.0",
+    "@typescript-eslint/parser": "^6.12.0",
+    "prettier": "^3.1.0",
     "rimraf": "^5.0.5",
-    "ts-jest": "^29.1.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "nodemon": "^3.0.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.ts",
+      "**/__tests__/**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/index.ts"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 75,
+        "functions": 75,
+        "lines": 75,
+        "statements": 75
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "assets",
+    "README.md",
+    "CHANGELOG.md"
+  ]
 }

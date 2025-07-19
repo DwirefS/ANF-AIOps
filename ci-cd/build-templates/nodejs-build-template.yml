@@ -1,0 +1,104 @@
+# Node.js Build Template
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+
+parameters:
+  - name: projectPath
+    type: string
+  - name: projectName
+    type: string
+  - name: nodeVersion
+    type: string
+    default: '18.x'
+  - name: runLint
+    type: boolean
+    default: true
+  - name: runTests
+    type: boolean
+    default: true
+  - name: buildCommand
+    type: string
+    default: 'npm run build'
+  - name: publishArtifact
+    type: boolean
+    default: true
+
+steps:
+  - task: NodeTool@0
+    displayName: 'Setup Node.js ${{ parameters.nodeVersion }}'
+    inputs:
+      versionSpec: ${{ parameters.nodeVersion }}
+
+  - task: Cache@2
+    displayName: 'Cache npm packages'
+    inputs:
+      key: 'npm | "$(Agent.OS)" | ${{ parameters.projectPath }}/package-lock.json'
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+      path: ${{ parameters.projectPath }}/node_modules
+
+  - script: |
+      cd ${{ parameters.projectPath }}
+      npm ci
+    displayName: 'Install dependencies'
+
+  - script: |
+      cd ${{ parameters.projectPath }}
+      npm audit --audit-level=high
+    displayName: 'Security audit'
+    continueOnError: true
+
+  - script: |
+      cd ${{ parameters.projectPath }}
+      npm run lint
+    displayName: 'Run linting'
+    condition: and(succeeded(), eq('${{ parameters.runLint }}', 'true'))
+    continueOnError: true
+
+  - script: |
+      cd ${{ parameters.projectPath }}
+      npm test -- --coverage --ci --reporters=default --reporters=jest-junit
+    displayName: 'Run tests'
+    condition: and(succeeded(), eq('${{ parameters.runTests }}', 'true'))
+    env:
+      CI: true
+
+  - task: PublishTestResults@2
+    displayName: 'Publish test results'
+    condition: and(succeededOrFailed(), eq('${{ parameters.runTests }}', 'true'))
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '${{ parameters.projectPath }}/junit.xml'
+      testRunTitle: '${{ parameters.projectName }} Tests'
+      failTaskOnFailedTests: false
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage'
+    condition: and(succeededOrFailed(), eq('${{ parameters.runTests }}', 'true'))
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '${{ parameters.projectPath }}/coverage/cobertura-coverage.xml'
+      reportDirectory: '${{ parameters.projectPath }}/coverage'
+
+  - script: |
+      cd ${{ parameters.projectPath }}
+      ${{ parameters.buildCommand }}
+    displayName: 'Build project'
+
+  - task: CopyFiles@2
+    displayName: 'Copy build output'
+    condition: and(succeeded(), eq('${{ parameters.publishArtifact }}', 'true'))
+    inputs:
+      SourceFolder: '${{ parameters.projectPath }}'
+      Contents: |
+        dist/**
+        package.json
+        package-lock.json
+        !node_modules/**
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/${{ parameters.projectName }}'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish ${{ parameters.projectName }} artifact'
+    condition: and(succeeded(), eq('${{ parameters.publishArtifact }}', 'true'))
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.projectName }}'
+      ArtifactName: '${{ parameters.projectName }}-drop'

@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Backups Under Volume operations
 const BackupsUnderVolumeCommonSchemas = {
@@ -192,52 +193,132 @@ export const backupsUnderVolumeTools: Tool[] = [
   {
     name: 'anf_backups_under_volume_list',
     description: 'List all backups for a specific volume with filtering and pagination',
-    inputSchema: BackupsUnderVolumeListSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_get',
     description: 'Get detailed information about a specific backup for a volume',
-    inputSchema: BackupsUnderVolumeGetSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_create',
     description: 'Create a new backup for a volume with optional snapshot',
-    inputSchema: BackupsUnderVolumeCreateSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_delete',
     description: 'Delete a specific backup for a volume',
-    inputSchema: BackupsUnderVolumeDeleteSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_update',
     description: 'Update backup metadata and properties for a volume backup',
-    inputSchema: BackupsUnderVolumeUpdateSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_get_latest_status',
     description: 'Get the latest backup status and information for a volume',
-    inputSchema: BackupsUnderVolumeGetLatestStatusSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeGetLatestStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_get_latest_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_get_configuration',
     description: 'Get current backup configuration for a volume',
-    inputSchema: BackupsUnderVolumeGetConfigurationSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeGetConfigurationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_get_configuration is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_set_configuration',
     description: 'Enable or update backup configuration for a volume',
-    inputSchema: BackupsUnderVolumeSetConfigurationSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeSetConfigurationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_set_configuration is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_disable_backup',
     description: 'Disable backup for a volume with option to delete existing backups',
-    inputSchema: BackupsUnderVolumeDisableBackupSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeDisableBackupSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_disable_backup is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_volume_get_history',
     description: 'Get backup history and metrics for a volume over time',
-    inputSchema: BackupsUnderVolumeGetHistorySchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeGetHistorySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_get_history is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

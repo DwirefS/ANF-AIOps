@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Snapshots operations
 const SnapshotsCommonSchemas = {
@@ -151,42 +152,106 @@ export const snapshotsOperationsTools: Tool[] = [
   {
     name: 'anf_snapshots_create',
     description: 'Create a point-in-time snapshot of a volume',
-    inputSchema: SnapshotsCreateSchema
+    inputSchema: wrapZodSchema(SnapshotsCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_delete',
     description: 'Delete a snapshot from a volume',
-    inputSchema: SnapshotsDeleteSchema
+    inputSchema: wrapZodSchema(SnapshotsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_get',
     description: 'Get detailed information about a specific snapshot',
-    inputSchema: SnapshotsGetSchema
+    inputSchema: wrapZodSchema(SnapshotsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_list',
     description: 'List all snapshots for a volume',
-    inputSchema: SnapshotsListSchema
+    inputSchema: wrapZodSchema(SnapshotsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_update',
     description: 'Update snapshot properties',
-    inputSchema: SnapshotsUpdateSchema
+    inputSchema: wrapZodSchema(SnapshotsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_restore_files',
     description: 'Restore specific files from a snapshot',
-    inputSchema: SnapshotsRestoreFilesSchema
+    inputSchema: wrapZodSchema(SnapshotsRestoreFilesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_restore_files is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_get_status',
     description: 'Get the current status of a snapshot',
-    inputSchema: SnapshotsGetStatusSchema
+    inputSchema: wrapZodSchema(SnapshotsGetStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_get_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_revert_volume',
     description: 'Revert entire volume to a snapshot state',
-    inputSchema: SnapshotsRevertVolumeSchema
+    inputSchema: wrapZodSchema(SnapshotsRevertVolumeSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_revert_volume is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

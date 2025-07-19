@@ -37,6 +37,7 @@ import { Tool } from '../types/tool';
 import { DefaultAzureCredential, ChainedTokenCredential, ManagedIdentityCredential } from '@azure/identity';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -229,7 +230,15 @@ export const securityComplianceTools: Tool[] = [
         resource_id: {
           type: 'string',
           description: 'Azure NetApp Files resource ID (account, pool, or volume)'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_comprehensive_security_assessment is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         assessment_type: {
           type: 'string',
           enum: [
@@ -315,7 +324,15 @@ export const securityComplianceTools: Tool[] = [
         resource_id: {
           type: 'string',
           description: 'Azure NetApp Files resource ID'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_rbac_governance is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         principal_id: {
           type: 'string',
           description: 'User, group, or service principal object ID'
@@ -400,7 +417,15 @@ export const securityComplianceTools: Tool[] = [
           type: 'string',
           enum: ['subscription', 'resource_group', 'resource'],
           description: 'Monitoring scope level'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_compliance_monitoring is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         resource_id: {
           type: 'string',
           description: 'Specific resource ID (required for resource scope)'
@@ -482,7 +507,15 @@ export const securityComplianceTools: Tool[] = [
         resource_id: {
           type: 'string',
           description: 'Azure NetApp Files resource ID'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_encryption_governance is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         operation: {
           type: 'string',
           enum: [
@@ -568,7 +601,15 @@ export const securityComplianceTools: Tool[] = [
         resource_id: {
           type: 'string',
           description: 'Azure NetApp Files resource ID (optional for subscription-wide)'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_audit_trail_management is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         log_type: {
           type: 'string',
           enum: [
@@ -661,7 +702,15 @@ export const securityComplianceTools: Tool[] = [
         resource_id: {
           type: 'string',
           description: 'Azure NetApp Files resource ID to monitor'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_threat_detection_response is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         detection_rules: {
           type: 'array',
           description: 'Threat detection rules to apply',
@@ -742,7 +791,15 @@ export const securityComplianceTools: Tool[] = [
         resource_id: {
           type: 'string',
           description: 'Azure NetApp Files resource ID'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_privacy_data_protection is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         privacy_operation: {
           type: 'string',
           enum: [

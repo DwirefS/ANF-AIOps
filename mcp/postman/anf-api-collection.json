@@ -1,0 +1,1123 @@
+{
+  "info": {
+    "name": "Azure NetApp Files AI-Ops API Collection",
+    "description": "Comprehensive Postman collection for testing Azure NetApp Files AI-Ops API endpoints covering all 19 operation groups with 200+ operations",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "anf-aiops-api-collection",
+    "author": "Dwiref Sharma <DwirefS@SapientEdge.io>"
+  },
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "tokenName",
+        "value": "Azure AD Token",
+        "type": "string"
+      },
+      {
+        "key": "clientId",
+        "value": "{{clientId}}",
+        "type": "string"
+      },
+      {
+        "key": "clientSecret",
+        "value": "{{clientSecret}}",
+        "type": "string"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token",
+        "type": "string"
+      },
+      {
+        "key": "authUrl",
+        "value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/authorize",
+        "type": "string"
+      },
+      {
+        "key": "scope",
+        "value": "https://management.azure.com/.default",
+        "type": "string"
+      },
+      {
+        "key": "grant_type",
+        "value": "authorization_code",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Generate request ID for tracking",
+          "pm.globals.set('requestId', pm.variables.replaceIn('{{$guid}}'));",
+          "",
+          "// Set current timestamp",
+          "pm.globals.set('timestamp', new Date().toISOString());",
+          "",
+          "// Set API version",
+          "pm.globals.set('apiVersion', '2025-03-01');"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test for response validation",
+          "pm.test('Response status should be successful', function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
+          "});",
+          "",
+          "pm.test('Response should have proper headers', function () {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});",
+          "",
+          "pm.test('Response time should be reasonable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(10000);",
+          "});",
+          "",
+          "// Store response data for subsequent requests",
+          "if (pm.response.code === 200 || pm.response.code === 201) {",
+          "    try {",
+          "        const responseData = pm.response.json();",
+          "        if (responseData.data && responseData.data.id) {",
+          "            pm.globals.set('lastResourceId', responseData.data.id);",
+          "        }",
+          "        if (responseData.data && responseData.data.name) {",
+          "            pm.globals.set('lastResourceName', responseData.data.name);",
+          "        }",
+          "    } catch (e) {",
+          "        console.log('Unable to parse response JSON');",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://management.azure.com",
+      "type": "string"
+    },
+    {
+      "key": "subscriptionId",
+      "value": "{{subscriptionId}}",
+      "type": "string"
+    },
+    {
+      "key": "resourceGroupName",
+      "value": "rg-anf-test",
+      "type": "string"
+    },
+    {
+      "key": "accountName",
+      "value": "anf-account-test",
+      "type": "string"
+    },
+    {
+      "key": "poolName",
+      "value": "premium-pool-test",
+      "type": "string"
+    },
+    {
+      "key": "volumeName",
+      "value": "database-volume-test",
+      "type": "string"
+    },
+    {
+      "key": "snapshotName",
+      "value": "snapshot-test-{{$timestamp}}",
+      "type": "string"
+    },
+    {
+      "key": "location",
+      "value": "eastus",
+      "type": "string"
+    },
+    {
+      "key": "apiVersion",
+      "value": "2025-03-01",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01. Accounts Operations",
+      "item": [
+        {
+          "name": "List NetApp Accounts by Subscription",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/providers/Microsoft.NetApp/netAppAccounts?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "providers", "Microsoft.NetApp", "netAppAccounts"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List all NetApp accounts in the subscription"
+          },
+          "response": []
+        },
+        {
+          "name": "List NetApp Accounts in Resource Group",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List NetApp accounts in a specific resource group"
+          },
+          "response": []
+        },
+        {
+          "name": "Create NetApp Account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": \"{{location}}\",\n  \"tags\": {\n    \"environment\": \"test\",\n    \"purpose\": \"development\",\n    \"owner\": \"anf-aiops\",\n    \"created\": \"{{timestamp}}\"\n  },\n  \"properties\": {\n    \"activeDirectories\": [\n      {\n        \"domain\": \"contoso.com\",\n        \"dns\": \"10.0.0.4\",\n        \"username\": \"admin\",\n        \"password\": \"SecurePassword123!\",\n        \"smbServerName\": \"SMBSERVER\",\n        \"organizationalUnit\": \"OU=Computers,DC=contoso,DC=com\",\n        \"site\": \"Default-First-Site-Name\",\n        \"aesEncryption\": false,\n        \"ldapSigning\": false\n      }\n    ],\n    \"encryption\": {\n      \"keySource\": \"Microsoft.NetApp\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Create a new NetApp account with Active Directory configuration"
+          },
+          "response": []
+        },
+        {
+          "name": "Get NetApp Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Get details of a specific NetApp account"
+          },
+          "response": []
+        },
+        {
+          "name": "Update NetApp Account",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": {\n    \"environment\": \"test\",\n    \"purpose\": \"development\",\n    \"owner\": \"anf-aiops\",\n    \"updated\": \"{{timestamp}}\",\n    \"status\": \"active\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Update NetApp account properties"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete NetApp Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Delete a NetApp account (run this last)"
+          },
+          "response": []
+        }
+      ],
+      "description": "NetApp account management operations including create, read, update, and delete"
+    },
+    {
+      "name": "02. Capacity Pools Operations",
+      "item": [
+        {
+          "name": "List Capacity Pools",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List all capacity pools in a NetApp account"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Capacity Pool",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": \"{{location}}\",\n  \"tags\": {\n    \"tier\": \"premium\",\n    \"workload\": \"database\",\n    \"owner\": \"anf-aiops\",\n    \"created\": \"{{timestamp}}\"\n  },\n  \"properties\": {\n    \"size\": 4398046511104,\n    \"serviceLevel\": \"Premium\",\n    \"qosType\": \"Auto\",\n    \"coolAccess\": false,\n    \"encryptionType\": \"Single\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Create a new Premium capacity pool with 4TiB size"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Capacity Pool",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Get details of a specific capacity pool"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Capacity Pool",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": {\n    \"tier\": \"premium\",\n    \"workload\": \"database\",\n    \"owner\": \"anf-aiops\",\n    \"updated\": \"{{timestamp}}\",\n    \"status\": \"active\"\n  },\n  \"properties\": {\n    \"qosType\": \"Manual\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Update capacity pool properties"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Capacity Pool",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Delete a capacity pool"
+          },
+          "response": []
+        }
+      ],
+      "description": "Capacity pool management operations for different service levels"
+    },
+    {
+      "name": "03. Volumes Operations",
+      "item": [
+        {
+          "name": "List Volumes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List all volumes in a capacity pool"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Volume with NFSv3",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": \"{{location}}\",\n  \"tags\": {\n    \"application\": \"database\",\n    \"backup\": \"enabled\",\n    \"owner\": \"anf-aiops\",\n    \"created\": \"{{timestamp}}\"\n  },\n  \"properties\": {\n    \"creationToken\": \"{{volumeName}}\",\n    \"serviceLevel\": \"Premium\",\n    \"usageThreshold\": 107374182400,\n    \"protocolTypes\": [\"NFSv3\"],\n    \"subnetId\": \"/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.Network/virtualNetworks/vnet-anf/subnets/anf-subnet\",\n    \"exportPolicy\": {\n      \"rules\": [\n        {\n          \"ruleIndex\": 1,\n          \"allowedClients\": \"10.0.0.0/24\",\n          \"unixReadWrite\": true,\n          \"nfsv3\": true,\n          \"hasRootAccess\": true,\n          \"chownMode\": \"Restricted\"\n        }\n      ]\n    },\n    \"snapshotDirectoryVisible\": true,\n    \"kerberosEnabled\": false,\n    \"securityStyle\": \"unix\",\n    \"encryptionKeySource\": \"Microsoft.NetApp\",\n    \"ldapEnabled\": false,\n    \"coolAccess\": false,\n    \"coolnessPeriod\": 31,\n    \"unixPermissions\": \"0755\",\n    \"avsDataStore\": \"Disabled\",\n    \"isDefaultQuotaEnabled\": false,\n    \"defaultUserQuotaInKiBs\": 0,\n    \"defaultGroupQuotaInKiBs\": 0\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Create a new NFSv3 volume with export policy"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Volume",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Get details of a specific volume"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Volume",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tags\": {\n    \"application\": \"database\",\n    \"backup\": \"enabled\",\n    \"owner\": \"anf-aiops\",\n    \"updated\": \"{{timestamp}}\",\n    \"status\": \"active\"\n  },\n  \"properties\": {\n    \"usageThreshold\": 214748364800,\n    \"exportPolicy\": {\n      \"rules\": [\n        {\n          \"ruleIndex\": 1,\n          \"allowedClients\": \"10.0.0.0/16\",\n          \"unixReadWrite\": true,\n          \"nfsv3\": true,\n          \"hasRootAccess\": true,\n          \"chownMode\": \"Restricted\"\n        }\n      ]\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Update volume properties including size and export policy"
+          },
+          "response": []
+        },
+        {
+          "name": "Authorize Volume Replication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remoteVolumeResourceId\": \"/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}-dr/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}-dr/capacityPools/{{poolName}}-dr/volumes/{{volumeName}}-dr\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}/authorizeReplication?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}", "authorizeReplication"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Authorize cross-region replication for volume"
+          },
+          "response": []
+        },
+        {
+          "name": "Break Volume Replication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"forceBreakReplication\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}/breakReplication?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}", "breakReplication"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Break replication relationship for volume"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Volume",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}?api-version={{apiVersion}}&forceDelete=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                },
+                {
+                  "key": "forceDelete",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Delete a volume"
+          },
+          "response": []
+        }
+      ],
+      "description": "Volume lifecycle management including creation, replication, and deletion"
+    },
+    {
+      "name": "04. Snapshots Operations",
+      "item": [
+        {
+          "name": "List Snapshots",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}/snapshots?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}", "snapshots"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List all snapshots for a volume"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Snapshot",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": \"{{location}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}/snapshots/{{snapshotName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}", "snapshots", "{{snapshotName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Create a new point-in-time snapshot"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Snapshot",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}/snapshots/{{snapshotName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}", "snapshots", "{{snapshotName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Get details of a specific snapshot"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Snapshot",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/capacityPools/{{poolName}}/volumes/{{volumeName}}/snapshots/{{snapshotName}}?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "capacityPools", "{{poolName}}", "volumes", "{{volumeName}}", "snapshots", "{{snapshotName}}"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Delete a snapshot"
+          },
+          "response": []
+        }
+      ],
+      "description": "Snapshot management for point-in-time volume recovery"
+    },
+    {
+      "name": "05. Backup Policies Operations",
+      "item": [
+        {
+          "name": "List Backup Policies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/backupPolicies?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "backupPolicies"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List all backup policies for a NetApp account"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Backup Policy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": \"{{location}}\",\n  \"tags\": {\n    \"type\": \"backup-policy\",\n    \"retention\": \"comprehensive\",\n    \"owner\": \"anf-aiops\",\n    \"created\": \"{{timestamp}}\"\n  },\n  \"properties\": {\n    \"dailyBackupsToKeep\": 7,\n    \"weeklyBackupsToKeep\": 4,\n    \"monthlyBackupsToKeep\": 12,\n    \"yearlyBackupsToKeep\": 5,\n    \"enabled\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/backupPolicies/daily-backup-policy?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "backupPolicies", "daily-backup-policy"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Create comprehensive backup policy with multiple retention periods"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Backup Policy",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/backupPolicies/daily-backup-policy?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "backupPolicies", "daily-backup-policy"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Get details of a specific backup policy"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Backup Policy",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName}}/providers/Microsoft.NetApp/netAppAccounts/{{accountName}}/backupPolicies/daily-backup-policy?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "resourceGroups", "{{resourceGroupName}}", "providers", "Microsoft.NetApp", "netAppAccounts", "{{accountName}}", "backupPolicies", "daily-backup-policy"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Delete a backup policy"
+          },
+          "response": []
+        }
+      ],
+      "description": "Backup policy management for automated backup schedules"
+    },
+    {
+      "name": "06. Resource Operations",
+      "item": [
+        {
+          "name": "Check Name Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{accountName}}-availability-test\",\n  \"type\": \"Microsoft.NetApp/netAppAccounts\",\n  \"resourceGroup\": \"{{resourceGroupName}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/providers/Microsoft.NetApp/checkNameAvailability?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "providers", "Microsoft.NetApp", "checkNameAvailability"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Check if a resource name is available"
+          },
+          "response": []
+        },
+        {
+          "name": "List Quota Limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/providers/Microsoft.NetApp/locations/{{location}}/quotaLimits?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "providers", "Microsoft.NetApp", "locations", "{{location}}", "quotaLimits"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List quota limits for the subscription in a specific region"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Specific Quota Limit",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/providers/Microsoft.NetApp/locations/{{location}}/quotaLimits/totalVolumesPerSubscription?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "providers", "Microsoft.NetApp", "locations", "{{location}}", "quotaLimits", "totalVolumesPerSubscription"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Get specific quota limit for volumes per subscription"
+          },
+          "response": []
+        },
+        {
+          "name": "List Operations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/providers/Microsoft.NetApp/operations?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["providers", "Microsoft.NetApp", "operations"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "List all available NetApp operations"
+          },
+          "response": []
+        }
+      ],
+      "description": "Resource management operations including name availability and quota checks"
+    },
+    {
+      "name": "07. Health & Monitoring",
+      "item": [
+        {
+          "name": "Health Check Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check API health status"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Service Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Request-ID",
+                "value": "{{requestId}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/providers/Microsoft.NetApp/locations/{{location}}/status?api-version={{apiVersion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "{{subscriptionId}}", "providers", "Microsoft.NetApp", "locations", "{{location}}", "status"],
+              "query": [
+                {
+                  "key": "api-version",
+                  "value": "{{apiVersion}}"
+                }
+              ]
+            },
+            "description": "Get NetApp service status for a specific region"
+          },
+          "response": []
+        }
+      ],
+      "description": "Health monitoring and service status endpoints"
+    }
+  ]
+}

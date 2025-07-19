@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Backup Vaults operations
 const BackupVaultsCommonSchemas = {
@@ -126,37 +127,93 @@ export const backupVaultsOperationsTools: Tool[] = [
   {
     name: 'anf_backup_vaults_create_or_update',
     description: 'Create or update a backup vault for storing volume backups',
-    inputSchema: BackupVaultsCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(BackupVaultsCreateOrUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_delete',
     description: 'Delete a backup vault (must be empty of backups)',
-    inputSchema: BackupVaultsDeleteSchema
+    inputSchema: wrapZodSchema(BackupVaultsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_get',
     description: 'Get detailed information about a specific backup vault',
-    inputSchema: BackupVaultsGetSchema
+    inputSchema: wrapZodSchema(BackupVaultsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_list',
     description: 'List all backup vaults in a NetApp account',
-    inputSchema: BackupVaultsListSchema
+    inputSchema: wrapZodSchema(BackupVaultsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_update',
     description: 'Update backup vault properties and tags',
-    inputSchema: BackupVaultsUpdateSchema
+    inputSchema: wrapZodSchema(BackupVaultsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_get_backup_status',
     description: 'Get backup status and statistics for a vault',
-    inputSchema: BackupVaultsGetBackupStatusSchema
+    inputSchema: wrapZodSchema(BackupVaultsGetBackupStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_get_backup_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_migrate_backups',
     description: 'Migrate backups from one vault to another',
-    inputSchema: BackupVaultsMigrateBackupsSchema
+    inputSchema: wrapZodSchema(BackupVaultsMigrateBackupsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_migrate_backups is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

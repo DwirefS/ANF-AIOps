@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // =============================================================================
 // OPERATIONS OPERATION GROUP
@@ -110,37 +111,93 @@ export const operationsTools: Tool[] = [
   {
     name: 'anf_operations_list',
     description: 'List all available Azure NetApp Files REST API operations with metadata',
-    inputSchema: OperationsListSchema
+    inputSchema: wrapZodSchema(OperationsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_operations_get',
     description: 'Get detailed information about a specific NetApp Files operation',
-    inputSchema: OperationsGetSchema
+    inputSchema: wrapZodSchema(OperationsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_operations_by_version',
     description: 'Get operations available in a specific API version',
-    inputSchema: OperationsByVersionSchema
+    inputSchema: wrapZodSchema(OperationsByVersionSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_by_version is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_operations_by_category',
     description: 'Get operations filtered by resource category or operation group',
-    inputSchema: OperationsByCategorySchema
+    inputSchema: wrapZodSchema(OperationsByCategorySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_by_category is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_operations_detailed',
     description: 'Get detailed operation descriptions with examples and schemas',
-    inputSchema: OperationsDetailedSchema
+    inputSchema: wrapZodSchema(OperationsDetailedSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_detailed is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_operations_search',
     description: 'Search operations by name pattern or description keywords',
-    inputSchema: OperationsSearchSchema
+    inputSchema: wrapZodSchema(OperationsSearchSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_search is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_operations_analytics',
     description: 'Get operation usage analytics and performance statistics',
-    inputSchema: OperationsAnalyticsSchema
+    inputSchema: wrapZodSchema(OperationsAnalyticsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_analytics is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

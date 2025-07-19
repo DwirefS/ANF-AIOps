@@ -1,0 +1,307 @@
+# Security Scanning Workflow
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+name: Security Scan
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # CodeQL Analysis
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp', 'javascript', 'typescript' ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Setup .NET for C# analysis
+        if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build C# code
+        if: matrix.language == 'csharp'
+        run: |
+          cd functions/ANFServer
+          dotnet restore
+          dotnet build
+
+      - name: Setup Node.js for JS/TS analysis
+        if: matrix.language == 'javascript' || matrix.language == 'typescript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies for JS/TS
+        if: matrix.language == 'javascript' || matrix.language == 'typescript'
+        run: |
+          for dir in rag src/mcp-server src/teams-bot; do
+            if [ -d "$dir" ]; then
+              cd "$dir"
+              npm ci || true
+              cd -
+            fi
+          done
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  # Container Scanning
+  container-scan:
+    name: Container Image Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build container images
+        run: |
+          # Build Azure Functions container
+          if [ -f "functions/ANFServer/Dockerfile" ]; then
+            docker build -t anf-functions:scan ./functions/ANFServer
+          fi
+          
+          # Build MCP Server container
+          if [ -f "src/mcp-server/Dockerfile" ]; then
+            docker build -t mcp-server:scan ./src/mcp-server
+          fi
+          
+          # Build Teams Bot container
+          if [ -f "src/teams-bot/Dockerfile" ]; then
+            docker build -t teams-bot:scan ./src/teams-bot
+          fi
+
+      - name: Run Trivy container scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'anf-functions:scan'
+          format: 'sarif'
+          output: 'trivy-container-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-container-results.sarif'
+
+  # Dependency Scanning
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'ANF-AIOps'
+          path: '.'
+          format: 'ALL'
+          args: >
+            --enableRetired
+            --enableExperimental
+
+      - name: Upload OWASP results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: dependency-check-report
+          path: reports/
+
+  # Secret Scanning
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+
+  # Infrastructure Security Scan
+  infrastructure-scan:
+    name: Infrastructure Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Checkov for Terraform
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: infra/
+          framework: terraform
+          output_format: sarif
+          output_file_path: checkov-terraform.sarif
+
+      - name: Run Checkov for Bicep
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: src/infrastructure/bicep/
+          framework: bicep
+          output_format: sarif
+          output_file_path: checkov-bicep.sarif
+
+      - name: Upload Checkov results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: checkov-terraform.sarif
+
+  # SAST for .NET
+  dotnet-security:
+    name: .NET Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install security tools
+        run: |
+          dotnet tool install --global security-scan
+          dotnet tool install --global dotnet-retire
+
+      - name: Run Security Scan
+        run: |
+          cd functions/ANFServer
+          security-scan . --excl-proj "*.Test.csproj" || true
+
+      - name: Check for retired packages
+        run: |
+          cd functions/ANFServer
+          dotnet-retire || true
+
+  # License Compliance
+  license-compliance:
+    name: License Compliance Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run License Finder
+        uses: pivotal/licensefinder-action@v1
+        with:
+          config-file: .license-finder.yml
+
+  # Security Policy Compliance
+  policy-compliance:
+    name: Security Policy Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate security policies
+        run: |
+          # Check for required security files
+          files=("SECURITY.md" ".github/CODEOWNERS")
+          for file in "${files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Missing required security file: $file"
+              exit 1
+            fi
+          done
+
+      - name: Check branch protection
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Verify main branch protection rules
+          gh api repos/${{ github.repository }}/branches/main/protection || {
+            echo "Main branch protection not configured"
+            exit 1
+          }
+
+  # Generate Security Report
+  security-report:
+    name: Generate Security Report
+    runs-on: ubuntu-latest
+    needs: [codeql-analysis, container-scan, dependency-scan, secret-scan, infrastructure-scan, dotnet-security]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Generate consolidated report
+        run: |
+          mkdir -p security-reports
+          echo "# Security Scan Report" > security-reports/SECURITY_REPORT.md
+          echo "Generated on: $(date)" >> security-reports/SECURITY_REPORT.md
+          echo "Repository: ${{ github.repository }}" >> security-reports/SECURITY_REPORT.md
+          echo "Commit: ${{ github.sha }}" >> security-reports/SECURITY_REPORT.md
+          echo "" >> security-reports/SECURITY_REPORT.md
+          
+          # Add scan summaries
+          echo "## Scan Results Summary" >> security-reports/SECURITY_REPORT.md
+          echo "- CodeQL Analysis: ${{ needs.codeql-analysis.result }}" >> security-reports/SECURITY_REPORT.md
+          echo "- Container Scan: ${{ needs.container-scan.result }}" >> security-reports/SECURITY_REPORT.md
+          echo "- Dependency Scan: ${{ needs.dependency-scan.result }}" >> security-reports/SECURITY_REPORT.md
+          echo "- Secret Scan: ${{ needs.secret-scan.result }}" >> security-reports/SECURITY_REPORT.md
+          echo "- Infrastructure Scan: ${{ needs.infrastructure-scan.result }}" >> security-reports/SECURITY_REPORT.md
+          echo "- .NET Security: ${{ needs.dotnet-security.result }}" >> security-reports/SECURITY_REPORT.md
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: security-reports/
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('security-reports/SECURITY_REPORT.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });

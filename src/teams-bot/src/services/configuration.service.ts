@@ -13,7 +13,7 @@ export interface BotConfiguration {
     mcpServerUrl: string;
     port: number;
     environment: string;
-    keyVaultUrl?: string;
+    keyVaultUrl?: string | undefined;
     tenantId: string;
     clientId: string;
     clientSecret: string;
@@ -47,7 +47,7 @@ export class ConfigurationService {
                 mcpServerUrl: process.env.MCP_SERVER_URL || '',
                 port: parseInt(process.env.PORT || '3978', 10),
                 environment: process.env.NODE_ENV || 'development',
-                keyVaultUrl: process.env.KEY_VAULT_URL,
+                keyVaultUrl: process.env.KEY_VAULT_URL || undefined,
                 tenantId: process.env.AZURE_TENANT_ID || '',
                 clientId: process.env.AZURE_CLIENT_ID || '',
                 clientSecret: process.env.AZURE_CLIENT_SECRET || '',

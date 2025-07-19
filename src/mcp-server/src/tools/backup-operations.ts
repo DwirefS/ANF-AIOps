@@ -12,8 +12,9 @@
  * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for backup operations
 const BackupCommonSchemas = {
@@ -281,27 +282,67 @@ export const backupOperationsTools: Tool[] = [
   {
     name: 'anf_backup_policies_create',
     description: 'Create a backup policy with retention settings for daily, weekly, monthly, and yearly backups',
-    inputSchema: BackupPoliciesCreateSchema
+    inputSchema: wrapZodSchema(BackupPoliciesCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_delete',
     description: 'Delete a backup policy (cannot be deleted if associated with volumes)',
-    inputSchema: BackupPoliciesDeleteSchema
+    inputSchema: wrapZodSchema(BackupPoliciesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_get',
     description: 'Get detailed information about a backup policy including retention settings',
-    inputSchema: BackupPoliciesGetSchema
+    inputSchema: wrapZodSchema(BackupPoliciesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_list',
     description: 'List all backup policies in a NetApp account',
-    inputSchema: BackupPoliciesListSchema
+    inputSchema: wrapZodSchema(BackupPoliciesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_update',
     description: 'Update backup policy settings including retention periods',
-    inputSchema: BackupPoliciesUpdateSchema
+    inputSchema: wrapZodSchema(BackupPoliciesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -310,27 +351,67 @@ export const backupOperationsTools: Tool[] = [
   {
     name: 'anf_backup_vaults_create_or_update',
     description: 'Create or update a backup vault for storing volume backups',
-    inputSchema: BackupVaultsCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(BackupVaultsCreateOrUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_delete',
     description: 'Delete a backup vault (must be empty of backups)',
-    inputSchema: BackupVaultsDeleteSchema
+    inputSchema: wrapZodSchema(BackupVaultsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_get',
     description: 'Get detailed information about a backup vault',
-    inputSchema: BackupVaultsGetSchema
+    inputSchema: wrapZodSchema(BackupVaultsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_list',
     description: 'List all backup vaults in a NetApp account',
-    inputSchema: BackupVaultsListSchema
+    inputSchema: wrapZodSchema(BackupVaultsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_vaults_update',
     description: 'Update backup vault properties and metadata',
-    inputSchema: BackupVaultsUpdateSchema
+    inputSchema: wrapZodSchema(BackupVaultsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_vaults_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -339,47 +420,119 @@ export const backupOperationsTools: Tool[] = [
   {
     name: 'anf_backups_create',
     description: 'Create a backup of a volume to a backup vault',
-    inputSchema: BackupsCreateSchema
+    inputSchema: wrapZodSchema(BackupsCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_delete',
     description: 'Delete a backup from a backup vault',
-    inputSchema: BackupsDeleteSchema
+    inputSchema: wrapZodSchema(BackupsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get',
     description: 'Get detailed information about a specific backup',
-    inputSchema: BackupsGetSchema
+    inputSchema: wrapZodSchema(BackupsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_list',
     description: 'List backups in a backup vault with optional filtering',
-    inputSchema: BackupsListSchema
+    inputSchema: wrapZodSchema(BackupsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_update',
     description: 'Update backup metadata such as labels',
-    inputSchema: BackupsUpdateSchema
+    inputSchema: wrapZodSchema(BackupsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get_latest_status',
     description: 'Get the latest backup status for a volume',
-    inputSchema: BackupsGetLatestStatusSchema
+    inputSchema: wrapZodSchema(BackupsGetLatestStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get_latest_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get_volume_latest_restore_status',
     description: 'Get the latest restore status for a volume',
-    inputSchema: BackupsGetVolumeLatestRestoreStatusSchema
+    inputSchema: wrapZodSchema(BackupsGetVolumeLatestRestoreStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get_volume_latest_restore_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_list_by_vault',
     description: 'List all backups in a specific backup vault',
-    inputSchema: BackupsListByVaultSchema
+    inputSchema: wrapZodSchema(BackupsListByVaultSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_list_by_vault is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_restore_files',
     description: 'Restore specific files from a backup to a destination volume',
-    inputSchema: BackupsRestoreFilesSchema
+    inputSchema: wrapZodSchema(BackupsRestoreFilesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_restore_files is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -388,7 +541,15 @@ export const backupOperationsTools: Tool[] = [
   {
     name: 'anf_backups_under_account_list',
     description: 'List all backups under a NetApp account across all backup vaults',
-    inputSchema: BackupsUnderAccountListSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -397,7 +558,15 @@ export const backupOperationsTools: Tool[] = [
   {
     name: 'anf_backups_under_backup_vault_list',
     description: 'List all backups within a specific backup vault',
-    inputSchema: BackupsUnderBackupVaultListSchema
+    inputSchema: wrapZodSchema(BackupsUnderBackupVaultListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_backup_vault_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -406,7 +575,15 @@ export const backupOperationsTools: Tool[] = [
   {
     name: 'anf_backups_under_volume_list',
     description: 'List all backups for a specific volume',
-    inputSchema: BackupsUnderVolumeListSchema
+    inputSchema: wrapZodSchema(BackupsUnderVolumeListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_volume_list is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

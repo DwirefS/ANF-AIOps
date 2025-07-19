@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Snapshot Policies operations
 const SnapshotPoliciesCommonSchemas = {
@@ -180,47 +181,119 @@ export const snapshotPoliciesOperationsTools: Tool[] = [
   {
     name: 'anf_snapshot_policies_create',
     description: 'Create an automated snapshot policy with hourly, daily, weekly, and monthly schedules',
-    inputSchema: SnapshotPoliciesCreateSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_delete',
     description: 'Delete a snapshot policy (cannot delete if assigned to volumes)',
-    inputSchema: SnapshotPoliciesDeleteSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_get',
     description: 'Get detailed information about a specific snapshot policy',
-    inputSchema: SnapshotPoliciesGetSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_list',
     description: 'List all snapshot policies in a NetApp account',
-    inputSchema: SnapshotPoliciesListSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_update',
     description: 'Update snapshot policy schedules and retention settings',
-    inputSchema: SnapshotPoliciesUpdateSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_list_volumes',
     description: 'List all volumes using a specific snapshot policy',
-    inputSchema: SnapshotPoliciesListVolumesSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesListVolumesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_list_volumes is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_assign_to_volume',
     description: 'Assign a snapshot policy to a volume',
-    inputSchema: SnapshotPoliciesAssignToVolumeSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesAssignToVolumeSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_assign_to_volume is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_remove_from_volume',
     description: 'Remove a snapshot policy from a volume',
-    inputSchema: SnapshotPoliciesRemoveFromVolumeSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesRemoveFromVolumeSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_remove_from_volume is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_get_status',
     description: 'Get the execution status of a snapshot policy',
-    inputSchema: SnapshotPoliciesGetStatusSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesGetStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_get_status is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

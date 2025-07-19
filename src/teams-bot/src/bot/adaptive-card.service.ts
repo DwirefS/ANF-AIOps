@@ -15,7 +15,7 @@
  */
 
 import { Attachment, CardFactory } from 'botbuilder';
-import { VolumeInfo, PoolInfo, SnapshotInfo } from '../services/mcp.service';
+import { VolumeInfo } from '../services/mcp.service';
 
 export class AdaptiveCardService {
   

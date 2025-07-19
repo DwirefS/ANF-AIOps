@@ -55,7 +55,7 @@ export class MCPService {
     private client: AxiosInstance;
     private logger = LoggingService.getInstance();
 
-    constructor(private baseUrl: string) {
+    constructor(baseUrl: string) {
         this.client = axios.create({
             baseURL: baseUrl,
             timeout: 30000,

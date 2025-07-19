@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Volume Groups operations
 const VolumeGroupsCommonSchemas = {
@@ -160,32 +161,80 @@ export const volumeGroupsOperationsTools: Tool[] = [
   {
     name: 'anf_volume_groups_create',
     description: 'Create an application-specific volume group (SAP HANA, Oracle, SQL Server)',
-    inputSchema: VolumeGroupsCreateSchema
+    inputSchema: wrapZodSchema(VolumeGroupsCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_delete',
     description: 'Delete a volume group and all associated volumes',
-    inputSchema: VolumeGroupsDeleteSchema
+    inputSchema: wrapZodSchema(VolumeGroupsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_get',
     description: 'Get detailed information about a specific volume group',
-    inputSchema: VolumeGroupsGetSchema
+    inputSchema: wrapZodSchema(VolumeGroupsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_list',
     description: 'List all volume groups in a NetApp account',
-    inputSchema: VolumeGroupsListSchema
+    inputSchema: wrapZodSchema(VolumeGroupsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_update',
     description: 'Update volume group metadata',
-    inputSchema: VolumeGroupsUpdateSchema
+    inputSchema: wrapZodSchema(VolumeGroupsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_get_deployment_spec',
     description: 'Get deployment specification for application-specific configurations',
-    inputSchema: VolumeGroupsGetDeploymentSpecSchema
+    inputSchema: wrapZodSchema(VolumeGroupsGetDeploymentSpecSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_get_deployment_spec is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

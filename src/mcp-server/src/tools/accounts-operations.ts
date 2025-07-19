@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Accounts operations
 const AccountsCommonSchemas = {
@@ -239,67 +240,158 @@ export const accountsOperationsTools: Tool[] = [
   {
     name: 'anf_accounts_create_or_update',
     description: 'Create or update a NetApp account with Active Directory, encryption, and identity configuration',
-    inputSchema: AccountsCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(AccountsCreateOrUpdateSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_delete',
     description: 'Delete a NetApp account and all associated resources',
-    inputSchema: AccountsDeleteSchema
+    inputSchema: wrapZodSchema(AccountsDeleteSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_get',
     description: 'Get detailed information about a specific NetApp account',
-    inputSchema: AccountsGetSchema
+    inputSchema: wrapZodSchema(AccountsGetSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_list',
     description: 'List all NetApp accounts in a resource group',
-    inputSchema: AccountsListSchema
+    inputSchema: wrapZodSchema(AccountsListSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_list_by_subscription',
     description: 'List all NetApp accounts in a subscription',
-    inputSchema: AccountsListBySubscriptionSchema
+    inputSchema: wrapZodSchema(AccountsListBySubscriptionSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_list_by_subscription is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_update',
     description: 'Update NetApp account properties including tags and configurations',
-    inputSchema: AccountsUpdateSchema
+    inputSchema: wrapZodSchema(AccountsUpdateSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_change_key_vault',
     description: 'Change the key vault used for volume encryption',
-    inputSchema: AccountsChangeKeyVaultSchema
+    inputSchema: wrapZodSchema(AccountsChangeKeyVaultSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_change_key_vault is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_get_change_key_vault_information',
     description: 'Get information about volume encryption and key vault configuration',
-    inputSchema: AccountsGetChangeKeyVaultInformationSchema
+    inputSchema: wrapZodSchema(AccountsGetChangeKeyVaultInformationSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_get_change_key_vault_information is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_renew_credentials',
     description: 'Renew credentials for the NetApp account identity',
-    inputSchema: AccountsRenewCredentialsSchema
+    inputSchema: wrapZodSchema(AccountsRenewCredentialsSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_renew_credentials is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_transition_to_cmk',
     description: 'Transition volume encryption from platform-managed to customer-managed keys',
-    inputSchema: AccountsTransitionToCmkSchema
+    inputSchema: wrapZodSchema(AccountsTransitionToCmkSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_transition_to_cmk is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_list_replications',
     description: 'List all volume replications under the NetApp account',
-    inputSchema: AccountsListReplicationsSchema
+    inputSchema: wrapZodSchema(AccountsListReplicationsSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_list_replications is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_migrate_encryption_key',
     description: 'Migrate encryption key to a new key vault',
-    inputSchema: AccountsMigrateEncryptionKeySchema
+    inputSchema: wrapZodSchema(AccountsMigrateEncryptionKeySchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_migrate_encryption_key is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_get_encryption_status',
     description: 'Get the current encryption status and configuration of the account',
-    inputSchema: AccountsGetEncryptionStatusSchema
+    inputSchema: wrapZodSchema(AccountsGetEncryptionStatusSchema),
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_get_encryption_status is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

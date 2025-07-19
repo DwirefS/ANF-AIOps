@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Backups Under Account operations
 const BackupsUnderAccountCommonSchemas = {
@@ -189,47 +190,119 @@ export const backupsUnderAccountTools: Tool[] = [
   {
     name: 'anf_backups_under_account_list',
     description: 'List all backups under a NetApp account with filtering and pagination',
-    inputSchema: BackupsUnderAccountListSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_get',
     description: 'Get detailed information about a specific backup under account',
-    inputSchema: BackupsUnderAccountGetSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_delete',
     description: 'Delete a backup under account with optional force deletion',
-    inputSchema: BackupsUnderAccountDeleteSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_get_status',
     description: 'Get current status and progress of backup under account',
-    inputSchema: BackupsUnderAccountGetStatusSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountGetStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_get_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_restore',
     description: 'Restore from backup under account to new volume or restore specific files',
-    inputSchema: BackupsUnderAccountRestoreSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountRestoreSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_restore is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_copy',
     description: 'Copy backup under account to different region or backup vault',
-    inputSchema: BackupsUnderAccountCopySchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountCopySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_copy is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_update',
     description: 'Update backup metadata, tags, and retention policy under account',
-    inputSchema: BackupsUnderAccountUpdateSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_get_metrics',
     description: 'Get backup metrics and analytics for backup under account',
-    inputSchema: BackupsUnderAccountGetMetricsSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountGetMetricsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_get_metrics is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_under_account_list_dependencies',
     description: 'List all resources that depend on this backup under account',
-    inputSchema: BackupsUnderAccountListDependenciesSchema
+    inputSchema: wrapZodSchema(BackupsUnderAccountListDependenciesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_under_account_list_dependencies is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

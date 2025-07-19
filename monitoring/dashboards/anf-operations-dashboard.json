@@ -1,0 +1,358 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2020-09-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "author": "Dwiref Sharma <DwirefS@SapientEdge.io>",
+    "description": "Azure Monitor dashboard for ANF-AIOps operations monitoring",
+    "version": "2.0.0"
+  },
+  "parameters": {
+    "dashboardName": {
+      "type": "string",
+      "defaultValue": "ANF-AIOps-Operations-Dashboard",
+      "metadata": {
+        "description": "Name of the dashboard"
+      }
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource group containing ANF-AIOps resources"
+      }
+    },
+    "subscriptionId": {
+      "type": "string",
+      "defaultValue": "[subscription().subscriptionId]",
+      "metadata": {
+        "description": "Subscription ID"
+      }
+    },
+    "workspaceId": {
+      "type": "string",
+      "metadata": {
+        "description": "Log Analytics workspace resource ID"
+      }
+    },
+    "applicationInsightsId": {
+      "type": "string",
+      "metadata": {
+        "description": "Application Insights resource ID"
+      }
+    }
+  },
+  "variables": {
+    "dashboardId": "[resourceId('Microsoft.Portal/dashboards', parameters('dashboardName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Portal/dashboards",
+      "apiVersion": "2020-09-01-preview",
+      "name": "[parameters('dashboardName')]",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "hidden-title": "ANF-AIOps Operations Dashboard",
+        "Environment": "Production",
+        "Application": "ANF-AIOps",
+        "Owner": "DwirefS@SapientEdge.io"
+      },
+      "properties": {
+        "lenses": [
+          {
+            "order": 0,
+            "parts": [
+              {
+                "position": {
+                  "x": 0,
+                  "y": 0,
+                  "rowSpan": 4,
+                  "colSpan": 6
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "resourceTypeMode",
+                      "isOptional": true
+                    },
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('applicationInsightsId')]"
+                    },
+                    {
+                      "name": "Scope",
+                      "value": {
+                        "resourceIds": [
+                          "[parameters('applicationInsightsId')]"
+                        ]
+                      }
+                    },
+                    {
+                      "name": "PartId",
+                      "value": "1d4b1e3c-7d5f-4b4e-8b7a-1c3e2d4f5g6h"
+                    },
+                    {
+                      "name": "Version",
+                      "value": "2.0"
+                    },
+                    {
+                      "name": "TimeRange",
+                      "value": "P1D"
+                    },
+                    {
+                      "name": "DashboardId",
+                      "value": "[variables('dashboardId')]"
+                    },
+                    {
+                      "name": "DashboardTimeRange",
+                      "value": {
+                        "relative": {
+                          "duration": 86400000
+                        }
+                      }
+                    },
+                    {
+                      "name": "Query",
+                      "value": "requests\n| where timestamp > ago(24h)\n| summarize TotalRequests = count(), \n           SuccessfulRequests = countif(success == true),\n           FailedRequests = countif(success == false),\n           AvgDuration = avg(duration)\n| extend SuccessRate = (SuccessfulRequests * 100.0) / TotalRequests\n| project TotalRequests, SuccessfulRequests, FailedRequests, SuccessRate, AvgDuration\n"
+                    },
+                    {
+                      "name": "ControlType",
+                      "value": "FrameControlChart"
+                    },
+                    {
+                      "name": "SpecificChart",
+                      "value": "StackedColumn"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Analytics"
+                    },
+                    {
+                      "name": "PartSubTitle",
+                      "value": "ANF API Operations Overview"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              },
+              {
+                "position": {
+                  "x": 6,
+                  "y": 0,
+                  "rowSpan": 4,
+                  "colSpan": 6
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('applicationInsightsId')]"
+                    },
+                    {
+                      "name": "Query",
+                      "value": "customEvents\n| where name == \"ANF_Operation\"\n| where timestamp > ago(24h)\n| extend Operation = tostring(customDimensions.Operation),\n         Resource = tostring(customDimensions.Resource),\n         Success = tobool(customDimensions.Success)\n| summarize Count = count(), \n           SuccessCount = countif(Success == true),\n           FailureCount = countif(Success == false)\n    by Operation\n| extend SuccessRate = (SuccessCount * 100.0) / Count\n| order by Count desc\n| take 10\n"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Top ANF Operations"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              },
+              {
+                "position": {
+                  "x": 0,
+                  "y": 4,
+                  "rowSpan": 4,
+                  "colSpan": 12
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('workspaceId')]"
+                    },
+                    {
+                      "name": "Query",
+                      "value": "FunctionAppLogs\n| where TimeGenerated > ago(24h)\n| where Category == \"Function.ANFOperations\"\n| extend Operation = extract(\"Operation: ([A-Za-z]+)\", 1, Message),\n         Duration = extract(\"Duration: ([0-9]+)ms\", 1, Message),\n         Status = extract(\"Status: ([A-Za-z]+)\", 1, Message)\n| where isnotempty(Operation)\n| summarize AvgDuration = avg(todouble(Duration)),\n           MaxDuration = max(todouble(Duration)),\n           Count = count(),\n           SuccessCount = countif(Status == \"Success\"),\n           ErrorCount = countif(Status == \"Error\")\n    by Operation, bin(TimeGenerated, 1h)\n| extend SuccessRate = (SuccessCount * 100.0) / Count\n| order by TimeGenerated desc\n"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "ANF Operations Performance Timeline"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              },
+              {
+                "position": {
+                  "x": 0,
+                  "y": 8,
+                  "rowSpan": 3,
+                  "colSpan": 4
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('applicationInsightsId')]"
+                    },
+                    {
+                      "name": "Query",
+                      "value": "exceptions\n| where timestamp > ago(24h)\n| summarize ErrorCount = count() by tostring(type), bin(timestamp, 1h)\n| order by timestamp desc\n"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Error Analysis"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              },
+              {
+                "position": {
+                  "x": 4,
+                  "y": 8,
+                  "rowSpan": 3,
+                  "colSpan": 4
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('applicationInsightsId')]"
+                    },
+                    {
+                      "name": "Query",
+                      "value": "customEvents\n| where name == \"UserActivity\"\n| where timestamp > ago(24h)\n| extend UserId = tostring(customDimensions.UserId),\n         Action = tostring(customDimensions.Action)\n| summarize UniqueUsers = dcount(UserId),\n           TotalActions = count()\n    by bin(timestamp, 1h), Action\n| order by timestamp desc\n"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "User Activity"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              },
+              {
+                "position": {
+                  "x": 8,
+                  "y": 8,
+                  "rowSpan": 3,
+                  "colSpan": 4
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('workspaceId')]"
+                    },
+                    {
+                      "name": "Query",
+                      "value": "Perf\n| where TimeGenerated > ago(24h)\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\"\n| summarize AvgCPU = avg(CounterValue) by Computer, bin(TimeGenerated, 1h)\n| order by TimeGenerated desc\n"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "System Performance"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              },
+              {
+                "position": {
+                  "x": 0,
+                  "y": 11,
+                  "rowSpan": 4,
+                  "colSpan": 6
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('applicationInsightsId')]"
+                    },
+                    {
+                      "name": "Query",
+                      "value": "customEvents\n| where name == \"TeamsBot_Conversation\"\n| where timestamp > ago(24h)\n| extend Intent = tostring(customDimensions.Intent),\n         UserId = tostring(customDimensions.UserId),\n         Success = tobool(customDimensions.Success)\n| summarize ConversationCount = count(),\n           SuccessfulConversations = countif(Success == true),\n           UniqueUsers = dcount(UserId)\n    by Intent, bin(timestamp, 2h)\n| extend SuccessRate = (SuccessfulConversations * 100.0) / ConversationCount\n| order by timestamp desc\n"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Teams Bot Interactions"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              },
+              {
+                "position": {
+                  "x": 6,
+                  "y": 11,
+                  "rowSpan": 4,
+                  "colSpan": 6
+                },
+                "metadata": {
+                  "inputs": [
+                    {
+                      "name": "ComponentId",
+                      "value": "[parameters('workspaceId')]"
+                    },
+                    {
+                      "name": "Query",
+                      "value": "AzureActivity\n| where TimeGenerated > ago(24h)\n| where ResourceProvider == \"Microsoft.NetApp\"\n| summarize OperationCount = count() by OperationNameValue, bin(TimeGenerated, 1h)\n| order by TimeGenerated desc\n"
+                    },
+                    {
+                      "name": "PartTitle",
+                      "value": "Azure NetApp Files Activity"
+                    }
+                  ],
+                  "type": "Extension/HubsExtension/PartType/MonitorChartPart"
+                }
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "model": {
+            "timeRange": {
+              "value": {
+                "relative": {
+                  "duration": 86400000
+                }
+              },
+              "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+            },
+            "filterLocale": {
+              "value": "en-us"
+            },
+            "filters": {
+              "value": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "24h"
+                  },
+                  "displayCache": {
+                    "name": "Local Time",
+                    "value": "Past 24 hours"
+                  },
+                  "filteredPartIds": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "dashboardId": {
+      "type": "string",
+      "value": "[variables('dashboardId')]"
+    },
+    "dashboardUrl": {
+      "type": "string",
+      "value": "[concat('https://portal.azure.com/#@', tenant().displayName, '/dashboard/arm', variables('dashboardId'))]"
+    }
+  }
+}

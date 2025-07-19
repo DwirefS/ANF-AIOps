@@ -1,0 +1,84 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=your-storage-account;AccountKey=your-storage-key;EndpointSuffix=core.windows.net",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "FUNCTIONS_EXTENSION_VERSION": "~4",
+    
+    "AZURE_CLIENT_ID": "00000000-0000-0000-0000-000000000000",
+    "AZURE_CLIENT_SECRET": "your-azure-client-secret",
+    "AZURE_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+    "AZURE_SUBSCRIPTION_ID": "00000000-0000-0000-0000-000000000000",
+    
+    "ANF_ACCOUNT_NAME": "your-netapp-account-name",
+    "ANF_RESOURCE_GROUP": "your-netapp-resource-group",
+    "ANF_LOCATION": "eastus",
+    "ANF_DEFAULT_POOL": "your-default-capacity-pool",
+    "ANF_DEFAULT_SUBNET_ID": "/subscriptions/{subscription-id}/resourceGroups/{rg}/providers/Microsoft.Network/virtualNetworks/{vnet}/subnets/{subnet}",
+    
+    "JWT_SECRET": "your-jwt-secret-key-must-be-at-least-256-bits",
+    "JWT_ISSUER": "https://your-domain.com",
+    "JWT_AUDIENCE": "anf-aiops-api",
+    "JWT_EXPIRATION": "3600",
+    
+    "MCP_SERVER_URL": "http://localhost:3000",
+    "MCP_API_KEY": "your-mcp-api-key",
+    
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/",
+    
+    "REDIS_CONNECTION_STRING": "your-redis-connection-string",
+    "CACHE_TTL": "3600",
+    
+    "LOG_LEVEL": "Information",
+    "ENABLE_SWAGGER": "true",
+    "ENABLE_CORS": "true",
+    "CORS_ALLOWED_ORIGINS": "https://teams.microsoft.com,http://localhost:3000",
+    
+    "RATE_LIMIT_REQUESTS": "1000",
+    "RATE_LIMIT_WINDOW": "60000",
+    
+    "ENCRYPTION_KEY": "your-encryption-key-for-sensitive-data",
+    "API_KEY_HEADER": "X-API-Key",
+    
+    "TEAMS_BOT_URL": "http://localhost:3978",
+    "RAG_SYSTEM_URL": "http://localhost:3001",
+    
+    "AZURE_OPENAI_API_KEY": "your-openai-api-key",
+    "AZURE_OPENAI_ENDPOINT": "https://your-openai.openai.azure.com",
+    "AZURE_OPENAI_API_VERSION": "2024-02-01",
+    "AZURE_OPENAI_DEPLOYMENT_NAME": "gpt-4",
+    
+    "ENABLE_MONITORING": "true",
+    "ENABLE_AUDIT_LOGGING": "true",
+    "PERFORMANCE_SAMPLE_RATE": "0.1"
+  },
+  "Host": {
+    "CORS": {
+      "SupportedMethods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "OPTIONS"
+      ],
+      "SupportedOrigins": [
+        "https://teams.microsoft.com",
+        "http://localhost:3000",
+        "http://localhost:3978"
+      ]
+    },
+    "LocalHttpPort": 7071,
+    "Logging": {
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information"
+      }
+    }
+  },
+  "ConnectionStrings": {},
+  "watchDirectories": [
+    "Shared"
+  ]
+}

@@ -12,8 +12,9 @@
  * Author: Dwiref Sharma <DwirefS@SapientEdge.io>
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for advanced operations
 const AdvancedCommonSchemas = {
@@ -368,32 +369,80 @@ export const advancedAnfOperationsTools: Tool[] = [
   {
     name: 'anf_snapshot_policies_create',
     description: 'Create a snapshot policy with hourly, daily, weekly, and monthly schedules',
-    inputSchema: SnapshotPoliciesCreateSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_delete',
     description: 'Delete a snapshot policy (cannot be deleted if associated with volumes)',
-    inputSchema: SnapshotPoliciesDeleteSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_get',
     description: 'Get detailed information about a snapshot policy including all schedules',
-    inputSchema: SnapshotPoliciesGetSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_list',
     description: 'List all snapshot policies in a NetApp account',
-    inputSchema: SnapshotPoliciesListSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_update',
     description: 'Update snapshot policy schedules and settings',
-    inputSchema: SnapshotPoliciesUpdateSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshot_policies_list_volumes',
     description: 'List all volumes associated with a snapshot policy',
-    inputSchema: SnapshotPoliciesListVolumesSchema
+    inputSchema: wrapZodSchema(SnapshotPoliciesListVolumesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshot_policies_list_volumes is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -402,32 +451,80 @@ export const advancedAnfOperationsTools: Tool[] = [
   {
     name: 'anf_subvolumes_create',
     description: 'Create a subvolume within a parent volume with specified path and size',
-    inputSchema: SubvolumesCreateSchema
+    inputSchema: wrapZodSchema(SubvolumesCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_subvolumes_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_subvolumes_delete',
     description: 'Delete a subvolume and its data permanently',
-    inputSchema: SubvolumesDeleteSchema
+    inputSchema: wrapZodSchema(SubvolumesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_subvolumes_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_subvolumes_get',
     description: 'Get detailed information about a subvolume',
-    inputSchema: SubvolumesGetSchema
+    inputSchema: wrapZodSchema(SubvolumesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_subvolumes_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_subvolumes_list',
     description: 'List all subvolumes within a volume',
-    inputSchema: SubvolumesListSchema
+    inputSchema: wrapZodSchema(SubvolumesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_subvolumes_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_subvolumes_update',
     description: 'Update subvolume properties such as size and permissions',
-    inputSchema: SubvolumesUpdateSchema
+    inputSchema: wrapZodSchema(SubvolumesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_subvolumes_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_subvolumes_get_metadata',
     description: 'Get metadata information for a subvolume',
-    inputSchema: SubvolumesGetMetadataSchema
+    inputSchema: wrapZodSchema(SubvolumesGetMetadataSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_subvolumes_get_metadata is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -436,22 +533,54 @@ export const advancedAnfOperationsTools: Tool[] = [
   {
     name: 'anf_volume_groups_create',
     description: 'Create a volume group for application-specific deployments (SAP HANA, Oracle, SQL, SharePoint)',
-    inputSchema: VolumeGroupsCreateSchema
+    inputSchema: wrapZodSchema(VolumeGroupsCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_delete',
     description: 'Delete a volume group and all associated volumes',
-    inputSchema: VolumeGroupsDeleteSchema
+    inputSchema: wrapZodSchema(VolumeGroupsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_get',
     description: 'Get detailed information about a volume group including all volumes',
-    inputSchema: VolumeGroupsGetSchema
+    inputSchema: wrapZodSchema(VolumeGroupsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_groups_list',
     description: 'List all volume groups in a NetApp account',
-    inputSchema: VolumeGroupsListSchema
+    inputSchema: wrapZodSchema(VolumeGroupsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_groups_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -460,27 +589,67 @@ export const advancedAnfOperationsTools: Tool[] = [
   {
     name: 'anf_volume_quota_rules_create',
     description: 'Create a quota rule for users or groups on a volume',
-    inputSchema: VolumeQuotaRulesCreateSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_delete',
     description: 'Delete a volume quota rule',
-    inputSchema: VolumeQuotaRulesDeleteSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_get',
     description: 'Get detailed information about a volume quota rule',
-    inputSchema: VolumeQuotaRulesGetSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_list',
     description: 'List all quota rules for a volume',
-    inputSchema: VolumeQuotaRulesListSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_update',
     description: 'Update quota rule settings such as quota size',
-    inputSchema: VolumeQuotaRulesUpdateSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -489,22 +658,54 @@ export const advancedAnfOperationsTools: Tool[] = [
   {
     name: 'anf_netapp_resource_quota_limits_list',
     description: 'List quota limits for NetApp resources in a specific region',
-    inputSchema: NetAppResourceQuotaLimitsListSchema
+    inputSchema: wrapZodSchema(NetAppResourceQuotaLimitsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_quota_limits_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_region_infos_list',
     description: 'List region information and capabilities for NetApp resources',
-    inputSchema: NetAppResourceRegionInfosListSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegionInfosListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_region_infos_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_usages_list',
     description: 'List current resource usage in a specific region',
-    inputSchema: NetAppResourceUsagesListSchema
+    inputSchema: wrapZodSchema(NetAppResourceUsagesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_usages_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_check_name_availability',
     description: 'Check availability of a resource name before creation',
-    inputSchema: NetAppResourceCheckNameAvailabilitySchema
+    inputSchema: wrapZodSchema(NetAppResourceCheckNameAvailabilitySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_check_name_availability is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -513,7 +714,15 @@ export const advancedAnfOperationsTools: Tool[] = [
   {
     name: 'anf_operations_list',
     description: 'List all available NetApp Files REST API operations',
-    inputSchema: OperationsListSchema
+    inputSchema: wrapZodSchema(OperationsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_operations_list is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

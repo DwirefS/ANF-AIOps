@@ -25,8 +25,9 @@
  * Total: 100+ comprehensive ANF REST operations
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas used across multiple operations
 const CommonSchemas = {
@@ -592,52 +593,132 @@ export const comprehensiveAnfApiTools: Tool[] = [
   {
     name: 'anf_accounts_create_or_update',
     description: 'Create or update a NetApp account with comprehensive configuration including Active Directory, encryption, and identity settings',
-    inputSchema: AccountsCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(AccountsCreateOrUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_delete',
     description: 'Delete a NetApp account with all associated resources',
-    inputSchema: AccountsDeleteSchema
+    inputSchema: wrapZodSchema(AccountsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_get',
     description: 'Get detailed information about a specific NetApp account',
-    inputSchema: AccountsGetSchema
+    inputSchema: wrapZodSchema(AccountsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_list',
     description: 'List all NetApp accounts in a resource group',
-    inputSchema: AccountsListSchema
+    inputSchema: wrapZodSchema(AccountsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_list_by_subscription',
     description: 'List all NetApp accounts in a subscription',
-    inputSchema: AccountsListBySubscriptionSchema
+    inputSchema: wrapZodSchema(AccountsListBySubscriptionSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_list_by_subscription is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_update',
     description: 'Update properties of an existing NetApp account',
-    inputSchema: AccountsUpdateSchema
+    inputSchema: wrapZodSchema(AccountsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_change_key_vault',
     description: 'Change Key Vault/Managed HSM used for volume encryption',
-    inputSchema: AccountsChangeKeyVaultSchema
+    inputSchema: wrapZodSchema(AccountsChangeKeyVaultSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_change_key_vault is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_get_change_key_vault_information',
     description: 'Get information about how volumes are encrypted under NetApp account',
-    inputSchema: AccountsGetChangeKeyVaultInformationSchema
+    inputSchema: wrapZodSchema(AccountsGetChangeKeyVaultInformationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_get_change_key_vault_information is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_renew_credentials',
     description: 'Renew identity credentials for the NetApp account',
-    inputSchema: AccountsRenewCredentialsSchema
+    inputSchema: wrapZodSchema(AccountsRenewCredentialsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_renew_credentials is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_accounts_transition_to_cmk',
     description: 'Transition volumes encryption from Platform Managed Keys (PMK) to Customer Managed Keys (CMK)',
-    inputSchema: AccountsTransitionToCmkSchema
+    inputSchema: wrapZodSchema(AccountsTransitionToCmkSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_accounts_transition_to_cmk is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -646,27 +727,67 @@ export const comprehensiveAnfApiTools: Tool[] = [
   {
     name: 'anf_pools_create_or_update',
     description: 'Create or update a capacity pool with specified size, service level, and QoS settings',
-    inputSchema: PoolsCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(PoolsCreateOrUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_delete',
     description: 'Delete a capacity pool (must be empty of volumes)',
-    inputSchema: PoolsDeleteSchema
+    inputSchema: wrapZodSchema(PoolsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_get',
     description: 'Get detailed information about a capacity pool',
-    inputSchema: PoolsGetSchema
+    inputSchema: wrapZodSchema(PoolsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_list',
     description: 'List all capacity pools in a NetApp account',
-    inputSchema: PoolsListSchema
+    inputSchema: wrapZodSchema(PoolsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_pools_update',
     description: 'Update properties of an existing capacity pool',
-    inputSchema: PoolsUpdateSchema
+    inputSchema: wrapZodSchema(PoolsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_pools_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -675,92 +796,236 @@ export const comprehensiveAnfApiTools: Tool[] = [
   {
     name: 'anf_volumes_create_or_update',
     description: 'Create or update a volume with comprehensive configuration including protocols, export policies, data protection, and advanced features',
-    inputSchema: VolumesCreateOrUpdateSchema
+    inputSchema: wrapZodSchema(VolumesCreateOrUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_create_or_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_delete',
     description: 'Delete a volume with optional force delete for replication scenarios',
-    inputSchema: VolumesDeleteSchema
+    inputSchema: wrapZodSchema(VolumesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_get',
     description: 'Get detailed information about a volume including all properties and status',
-    inputSchema: VolumesGetSchema
+    inputSchema: wrapZodSchema(VolumesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_list',
     description: 'List all volumes in a capacity pool',
-    inputSchema: VolumesListSchema
+    inputSchema: wrapZodSchema(VolumesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_update',
     description: 'Update properties of an existing volume',
-    inputSchema: VolumesUpdateSchema
+    inputSchema: wrapZodSchema(VolumesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_authorize_replication',
     description: 'Authorize source volume for cross-region replication',
-    inputSchema: VolumesAuthorizeReplicationSchema
+    inputSchema: wrapZodSchema(VolumesAuthorizeReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_authorize_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_break_replication',
     description: 'Break volume replication relationship',
-    inputSchema: VolumesBreakReplicationSchema
+    inputSchema: wrapZodSchema(VolumesBreakReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_break_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_delete_replication',
     description: 'Delete volume replication configuration',
-    inputSchema: VolumesDeleteReplicationSchema
+    inputSchema: wrapZodSchema(VolumesDeleteReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_delete_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_list_replications',
     description: 'List all replication relationships for a volume',
-    inputSchema: VolumesListReplicationsSchema
+    inputSchema: wrapZodSchema(VolumesListReplicationsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_list_replications is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_replication_status',
     description: 'Get replication status for a volume',
-    inputSchema: VolumesReplicationStatusSchema
+    inputSchema: wrapZodSchema(VolumesReplicationStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_replication_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_resync_replication',
     description: 'Resync volume replication to synchronize data',
-    inputSchema: VolumesResyncReplicationSchema
+    inputSchema: wrapZodSchema(VolumesResyncReplicationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_resync_replication is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_revert',
     description: 'Revert a volume to a specific snapshot',
-    inputSchema: VolumesRevertSchema
+    inputSchema: wrapZodSchema(VolumesRevertSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_revert is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_pool_change',
     description: 'Move a volume to a different capacity pool',
-    inputSchema: VolumesPoolChangeSchema
+    inputSchema: wrapZodSchema(VolumesPoolChangeSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_pool_change is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_relocate',
     description: 'Relocate a volume to optimize placement and performance',
-    inputSchema: VolumesRelocateSchema
+    inputSchema: wrapZodSchema(VolumesRelocateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_relocate is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_finalize_relocation',
     description: 'Finalize volume relocation process',
-    inputSchema: VolumesFinalizeRelocationSchema
+    inputSchema: wrapZodSchema(VolumesFinalizeRelocationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_finalize_relocation is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_revert_relocation',
     description: 'Revert volume relocation if needed',
-    inputSchema: VolumesRevertRelocationSchema
+    inputSchema: wrapZodSchema(VolumesRevertRelocationSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_revert_relocation is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_reset_cifs_password',
     description: 'Reset CIFS password for SMB volume access',
-    inputSchema: VolumesResetCifsPasswordSchema
+    inputSchema: wrapZodSchema(VolumesResetCifsPasswordSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_reset_cifs_password is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volumes_break_file_locks',
     description: 'Break file locks on a volume for maintenance or recovery',
-    inputSchema: VolumesBreakFileLocksSchema
+    inputSchema: wrapZodSchema(VolumesBreakFileLocksSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volumes_break_file_locks is not yet implemented',
+        placeholder: true
+      };
+    }
   },
 
   // =========================================================================
@@ -769,32 +1034,80 @@ export const comprehensiveAnfApiTools: Tool[] = [
   {
     name: 'anf_snapshots_create',
     description: 'Create a point-in-time snapshot of a volume',
-    inputSchema: SnapshotsCreateSchema
+    inputSchema: wrapZodSchema(SnapshotsCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_delete',
     description: 'Delete a volume snapshot',
-    inputSchema: SnapshotsDeleteSchema
+    inputSchema: wrapZodSchema(SnapshotsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_get',
     description: 'Get detailed information about a snapshot',
-    inputSchema: SnapshotsGetSchema
+    inputSchema: wrapZodSchema(SnapshotsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_list',
     description: 'List all snapshots for a volume',
-    inputSchema: SnapshotsListSchema
+    inputSchema: wrapZodSchema(SnapshotsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_update',
     description: 'Update properties of an existing snapshot',
-    inputSchema: SnapshotsUpdateSchema
+    inputSchema: wrapZodSchema(SnapshotsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_snapshots_restore_files',
     description: 'Restore specific files from a snapshot',
-    inputSchema: SnapshotsRestoreFilesSchema
+    inputSchema: wrapZodSchema(SnapshotsRestoreFilesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_snapshots_restore_files is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

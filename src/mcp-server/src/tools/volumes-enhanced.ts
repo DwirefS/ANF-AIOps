@@ -36,6 +36,7 @@ import { NetAppManagementClient } from '@azure/arm-netapp';
 import { DefaultAzureCredential } from '@azure/identity';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -247,7 +248,15 @@ export const volumeToolsEnhanced: Tool[] = [
           pattern: '^[a-zA-Z][a-zA-Z0-9-]*$',
           minLength: 3,
           maxLength: 64
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_create_volume_enterprise is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         resource_group: {
           type: 'string',
           description: 'Resource group name'
@@ -358,7 +367,15 @@ export const volumeToolsEnhanced: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        resource_group: { type: 'string', description: 'Filter by resource group' },
+        resource_group: { type: 'string', description: 'Filter by resource group' ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_list_volumes_governance is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         account_name: { type: 'string', description: 'Filter by NetApp account' },
         pool_name: { type: 'string', description: 'Filter by capacity pool' },
         compliance_status: {
@@ -406,7 +423,15 @@ export const volumeToolsEnhanced: Tool[] = [
         volume_id: {
           type: 'string',
           description: 'Volume resource ID or name'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_resize_volume_secure is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         new_size_gb: {
           type: 'number',
           description: 'New volume size in GB',
@@ -454,7 +479,15 @@ export const volumeToolsEnhanced: Tool[] = [
         source_volume_id: {
           type: 'string',
           description: 'Source volume resource ID'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_setup_volume_replication is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         destination_volume: {
           type: 'object',
           description: 'Destination volume configuration',
@@ -502,7 +535,15 @@ export const volumeToolsEnhanced: Tool[] = [
         volume_id: {
           type: 'string',
           description: 'Volume resource ID to backup'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_create_volume_backup is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         backup_name: {
           type: 'string',
           description: 'Unique backup name'
@@ -548,7 +589,15 @@ export const volumeToolsEnhanced: Tool[] = [
         volume_id: {
           type: 'string',
           description: 'Volume resource ID to scan'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_security_scan is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         scan_depth: {
           type: 'string',
           enum: ['basic', 'comprehensive', 'deep'],
@@ -594,7 +643,15 @@ export const volumeToolsEnhanced: Tool[] = [
         volume_id: {
           type: 'string',
           description: 'Volume resource ID to analyze'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_cost_optimization is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         analysis_period_days: {
           type: 'number',
           description: 'Analysis period in days',
@@ -642,7 +699,15 @@ export const volumeToolsEnhanced: Tool[] = [
         volume_id: {
           type: 'string',
           description: 'Volume resource ID to assess'
-        },
+        ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_compliance_report is not yet implemented',
+        placeholder: true
+      };
+    }
+  },
         compliance_frameworks: {
           type: 'array',
           description: 'Compliance frameworks to assess',

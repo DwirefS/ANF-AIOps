@@ -1,0 +1,72 @@
+{
+  "name": "anf-aiops-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite for ANF-AIOps project",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:unit": "npm run test:unit:mcp && npm run test:unit:teams && npm run test:unit:functions",
+    "test:integration": "npm run test:integration:mcp && npm run test:integration:teams && npm run test:integration:functions",
+    "test:e2e": "mocha e2e/**/*.test.js --timeout 300000 --recursive",
+    "test:security": "mocha security/**/*.js --timeout 60000 --recursive",
+    "test:load": "k6 run load/load-test-config.js",
+    "test:unit:mcp": "cd ../src/mcp-server && npm run test:unit",
+    "test:unit:teams": "cd ../src/teams-bot && npm run test:unit",
+    "test:unit:functions": "cd ../functions/ANFServer && dotnet test Tests/",
+    "test:integration:mcp": "cd ../src/mcp-server && npm run test:integration",
+    "test:integration:teams": "cd ../src/teams-bot && npm run test:integration",
+    "test:integration:functions": "cd ../functions/ANFServer && dotnet test Tests/ --filter Category=Integration",
+    "test:coverage": "npm run test:coverage:unit && npm run test:coverage:integration",
+    "test:coverage:unit": "npm run test:coverage:mcp && npm run test:coverage:teams",
+    "test:coverage:mcp": "cd ../src/mcp-server && npm run test:coverage:unit",
+    "test:coverage:teams": "cd ../src/teams-bot && npm run test:coverage:unit",
+    "test:ci": "npm run test:unit && npm run test:security",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e && npm run test:security",
+    "setup:test-env": "node scripts/setup-test-environment.js",
+    "cleanup:test-env": "node scripts/cleanup-test-environment.js",
+    "generate:test-data": "node scripts/generate-test-data.js",
+    "validate:test-config": "node scripts/validate-test-config.js"
+  },
+  "keywords": [
+    "azure",
+    "netapp",
+    "aiops",
+    "testing",
+    "e2e",
+    "integration",
+    "unit-tests"
+  ],
+  "author": {
+    "name": "Dwiref Sharma",
+    "email": "DwirefS@SapientEdge.io"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^10.2.0",
+    "chai": "^4.3.10",
+    "axios": "^1.6.2",
+    "sinon": "^17.0.1",
+    "nyc": "^15.1.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.0",
+    "dotenv": "^16.3.1",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "inquirer": "^8.2.6"
+  },
+  "optionalDependencies": {
+    "puppeteer": "^21.6.1",
+    "playwright": "^1.40.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/anf-aiops.git",
+    "directory": "tests"
+  }
+}

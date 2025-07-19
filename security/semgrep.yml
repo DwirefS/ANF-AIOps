@@ -1,0 +1,235 @@
+# Semgrep Security Rules Configuration for ANF-AIOps
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+# Custom security rules and configuration for SAST scanning
+
+# Semgrep configuration
+extends: 
+  - auto
+  - security-audit
+  - secrets
+  - owasp-top-ten
+  - cwe-top-25
+
+# Rule sources
+rules:
+  # Azure-specific security rules
+  - id: azure-key-vault-secrets-hardcoded
+    pattern: |
+      $VAR = "https://$VAULT.vault.azure.net/secrets/$SECRET"
+    message: "Hardcoded Azure Key Vault secret URL detected"
+    languages: [typescript, javascript, csharp]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      owasp: "A07:2021 - Identification and Authentication Failures"
+
+  - id: azure-connection-string-hardcoded
+    patterns:
+      - pattern: |
+          $VAR = "DefaultEndpointsProtocol=https;AccountName=$ACCOUNT;AccountKey=$KEY"
+      - pattern: |
+          $VAR = "Server=$SERVER;Database=$DB;User ID=$USER;Password=$PASS"
+    message: "Hardcoded Azure connection string detected"
+    languages: [typescript, javascript, csharp]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+
+  # JWT security rules
+  - id: jwt-none-algorithm
+    pattern: |
+      { ..., alg: "none", ... }
+    message: "JWT 'none' algorithm is insecure"
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+
+  - id: jwt-weak-secret
+    patterns:
+      - pattern: |
+          jwt.sign($PAYLOAD, "secret")
+      - pattern: |
+          jwt.sign($PAYLOAD, "password")
+      - pattern: |
+          jwt.sign($PAYLOAD, "123456")
+    message: "JWT signed with weak secret"
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-521: Weak Password Requirements"
+
+  # SQL injection rules for C#
+  - id: csharp-sql-injection
+    pattern: |
+      $CMD.CommandText = $USER_INPUT
+    message: "Potential SQL injection vulnerability"
+    languages: [csharp]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      owasp: "A03:2021 - Injection"
+
+  # XSS prevention rules
+  - id: typescript-xss-innerHTML
+    pattern: |
+      $ELEMENT.innerHTML = $USER_INPUT
+    message: "Potential XSS vulnerability via innerHTML"
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-79: Improper Neutralization of Input During Web Page Generation"
+      owasp: "A03:2021 - Injection"
+
+  # Insecure random number generation
+  - id: insecure-random
+    patterns:
+      - pattern: Math.random()
+      - pattern: new Random()
+    message: "Insecure random number generation for security purposes"
+    languages: [typescript, javascript, csharp]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-338: Use of Cryptographically Weak Pseudo-Random Number Generator"
+
+  # Insecure HTTP usage
+  - id: insecure-http-requests
+    patterns:
+      - pattern: |
+          axios.get("http://...")
+      - pattern: |
+          fetch("http://...")
+      - pattern: |
+          HttpClient.GetAsync("http://...")
+    message: "Insecure HTTP request detected, use HTTPS"
+    languages: [typescript, javascript, csharp]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-319: Cleartext Transmission of Sensitive Information"
+
+  # Debug/development code detection
+  - id: debug-code-left-in-production
+    patterns:
+      - pattern: console.log(...)
+      - pattern: console.debug(...)
+      - pattern: debugger
+      - pattern: Debug.WriteLine(...)
+    message: "Debug code should not be left in production"
+    languages: [typescript, javascript, csharp]
+    severity: INFO
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-489: Active Debug Code"
+
+  # Environment variable exposure
+  - id: environment-variable-exposure
+    patterns:
+      - pattern: |
+          process.env
+      - pattern: |
+          Environment.GetEnvironmentVariable(...)
+    message: "Environment variable usage detected - ensure no sensitive data exposure"
+    languages: [typescript, javascript, csharp]
+    severity: INFO
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-200: Exposure of Sensitive Information to an Unauthorized Actor"
+
+  # Weak encryption algorithms
+  - id: weak-encryption-algorithms
+    patterns:
+      - pattern: |
+          crypto.createCipher("des", ...)
+      - pattern: |
+          crypto.createCipher("rc4", ...)
+      - pattern: |
+          new DESCryptoServiceProvider()
+      - pattern: |
+          new RC2CryptoServiceProvider()
+    message: "Weak encryption algorithm detected"
+    languages: [typescript, javascript, csharp]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+
+  # File path traversal
+  - id: path-traversal
+    patterns:
+      - pattern: |
+          fs.readFile($USER_INPUT, ...)
+      - pattern: |
+          File.ReadAllText($USER_INPUT)
+      - pattern: |
+          path.join($USER_INPUT, ...)
+    message: "Potential path traversal vulnerability"
+    languages: [typescript, javascript, csharp]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: audit
+      cwe: "CWE-22: Improper Limitation of a Pathname to a Restricted Directory"
+      owasp: "A01:2021 - Broken Access Control"
+
+# Global configuration
+exclude:
+  - "node_modules/"
+  - "dist/"
+  - "build/"
+  - "coverage/"
+  - "*.min.js"
+  - "*.min.css"
+  - "package-lock.json"
+  - "yarn.lock"
+  - "*.tfstate"
+  - "*.tfstate.backup"
+  - ".terraform/"
+  - "tests/"
+  - "*.test.*"
+  - "*.spec.*"
+
+# Severity levels configuration
+severity:
+  error: ERROR
+  warning: WARNING
+  info: INFO
+
+# Output configuration
+output:
+  format: json
+  destination: semgrep-results.json
+
+# Performance configuration
+max_target_bytes: 1000000
+timeout: 30
+timeout_threshold: 10
+
+# Metrics collection
+metrics:
+  enabled: true
+  endpoint: https://metrics.semgrep.dev
+
+# Enterprise features
+enterprise:
+  enabled: true
+  license_check: true
+  compliance_reporting: true

@@ -1,106 +1,457 @@
-# Environment files
+# ANF AI-Ops .gitignore Configuration
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+# 
+# Comprehensive gitignore for Azure NetApp Files AI-Ops solution
+# Covers Node.js, TypeScript, .NET, Azure, Docker, and security files
+
+# ============================================================================
+# Environment and Configuration Files
+# ============================================================================
+
+# Environment variables and secrets
 .env
 .env.local
-.env.*.local
-*.env
+.env.development
+.env.test
+.env.production
+.env.*
+!.env.example
 
-# Azure credentials
-*.pfx
-*.cer
-*.key
-*.pem
-appsettings.Development.json
+# Local configuration files
 local.settings.json
+appsettings.*.json
+!appsettings.json
+config.json
+!config.example.json
 
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
+# Azure and cloud credentials
+.azure/
+*.publishsettings
+*.azurePubxml
+
+# Application settings with secrets
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/local.settings.json
+
+# ============================================================================
+# Node.js and TypeScript
+# ============================================================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime and build outputs
+dist/
+build/
+out/
+.next/
+*.tsbuildinfo
+
+# Package manager locks (keep one, ignore others)
+# Uncomment the one you're using:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# TypeScript cache
+*.tsbuildinfo
+
+# ESLint cache
+.eslintcache
+
+# Jest test results and coverage
+coverage/
+.nyc_output
+*.lcov
+junit.xml
+test-results.xml
+
+# ============================================================================
+# .NET and C#
+# ============================================================================
 
 # Build outputs
 bin/
 obj/
-out/
-dist/
-build/
 *.dll
 *.exe
 *.pdb
+*.cache
 
-# Package directories
-node_modules/
+# Visual Studio and IDE files
+.vs/
+.vscode/settings.json
+.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# MSBuild logs
+*.binlog
+
+# NuGet packages
+*.nupkg
+*.snupkg
 packages/
-.pnp.*
-.yarn/
+.nuget/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-pip-log.txt
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# ============================================================================
+# Azure Functions and Cloud
+# ============================================================================
+
+# Azure Functions
+.azure/
+.azurefunctions/
+local.settings.json
+*.Publish.xml
+*.pubxml
+*.PublishProfile
+
+# Azure Resource Manager
+*.azurerm
+*.tf.json
 
 # Terraform
 *.tfstate
 *.tfstate.*
 .terraform/
 .terraform.lock.hcl
-*.tfvars
-!examples.tfvars
+terraform.tfvars
+terraform.tfvars.json
 
-# Azure Functions
-local.settings.json
-.funcignore
+# Pulumi
+Pulumi.*.yaml
+Pulumi.yaml
 
-# Logs
+# ============================================================================
+# Container and Docker
+# ============================================================================
+
+# Docker
+Dockerfile.local
+docker-compose.override.yml
+.dockerignore.local
+
+# Container logs
 *.log
-logs/
-*.log.*
 
-# Test outputs
-coverage/
-.nyc_output/
-*.coverage
-.coverage.*
-htmlcov/
+# ============================================================================
+# Development and IDE
+# ============================================================================
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-.cache/
-tmp/
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
 
-# Security - Never commit these
-*.pfx
-*.p12
-*.key
-*.pem
-*.crt
-*.cer
-secrets/
-credentials/
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
 
-# OS files
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+$RECYCLE.BIN/
 
-# Documentation build
-docs/_build/
-site/
+# Linux
+*~
+.fuse_hidden*
+.Trash-*
+.nfs*
 
-# Deployment packages
+# ============================================================================
+# Logs and Temporary Files
+# ============================================================================
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# ============================================================================
+# Security and Secrets
+# ============================================================================
+
+# Secrets and keys
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+.secrets/
+
+# Security scan results
+.semgrep/
+.checkov/
+.gitleaks/
+security-scan-results/
+
+# Certificate files
+*.crt
+*.cer
+*.der
+
+# SSH keys
+*.rsa
+*.ed25519
+id_rsa*
+id_ed25519*
+
+# ============================================================================
+# Backup and Archive Files
+# ============================================================================
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+
+# Archive files
 *.zip
+*.tar
 *.tar.gz
 *.tgz
+*.rar
+*.7z
 
-# Azure specific
-.azure/
-*.PublishSettings
+# ============================================================================
+# Database and Data Files
+# ============================================================================
+
+# SQLite databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Database dumps
+*.sql.gz
+*.dump
+
+# Data files
+data/
+*.csv
+*.json.bak
+
+# ============================================================================
+# Monitoring and Analytics
+# ============================================================================
+
+# Application Insights
+ApplicationInsights.config
+
+# New Relic
+newrelic.js
+
+# Datadog
+datadog.yaml
+
+# ============================================================================
+# Testing and Coverage
+# ============================================================================
+
+# Test outputs
+.nyc_output/
+coverage/
+*.lcov
+.coverage/
+htmlcov/
+
+# Jest
+jest.config.local.js
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# Playwright
+test-results/
+playwright-report/
+
+# ============================================================================
+# Package Managers and Dependencies
+# ============================================================================
+
+# Bower
+bower_components/
+
+# jspm
+jspm_packages/
+
+# Yarn Berry
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ============================================================================
+# Build Tools and Bundlers
+# ============================================================================
+
+# Webpack
+.webpack/
+
+# Parcel
+.parcel-cache/
+
+# Rollup
+.rollup.cache/
+
+# Vite
+.vite/
+
+# SvelteKit
+.svelte-kit/
+
+# ============================================================================
+# Documentation and Generated Files
+# ============================================================================
+
+# Generated documentation
+docs/generated/
+api-docs/
+.docusaurus/
+
+# Generated OpenAPI specs
+openapi-generated.yaml
+swagger-generated.json
+
+# ============================================================================
+# Monitoring and Performance
+# ============================================================================
+
+# Performance monitoring
+.clinic/
+.0x/
+
+# Load testing
+artillery-output/
+k6-output/
+
+# ============================================================================
+# Misc
+# ============================================================================
+
+# Temporary directories used by linters and tools
+.eslint_cache/
+.stylelint_cache/
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional npm cache directory
+.npm/
+
+# Optional REPL history
+.node_repl_history
+
+# Zero-installs / PnP
+.pnp
+.pnp.js
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Rush intermediate files
+common/temp/
+common/scripts/
+
+# Debugging files
+chrome-profiler-events*.json
+v8-compile-cache-*
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+
+# ANF AI-Ops specific temporary files
+anf-temp/
+anf-cache/
+.anf/
+
+# MCP server generated files
+mcp-generated/
+mcp-cache/
+
+# Teams bot cache
+teams-cache/
+adaptive-cards-cache/
+
+# Azure NetApp Files test data
+test-data/netapp/
+test-volumes/
+test-snapshots/
+
+# Local development databases
+*.sqlite3-journal
+dev.db
+
+# Local certificates for development
+certs/
+ssl/
+localhost.*
+
+# ============================================================================
+# End of .gitignore
+# ============================================================================

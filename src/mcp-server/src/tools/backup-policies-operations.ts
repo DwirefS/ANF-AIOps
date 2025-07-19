@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Backup Policies operations
 const BackupPoliciesCommonSchemas = {
@@ -109,27 +110,67 @@ export const backupPoliciesOperationsTools: Tool[] = [
   {
     name: 'anf_backup_policies_create',
     description: 'Create a backup policy with retention settings for daily, weekly, monthly, and yearly backups',
-    inputSchema: BackupPoliciesCreateSchema
+    inputSchema: wrapZodSchema(BackupPoliciesCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_delete',
     description: 'Delete a backup policy (cannot delete if assigned to volumes)',
-    inputSchema: BackupPoliciesDeleteSchema
+    inputSchema: wrapZodSchema(BackupPoliciesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_get',
     description: 'Get detailed information about a specific backup policy',
-    inputSchema: BackupPoliciesGetSchema
+    inputSchema: wrapZodSchema(BackupPoliciesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_list',
     description: 'List all backup policies in a NetApp account',
-    inputSchema: BackupPoliciesListSchema
+    inputSchema: wrapZodSchema(BackupPoliciesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backup_policies_update',
     description: 'Update backup policy retention settings',
-    inputSchema: BackupPoliciesUpdateSchema
+    inputSchema: wrapZodSchema(BackupPoliciesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backup_policies_update is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

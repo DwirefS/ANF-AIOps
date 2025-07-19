@@ -1,0 +1,651 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "# ANF-AIOps Analytics Workbook\r\n\r\n**Author:** Dwiref Sharma <DwirefS@SapientEdge.io>  \r\n**Version:** 2.0.0  \r\n**Last Updated:** 2025-07-18\r\n\r\nComprehensive analytics and monitoring workbook for Azure NetApp Files AI-Ops solution. This workbook provides detailed insights into system performance, user activity, security metrics, and operational efficiency.\r\n\r\n---"
+      },
+      "name": "Header"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "timeRange",
+            "version": "KqlParameterItem/1.0",
+            "name": "TimeRange",
+            "type": 4,
+            "isRequired": true,
+            "value": {
+              "durationMs": 86400000
+            },
+            "typeSettings": {
+              "selectableValues": [
+                {
+                  "durationMs": 3600000
+                },
+                {
+                  "durationMs": 14400000
+                },
+                {
+                  "durationMs": 43200000
+                },
+                {
+                  "durationMs": 86400000
+                },
+                {
+                  "durationMs": 172800000
+                },
+                {
+                  "durationMs": 604800000
+                },
+                {
+                  "durationMs": 2592000000
+                }
+              ],
+              "allowCustom": true
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            }
+          },
+          {
+            "id": "environment",
+            "version": "KqlParameterItem/1.0",
+            "name": "Environment",
+            "type": 2,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "customDimensions\r\n| where isnotempty(Environment)\r\n| distinct tostring(Environment)\r\n| sort by Environment asc",
+            "value": [
+              "Production"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "selectAllValue": "*"
+            },
+            "timeContext": {
+              "durationMs": 0
+            },
+            "timeContextFromParameter": "TimeRange",
+            "queryType": 0,
+            "resourceType": "microsoft.insights/components"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.insights/components"
+      },
+      "name": "Parameters"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "overview-tab",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "📊 Overview",
+            "subTarget": "overview",
+            "style": "link"
+          },
+          {
+            "id": "performance-tab",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "⚡ Performance",
+            "subTarget": "performance",
+            "style": "link"
+          },
+          {
+            "id": "users-tab",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "👥 Users & Activity",
+            "subTarget": "users",
+            "style": "link"
+          },
+          {
+            "id": "security-tab",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "🔒 Security",
+            "subTarget": "security",
+            "style": "link"
+          },
+          {
+            "id": "anf-operations-tab",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "🗂️ ANF Operations",
+            "subTarget": "anf-operations",
+            "style": "link"
+          },
+          {
+            "id": "teams-bot-tab",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "🤖 Teams Bot",
+            "subTarget": "teams-bot",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "Navigation Tabs"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## 📊 System Overview\r\n\r\nHigh-level metrics and health indicators for the ANF-AIOps system."
+            },
+            "name": "Overview Header"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| where timestamp {TimeRange}\r\n| summarize \r\n    TotalRequests = count(),\r\n    SuccessfulRequests = countif(success == true),\r\n    FailedRequests = countif(success == false),\r\n    AvgDuration = avg(duration),\r\n    P95Duration = percentile(duration, 95),\r\n    UniqueUsers = dcount(user_Id)\r\n| extend \r\n    SuccessRate = round((SuccessfulRequests * 100.0) / TotalRequests, 2),\r\n    ErrorRate = round((FailedRequests * 100.0) / TotalRequests, 2)\r\n| project \r\n    ['Total Requests'] = TotalRequests,\r\n    ['Success Rate (%)'] = SuccessRate,\r\n    ['Error Rate (%)'] = ErrorRate,\r\n    ['Avg Response Time (ms)'] = round(AvgDuration, 0),\r\n    ['95th Percentile (ms)'] = round(P95Duration, 0),\r\n    ['Active Users'] = UniqueUsers",
+              "size": 3,
+              "title": "System Health Metrics",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Success Rate (%)",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": ">=",
+                          "thresholdValue": "99",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": ">=",
+                          "thresholdValue": "95",
+                          "representation": "2",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "failed",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "Error Rate (%)",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "<=",
+                          "thresholdValue": "1",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "<=",
+                          "thresholdValue": "5",
+                          "representation": "yellow",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "red",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "System Health Metrics"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| where timestamp {TimeRange}\r\n| summarize RequestCount = count() by bin(timestamp, {TimeRange:grain})\r\n| render timechart",
+              "size": 0,
+              "title": "Request Volume Over Time",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Request Volume"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| where timestamp {TimeRange}\r\n| summarize \r\n    AvgDuration = avg(duration),\r\n    P95Duration = percentile(duration, 95)\r\n    by bin(timestamp, {TimeRange:grain})\r\n| render timechart",
+              "size": 0,
+              "title": "Response Time Trends",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Response Time Trends"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "overview"
+      },
+      "name": "Overview Group"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## ⚡ Performance Analytics\r\n\r\nDetailed performance metrics and bottleneck analysis."
+            },
+            "name": "Performance Header"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| where timestamp {TimeRange}\r\n| extend OperationCategory = case(\r\n    url contains \"accounts\", \"Account Operations\",\r\n    url contains \"pools\", \"Pool Operations\",\r\n    url contains \"volumes\", \"Volume Operations\",\r\n    url contains \"snapshots\", \"Snapshot Operations\",\r\n    \"Other\"\r\n)\r\n| summarize \r\n    Count = count(),\r\n    AvgDuration = avg(duration),\r\n    P95Duration = percentile(duration, 95),\r\n    MaxDuration = max(duration),\r\n    SuccessRate = round((countif(success == true) * 100.0) / count(), 2)\r\n    by OperationCategory\r\n| order by Count desc",
+              "size": 0,
+              "title": "Performance by Operation Category",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table"
+            },
+            "name": "Performance by Category"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| where timestamp {TimeRange}\r\n| where duration > 5000  // Slow requests > 5 seconds\r\n| project timestamp, name, duration, success, resultCode\r\n| order by duration desc\r\n| take 20",
+              "size": 0,
+              "title": "Slowest Operations (>5 seconds)",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table"
+            },
+            "customWidth": "50",
+            "name": "Slow Operations"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "exceptions\r\n| where timestamp {TimeRange}\r\n| summarize ErrorCount = count() by type, bin(timestamp, {TimeRange:grain})\r\n| render timechart",
+              "size": 0,
+              "title": "Error Trends Over Time",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Error Trends"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "performance"
+      },
+      "name": "Performance Group"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## 👥 User Activity & Engagement\r\n\r\nUser behavior patterns and system adoption metrics."
+            },
+            "name": "Users Header"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"UserActivity\"\r\n| extend UserId = tostring(customDimensions.UserId)\r\n| summarize \r\n    TotalUsers = dcount(UserId),\r\n    TotalSessions = dcount(session_Id),\r\n    TotalActions = count(),\r\n    AvgActionsPerUser = round(count() / todouble(dcount(UserId)), 1)\r\n| project \r\n    ['Active Users'] = TotalUsers,\r\n    ['Total Sessions'] = TotalSessions,\r\n    ['Total Actions'] = TotalActions,\r\n    ['Avg Actions/User'] = AvgActionsPerUser",
+              "size": 3,
+              "title": "User Engagement Summary",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table"
+            },
+            "name": "User Engagement"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"UserActivity\"\r\n| extend \r\n    UserId = tostring(customDimensions.UserId),\r\n    Action = tostring(customDimensions.Action)\r\n| summarize UniqueUsers = dcount(UserId) by bin(timestamp, {TimeRange:grain}), Action\r\n| render timechart",
+              "size": 0,
+              "title": "User Activity by Action Type",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Activity by Action"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"UserActivity\"\r\n| extend UserId = tostring(customDimensions.UserId)\r\n| summarize SessionCount = dcount(session_Id) by UserId\r\n| summarize UserCount = count() by SessionCount\r\n| extend UserType = case(\r\n    SessionCount == 1, \"One-time Users\",\r\n    SessionCount <= 5, \"Occasional Users\",\r\n    SessionCount <= 20, \"Regular Users\",\r\n    \"Power Users\"\r\n)\r\n| summarize TotalUsers = sum(UserCount) by UserType\r\n| render piechart",
+              "size": 0,
+              "title": "User Engagement Distribution",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "User Distribution"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "users"
+      },
+      "name": "Users Group"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## 🔒 Security Monitoring\r\n\r\nSecurity events, authentication patterns, and threat detection."
+            },
+            "name": "Security Header"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name in (\"AuthenticationSuccess\", \"AuthenticationFailed\")\r\n| summarize \r\n    TotalAttempts = count(),\r\n    SuccessfulLogins = countif(name == \"AuthenticationSuccess\"),\r\n    FailedLogins = countif(name == \"AuthenticationFailed\")\r\n| extend \r\n    SuccessRate = round((SuccessfulLogins * 100.0) / TotalAttempts, 2),\r\n    FailureRate = round((FailedLogins * 100.0) / TotalAttempts, 2)\r\n| project \r\n    ['Total Login Attempts'] = TotalAttempts,\r\n    ['Successful Logins'] = SuccessfulLogins,\r\n    ['Failed Logins'] = FailedLogins,\r\n    ['Success Rate (%)'] = SuccessRate,\r\n    ['Failure Rate (%)'] = FailureRate",
+              "size": 3,
+              "title": "Authentication Summary",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table"
+            },
+            "name": "Authentication Summary"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"AuthenticationFailed\"\r\n| extend ClientIP = tostring(customDimensions.ClientIP)\r\n| where isnotempty(ClientIP)\r\n| summarize FailureCount = count() by ClientIP\r\n| where FailureCount > 5  // Potential brute force\r\n| order by FailureCount desc\r\n| take 10",
+              "size": 0,
+              "title": "Suspicious Login Activity (>5 failures)",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table"
+            },
+            "customWidth": "50",
+            "name": "Suspicious Activity"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "requests\r\n| where timestamp {TimeRange}\r\n| where resultCode in (401, 403)  // Unauthorized/Forbidden\r\n| summarize UnauthorizedRequests = count() by bin(timestamp, {TimeRange:grain})\r\n| render timechart",
+              "size": 0,
+              "title": "Unauthorized Access Attempts",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Unauthorized Access"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "security"
+      },
+      "name": "Security Group"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## 🗂️ Azure NetApp Files Operations\r\n\r\nDetailed analytics for ANF resource management operations."
+            },
+            "name": "ANF Operations Header"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"ANF_Operation\"\r\n| extend \r\n    Operation = tostring(customDimensions.Operation),\r\n    Resource = tostring(customDimensions.Resource),\r\n    Success = tobool(customDimensions.Success)\r\n| summarize \r\n    TotalOperations = count(),\r\n    SuccessfulOps = countif(Success == true),\r\n    FailedOps = countif(Success == false)\r\n    by Operation\r\n| extend SuccessRate = round((SuccessfulOps * 100.0) / TotalOperations, 1)\r\n| order by TotalOperations desc",
+              "size": 0,
+              "title": "ANF Operations Summary",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table"
+            },
+            "name": "ANF Operations Summary"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"ANF_Operation\"\r\n| extend Operation = tostring(customDimensions.Operation)\r\n| summarize OperationCount = count() by bin(timestamp, {TimeRange:grain}), Operation\r\n| render timechart",
+              "size": 0,
+              "title": "ANF Operations Trends",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "ANF Operations Trends"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"ANF_Operation\"\r\n| extend \r\n    Operation = tostring(customDimensions.Operation),\r\n    Success = tobool(customDimensions.Success)\r\n| where Success == false\r\n| summarize FailureCount = count() by Operation\r\n| order by FailureCount desc\r\n| take 10\r\n| render barchart",
+              "size": 0,
+              "title": "Top 10 Failed Operations",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Failed Operations"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "anf-operations"
+      },
+      "name": "ANF Operations Group"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## 🤖 Teams Bot Analytics\r\n\r\nMicrosoft Teams bot conversation patterns and AI effectiveness."
+            },
+            "name": "Teams Bot Header"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"TeamsBot_Conversation\"\r\n| extend \r\n    Intent = tostring(customDimensions.Intent),\r\n    Success = tobool(customDimensions.Success),\r\n    UserId = tostring(customDimensions.UserId)\r\n| summarize \r\n    TotalConversations = count(),\r\n    SuccessfulConversations = countif(Success == true),\r\n    UniqueUsers = dcount(UserId)\r\n    by Intent\r\n| extend SuccessRate = round((SuccessfulConversations * 100.0) / TotalConversations, 1)\r\n| order by TotalConversations desc",
+              "size": 0,
+              "title": "Bot Conversations by Intent",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components",
+              "visualization": "table"
+            },
+            "name": "Conversations by Intent"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"TeamsBot_Conversation\"\r\n| extend Success = tobool(customDimensions.Success)\r\n| summarize ConversationCount = count() by bin(timestamp, {TimeRange:grain}), Success\r\n| render timechart",
+              "size": 0,
+              "title": "Bot Conversation Success Rate",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Conversation Success"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "customEvents\r\n| where timestamp {TimeRange}\r\n| where name == \"TeamsBot_Conversation\"\r\n| extend \r\n    Intent = tostring(customDimensions.Intent),\r\n    Success = tobool(customDimensions.Success)\r\n| where Success == false\r\n| summarize FailureCount = count() by Intent\r\n| order by FailureCount desc\r\n| take 10\r\n| render piechart",
+              "size": 0,
+              "title": "Failed Conversation Intents",
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "TimeRange",
+              "queryType": 0,
+              "resourceType": "microsoft.insights/components"
+            },
+            "customWidth": "50",
+            "name": "Failed Intents"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "teams-bot"
+      },
+      "name": "Teams Bot Group"
+    }
+  ],
+  "defaultTab": "overview",
+  "fallbackResourceIds": [
+    "/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.Insights/components/{app-insights-name}"
+  ],
+  "fromTemplateId": "sentinel-ANFAIOpsAnalyticsWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

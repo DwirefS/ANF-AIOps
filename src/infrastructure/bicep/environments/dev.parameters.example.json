@@ -1,0 +1,177 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "dev"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "applicationName": {
+      "value": "anf-aiops"
+    },
+    "resourceGroupName": {
+      "value": "anf-aiops-dev"
+    },
+    "administratorEmail": {
+      "value": "DwirefS@SapientEdge.io"
+    },
+    "subscriptionId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "tenantId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "clientId": {
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    "clientSecret": {
+      "value": "your-client-secret"
+    },
+    "keyVaultName": {
+      "value": "anf-aiops-kv-dev"
+    },
+    "storageAccountName": {
+      "value": "anfaiopsdev"
+    },
+    "functionAppName": {
+      "value": "anf-aiops-functions-dev"
+    },
+    "appServicePlanName": {
+      "value": "anf-aiops-plan-dev"
+    },
+    "applicationInsightsName": {
+      "value": "anf-aiops-ai-dev"
+    },
+    "logAnalyticsWorkspaceName": {
+      "value": "anf-aiops-logs-dev"
+    },
+    "containerRegistryName": {
+      "value": "anfaiopsacr"
+    },
+    "containerAppEnvironmentName": {
+      "value": "anf-aiops-env-dev"
+    },
+    "mcpServerAppName": {
+      "value": "anf-aiops-mcp-dev"
+    },
+    "teamsBot��ppName": {
+      "value": "anf-aiops-bot-dev"
+    },
+    "ragSystemAppName": {
+      "value": "anf-aiops-rag-dev"
+    },
+    "apiManagementName": {
+      "value": "anf-aiops-apim-dev"
+    },
+    "virtualNetworkName": {
+      "value": "anf-aiops-vnet-dev"
+    },
+    "subnetName": {
+      "value": "anf-aiops-subnet-dev"
+    },
+    "anfSubnetName": {
+      "value": "anf-subnet-dev"
+    },
+    "networkSecurityGroupName": {
+      "value": "anf-aiops-nsg-dev"
+    },
+    "netAppAccountName": {
+      "value": "anf-aiops-account-dev"
+    },
+    "capacityPoolName": {
+      "value": "anf-aiops-pool-dev"
+    },
+    "searchServiceName": {
+      "value": "anf-aiops-search-dev"
+    },
+    "redisCacheName": {
+      "value": "anf-aiops-redis-dev"
+    },
+    "enableVnetIntegration": {
+      "value": true
+    },
+    "enablePrivateEndpoints": {
+      "value": false
+    },
+    "enableNetworkSecurityGroups": {
+      "value": true
+    },
+    "enableApplicationInsights": {
+      "value": true
+    },
+    "enableKeyVault": {
+      "value": true
+    },
+    "enableContainerRegistry": {
+      "value": true
+    },
+    "enableApiManagement": {
+      "value": true
+    },
+    "enableNetAppFiles": {
+      "value": true
+    },
+    "enableCognitiveSearch": {
+      "value": true
+    },
+    "enableRedisCache": {
+      "value": true
+    },
+    "skuName": {
+      "value": "B1"
+    },
+    "skuTier": {
+      "value": "Basic"
+    },
+    "containerAppCpu": {
+      "value": "0.5"
+    },
+    "containerAppMemory": {
+      "value": "1.0Gi"
+    },
+    "containerAppMinReplicas": {
+      "value": 1
+    },
+    "containerAppMaxReplicas": {
+      "value": 3
+    },
+    "vnetAddressPrefix": {
+      "value": "10.0.0.0/16"
+    },
+    "subnetAddressPrefix": {
+      "value": "10.0.1.0/24"
+    },
+    "anfSubnetAddressPrefix": {
+      "value": "10.0.2.0/24"
+    },
+    "netAppPoolSize": {
+      "value": "4398046511104"
+    },
+    "netAppServiceLevel": {
+      "value": "Premium"
+    },
+    "searchServiceSku": {
+      "value": "basic"
+    },
+    "redisCacheSku": {
+      "value": "Basic"
+    },
+    "redisCacheFamily": {
+      "value": "C"
+    },
+    "redisCacheCapacity": {
+      "value": 1
+    },
+    "tags": {
+      "value": {
+        "Environment": "Development",
+        "Application": "ANF-AIOps",
+        "Owner": "DwirefS@SapientEdge.io",
+        "CostCenter": "IT-Development",
+        "Project": "Azure NetApp Files AI Operations"
+      }
+    }
+  }
+}

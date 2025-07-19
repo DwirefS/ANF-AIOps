@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for NetApp Resource operations
 const NetAppResourceCommonSchemas = {
@@ -146,52 +147,132 @@ export const netAppResourceTools: Tool[] = [
   {
     name: 'anf_netapp_resource_check_name_availability',
     description: 'Check if a resource name is available for use in Azure NetApp Files',
-    inputSchema: NetAppResourceCheckNameAvailabilitySchema
+    inputSchema: wrapZodSchema(NetAppResourceCheckNameAvailabilitySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_check_name_availability is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_check_file_path_availability',
     description: 'Check if a file path is available for volume creation',
-    inputSchema: NetAppResourceCheckFilePathAvailabilitySchema
+    inputSchema: wrapZodSchema(NetAppResourceCheckFilePathAvailabilitySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_check_file_path_availability is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_list_skus',
     description: 'List all available SKUs for NetApp resources with optional location filter',
-    inputSchema: NetAppResourceListSkusSchema
+    inputSchema: wrapZodSchema(NetAppResourceListSkusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_list_skus is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_get_sku',
     description: 'Get detailed information about a specific NetApp SKU',
-    inputSchema: NetAppResourceGetSkuSchema
+    inputSchema: wrapZodSchema(NetAppResourceGetSkuSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_get_sku is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_validate_network',
     description: 'Validate network configuration for NetApp resource deployment',
-    inputSchema: NetAppResourceValidateNetworkSchema
+    inputSchema: wrapZodSchema(NetAppResourceValidateNetworkSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_validate_network is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_precheck',
     description: 'Run prechecks before creating NetApp resources',
-    inputSchema: NetAppResourcePrecheckSchema
+    inputSchema: wrapZodSchema(NetAppResourcePrecheckSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_precheck is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_get_provider_status',
     description: 'Get NetApp resource provider registration status',
-    inputSchema: NetAppResourceGetProviderStatusSchema
+    inputSchema: wrapZodSchema(NetAppResourceGetProviderStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_get_provider_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_register_provider',
     description: 'Register Microsoft.NetApp resource provider for the subscription',
-    inputSchema: NetAppResourceRegisterProviderSchema
+    inputSchema: wrapZodSchema(NetAppResourceRegisterProviderSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_register_provider is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_unregister_provider',
     description: 'Unregister Microsoft.NetApp resource provider from the subscription',
-    inputSchema: NetAppResourceUnregisterProviderSchema
+    inputSchema: wrapZodSchema(NetAppResourceUnregisterProviderSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_unregister_provider is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_get_metadata',
     description: 'Get NetApp resource provider metadata and API information',
-    inputSchema: NetAppResourceGetMetadataSchema
+    inputSchema: wrapZodSchema(NetAppResourceGetMetadataSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_get_metadata is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Volume Quota Rules operations
 const VolumeQuotaRulesCommonSchemas = {
@@ -122,32 +123,80 @@ export const volumeQuotaRulesOperationsTools: Tool[] = [
   {
     name: 'anf_volume_quota_rules_create',
     description: 'Create a user or group quota rule for a volume',
-    inputSchema: VolumeQuotaRulesCreateSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_delete',
     description: 'Delete a quota rule from a volume',
-    inputSchema: VolumeQuotaRulesDeleteSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_get',
     description: 'Get detailed information about a specific quota rule',
-    inputSchema: VolumeQuotaRulesGetSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_list',
     description: 'List all quota rules for a volume',
-    inputSchema: VolumeQuotaRulesListSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_update',
     description: 'Update quota limit for a rule',
-    inputSchema: VolumeQuotaRulesUpdateSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_volume_quota_rules_get_usage',
     description: 'Get current usage statistics for a quota rule',
-    inputSchema: VolumeQuotaRulesGetUsageSchema
+    inputSchema: wrapZodSchema(VolumeQuotaRulesGetUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_volume_quota_rules_get_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

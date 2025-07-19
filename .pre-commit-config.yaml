@@ -1,0 +1,247 @@
+# Pre-commit hooks configuration for ANF-AIOps
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+# Security-focused pre-commit hooks for enterprise-grade development
+
+repos:
+  # General file formatting and security
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+      - id: check-xml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: mixed-line-ending
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, master, --branch, production]
+
+  # Secret detection with GitLeaks
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.1
+    hooks:
+      - id: gitleaks
+
+  # Additional secret detection with detect-secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: |
+          (?x)^(
+            .*\.lock$|
+            .*\.min\.js$|
+            .*\.min\.css$|
+            package-lock\.json$|
+            yarn\.lock$|
+            pnpm-lock\.yaml$|
+            .*\.tfstate$|
+            .*\.tfstate\.backup$
+          )$
+
+  # Security scanning with Semgrep
+  - repo: https://github.com/semgrep/semgrep
+    rev: v1.52.0
+    hooks:
+      - id: semgrep
+        args: [
+          '--config=auto',
+          '--error',
+          '--severity=ERROR',
+          '--severity=WARNING'
+        ]
+        exclude: |
+          (?x)^(
+            tests/.*|
+            .*\.test\..*|
+            .*\.spec\..*|
+            node_modules/.*|
+            dist/.*|
+            build/.*|
+            coverage/.*
+          )$
+
+  # TypeScript and JavaScript linting
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.56.0
+    hooks:
+      - id: eslint
+        files: \.(js|jsx|ts|tsx)$
+        args: [--fix, --max-warnings=0]
+        additional_dependencies:
+          - '@typescript-eslint/eslint-plugin@^6.17.0'
+          - '@typescript-eslint/parser@^6.17.0'
+          - 'eslint-config-prettier@^9.1.0'
+          - 'eslint-plugin-security@^1.7.1'
+          - 'eslint-plugin-import@^2.29.1'
+
+  # Prettier for code formatting
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        files: \.(js|jsx|ts|tsx|json|yaml|yml|md|html|css|scss)$
+        args: [--write]
+
+  # C# specific linting and formatting
+  - repo: local
+    hooks:
+      - id: dotnet-format
+        name: dotnet format
+        entry: dotnet format
+        language: system
+        files: \.(cs|csproj|sln)$
+        pass_filenames: false
+        args: [--verbosity, normal, --verify-no-changes]
+
+      - id: dotnet-test
+        name: dotnet test
+        entry: dotnet test
+        language: system
+        files: \.(cs|csproj)$
+        pass_filenames: false
+        args: [--no-build, --verbosity, normal]
+
+  # Security linting for .NET projects
+  - repo: local
+    hooks:
+      - id: security-code-scan
+        name: Security Code Scan
+        entry: bash -c 'find . -name "*.csproj" -exec dotnet add {} package SecurityCodeScan.VS2019 --version 5.6.7 \; && dotnet build --configuration Release'
+        language: system
+        files: \.(cs|csproj)$
+        pass_filenames: false
+
+  # Terraform security scanning
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.86.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terraform_docs
+      - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+      - id: terraform_checkov
+        args:
+          - --args=--framework terraform
+          - --args=--check CKV_AZURE_1,CKV_AZURE_2,CKV_AZURE_3
+
+  # Infrastructure as Code security scanning
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.1.34
+    hooks:
+      - id: checkov
+        args: [
+          --framework, terraform,
+          --framework, bicep,
+          --framework, arm,
+          --framework, dockerfile,
+          --framework, kubernetes,
+          --check, CKV_AZURE_1,CKV_AZURE_2,CKV_AZURE_3,CKV_AZURE_4,CKV_AZURE_5,
+          --skip-check, CKV_AZURE_999  # Skip known false positives
+        ]
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        args: [-c=.yamllint.yml]
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        args: [--severity=warning]
+
+  # Docker security scanning
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        args: [--ignore, DL3008, --ignore, DL3009]
+
+  # License compliance checking
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: insert-license
+        files: \.(py|js|ts|cs|java|go|rb|php|sh|ps1)$
+        args:
+          - --license-filepath
+          - .license-header.txt
+          - --comment-style
+          - /*| *| */
+
+  # Conventional commit validation
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [optional-scope]
+
+  # Package.json security audit
+  - repo: local
+    hooks:
+      - id: npm-audit
+        name: npm audit
+        entry: bash -c 'find . -name "package.json" -not -path "*/node_modules/*" -execdir npm audit --audit-level moderate \;'
+        language: system
+        files: package\.json$
+        pass_filenames: false
+
+  # Python security scanning (if Python files exist)
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, ., -f, json, -o, bandit-report.json]
+        files: \.py$
+
+# Global configuration
+fail_fast: false
+default_stages: [commit, push]
+minimum_pre_commit_version: '3.0.0'
+
+# Exclude patterns
+exclude: |
+  (?x)^(
+    node_modules/.*|
+    dist/.*|
+    build/.*|
+    coverage/.*|
+    \.git/.*|
+    \.vscode/.*|
+    \.idea/.*|
+    .*\.min\.js$|
+    .*\.min\.css$|
+    package-lock\.json$|
+    yarn\.lock$|
+    pnpm-lock\.yaml$|
+    .*\.tfstate$|
+    .*\.tfstate\.backup$|
+    .*\.terraform/.*
+  )$

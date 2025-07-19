@@ -1,0 +1,232 @@
+#!/bin/bash
+# Commit message hook for ANF-AIOps
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+# Enforces conventional commit message format
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1" >&2
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+# Get the commit message file
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Skip if this is a merge commit
+if echo "$COMMIT_MSG" | grep -q "^Merge "; then
+    print_info "Merge commit detected, skipping conventional commit validation"
+    exit 0
+fi
+
+# Skip if this is a revert commit
+if echo "$COMMIT_MSG" | grep -q "^Revert "; then
+    print_info "Revert commit detected, skipping conventional commit validation"
+    exit 0
+fi
+
+# Skip if this is an amend or fixup commit
+if echo "$COMMIT_MSG" | grep -q "^fixup! \|^squash! "; then
+    print_info "Fixup/squash commit detected, skipping conventional commit validation"
+    exit 0
+fi
+
+print_info "Validating commit message format..."
+
+# Conventional commit pattern
+# Format: type(scope): description
+# 
+# type: feat, fix, docs, style, refactor, test, chore, ci, perf, build, security
+# scope: optional, can be any of: api, ui, db, auth, infra, rag, mcp, teams, anf, security
+# description: imperative mood, lowercase, no period at end
+CONVENTIONAL_COMMIT_REGEX="^(feat|fix|docs|style|refactor|test|chore|ci|perf|build|security)(\([a-z0-9-]+\))?: .{1,50}$"
+
+# Check if commit message follows conventional commit format
+if [[ ! $COMMIT_MSG =~ $CONVENTIONAL_COMMIT_REGEX ]]; then
+    print_error "Commit message does not follow Conventional Commits format!"
+    echo ""
+    echo "Current commit message:"
+    echo "  $COMMIT_MSG"
+    echo ""
+    echo "Expected format:"
+    echo "  <type>[optional scope]: <description>"
+    echo ""
+    echo "Types:"
+    echo "  feat     - A new feature"
+    echo "  fix      - A bug fix"
+    echo "  docs     - Documentation only changes"
+    echo "  style    - Changes that do not affect the meaning of the code"
+    echo "  refactor - A code change that neither fixes a bug nor adds a feature"
+    echo "  test     - Adding missing tests or correcting existing tests"
+    echo "  chore    - Other changes that don't modify src or test files"
+    echo "  ci       - Changes to CI configuration files and scripts"
+    echo "  perf     - A code change that improves performance"
+    echo "  build    - Changes that affect the build system or external dependencies"
+    echo "  security - Security-related changes"
+    echo ""
+    echo "Scopes (optional):"
+    echo "  api      - API related changes"
+    echo "  ui       - User interface changes"
+    echo "  db       - Database related changes"
+    echo "  auth     - Authentication/authorization changes"
+    echo "  infra    - Infrastructure changes"
+    echo "  rag      - RAG system changes"
+    echo "  mcp      - MCP server changes"
+    echo "  teams    - Teams bot changes"
+    echo "  anf      - Azure NetApp Files specific changes"
+    echo "  security - Security-related changes"
+    echo "  deps     - Dependency updates"
+    echo ""
+    echo "Examples:"
+    echo "  feat(anf): add volume encryption support"
+    echo "  fix(auth): resolve JWT token validation issue"
+    echo "  docs(api): update API documentation"
+    echo "  security(deps): update vulnerable packages"
+    echo "  ci: add security scanning to pipeline"
+    echo ""
+    echo "Rules:"
+    echo "  - Use imperative mood (\"add\" not \"added\" or \"adds\")"
+    echo "  - Don't capitalize the first letter of description"
+    echo "  - Don't use a period at the end"
+    echo "  - Keep description under 50 characters"
+    echo "  - Use present tense"
+    echo ""
+    exit 1
+fi
+
+# Additional validation rules
+COMMIT_SUBJECT=$(echo "$COMMIT_MSG" | head -n1)
+
+# Check if description starts with uppercase (should be lowercase)
+if [[ $COMMIT_SUBJECT =~ : [A-Z] ]]; then
+    print_error "Commit description should start with lowercase letter"
+    echo "Current: $COMMIT_SUBJECT"
+    echo "Example: $(echo "$COMMIT_SUBJECT" | sed 's/: [A-Z]/: \L&/')"
+    exit 1
+fi
+
+# Check if description ends with period (should not)
+if [[ $COMMIT_SUBJECT =~ \. *$ ]]; then
+    print_error "Commit description should not end with a period"
+    echo "Current: $COMMIT_SUBJECT"
+    echo "Fixed: $(echo "$COMMIT_SUBJECT" | sed 's/\. *$//')"
+    exit 1
+fi
+
+# Check for past tense verbs (should use imperative mood)
+PAST_TENSE_VERBS="added|fixed|updated|changed|removed|deleted|created|modified|implemented|resolved"
+if echo "$COMMIT_SUBJECT" | grep -qE ": ($PAST_TENSE_VERBS)"; then
+    print_warning "Consider using imperative mood instead of past tense"
+    echo "Current: $COMMIT_SUBJECT"
+    echo "Examples:"
+    echo "  'added' -> 'add'"
+    echo "  'fixed' -> 'fix'"
+    echo "  'updated' -> 'update'"
+    echo "  'created' -> 'create'"
+    echo ""
+fi
+
+# Check for specific ANF-AIOps project rules
+COMMIT_TYPE=$(echo "$COMMIT_SUBJECT" | sed 's/^\([^(]*\).*/\1/')
+COMMIT_SCOPE=$(echo "$COMMIT_SUBJECT" | sed -n 's/^[^(]*(\([^)]*\)).*/\1/p')
+COMMIT_DESC=$(echo "$COMMIT_SUBJECT" | sed 's/^[^:]*: //')
+
+# Security-related commit validation
+if [[ $COMMIT_TYPE == "security" ]] || [[ $COMMIT_SCOPE == "security" ]] || echo "$COMMIT_DESC" | grep -qE "security|vulnerability|cve|exploit"; then
+    print_info "Security-related commit detected"
+    
+    # Check for security-related keywords in description
+    if ! echo "$COMMIT_DESC" | grep -qE "security|vulnerability|fix|patch|update|upgrade|sanitize|validate|encrypt"; then
+        print_warning "Security commit should clearly describe the security improvement"
+    fi
+fi
+
+# ANF-specific validation
+if [[ $COMMIT_SCOPE == "anf" ]] || echo "$COMMIT_DESC" | grep -qE "netapp|volume|snapshot|capacity"; then
+    print_info "ANF-related commit detected"
+    
+    # Ensure ANF changes include proper scope
+    if [[ $COMMIT_SCOPE != "anf" ]] && [[ $COMMIT_TYPE != "docs" ]]; then
+        print_warning "Consider using 'anf' scope for Azure NetApp Files related changes"
+    fi
+fi
+
+# Infrastructure changes validation
+if [[ $COMMIT_SCOPE == "infra" ]] || echo "$COMMIT_DESC" | grep -qE "terraform|bicep|azure|infrastructure"; then
+    print_info "Infrastructure-related commit detected"
+    
+    # Warn about infrastructure changes
+    if [[ $COMMIT_TYPE == "feat" ]] || [[ $COMMIT_TYPE == "fix" ]]; then
+        print_warning "Infrastructure changes detected. Ensure proper testing and review."
+    fi
+fi
+
+# Check for breaking changes
+if echo "$COMMIT_MSG" | grep -q "BREAKING CHANGE"; then
+    print_warning "Breaking change detected! Ensure version bump and changelog update."
+fi
+
+# Check commit message length
+SUBJECT_LENGTH=${#COMMIT_SUBJECT}
+if [ $SUBJECT_LENGTH -gt 72 ]; then
+    print_error "Commit subject line is too long ($SUBJECT_LENGTH chars). Keep it under 72 characters."
+    exit 1
+elif [ $SUBJECT_LENGTH -gt 50 ]; then
+    print_warning "Commit subject line is quite long ($SUBJECT_LENGTH chars). Consider keeping it under 50 characters."
+fi
+
+# Check for body formatting if present
+COMMIT_BODY=$(echo "$COMMIT_MSG" | tail -n +3)
+if [ -n "$COMMIT_BODY" ]; then
+    # Check for proper blank line between subject and body
+    SECOND_LINE=$(echo "$COMMIT_MSG" | sed -n '2p')
+    if [ -n "$SECOND_LINE" ]; then
+        print_error "Commit message body must be separated from subject by a blank line"
+        exit 1
+    fi
+    
+    # Check body line length
+    while IFS= read -r line; do
+        if [ ${#line} -gt 72 ]; then
+            print_warning "Body line too long (${#line} chars): $line"
+        fi
+    done <<< "$COMMIT_BODY"
+fi
+
+# Success message
+print_success "Commit message format is valid!"
+
+# Additional tips for first-time contributors
+if [ ! -f ".git/hooks/commit-msg-tips-shown" ]; then
+    echo ""
+    print_info "💡 Commit Message Tips:"
+    echo "  - Use 'feat' for new features"
+    echo "  - Use 'fix' for bug fixes"
+    echo "  - Use 'security' for security-related changes"
+    echo "  - Add scope like '(anf)', '(api)', '(ui)' for context"
+    echo "  - Write in imperative mood: 'add feature' not 'added feature'"
+    echo ""
+    touch ".git/hooks/commit-msg-tips-shown"
+fi
+
+exit 0

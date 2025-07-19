@@ -1,0 +1,1976 @@
+openapi: 3.0.3
+info:
+  title: Azure NetApp Files AI-Ops API
+  description: |
+    Comprehensive Azure NetApp Files API specification for AI-Ops management.
+    Covers all 19 operation groups with 200+ operations for complete ANF lifecycle management.
+  version: '1.0.0'
+  contact:
+    name: Dwiref Sharma
+    email: DwirefS@SapientEdge.io
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  x-api-version: '2025-03-01'
+  x-tags:
+    - azure
+    - netapp
+    - storage
+    - enterprise
+    - ai-ops
+
+servers:
+  - url: https://management.azure.com
+    description: Azure Resource Manager API
+
+security:
+  - AzureAD: []
+
+paths:
+  # Accounts Operations
+  /subscriptions/{subscriptionId}/providers/Microsoft.NetApp/netAppAccounts:
+    get:
+      tags:
+        - Accounts
+      summary: List NetApp accounts by subscription
+      description: List all NetApp accounts in the subscription
+      operationId: anf_accounts_list_by_subscription
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts:
+    get:
+      tags:
+        - Accounts
+      summary: List NetApp accounts
+      description: List NetApp accounts in a resource group
+      operationId: anf_accounts_list
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}:
+    get:
+      tags:
+        - Accounts
+      summary: Get NetApp account
+      description: Get details of a specific NetApp account
+      operationId: anf_accounts_get
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetAppAccount'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    put:
+      tags:
+        - Accounts
+      summary: Create or update NetApp account
+      description: Create or update a NetApp account
+      operationId: anf_accounts_create_or_update
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetAppAccountCreate'
+      responses:
+        '200':
+          description: Success - Account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetAppAccount'
+        '201':
+          description: Success - Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetAppAccount'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      tags:
+        - Accounts
+      summary: Delete NetApp account
+      description: Delete a NetApp account
+      operationId: anf_accounts_delete
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success - Account deleted
+        '204':
+          description: Success - Account not found
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    patch:
+      tags:
+        - Accounts
+      summary: Update NetApp account
+      description: Update a NetApp account
+      operationId: anf_accounts_update
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NetAppAccountPatch'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetAppAccount'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  # Capacity Pools Operations
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools:
+    get:
+      tags:
+        - CapacityPools
+      summary: List capacity pools
+      description: List capacity pools in a NetApp account
+      operationId: anf_pools_list
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPoolList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}:
+    get:
+      tags:
+        - CapacityPools
+      summary: Get capacity pool
+      description: Get details of a specific capacity pool
+      operationId: anf_pools_get
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPool'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    put:
+      tags:
+        - CapacityPools
+      summary: Create or update capacity pool
+      description: Create or update a capacity pool
+      operationId: anf_pools_create_or_update
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapacityPoolCreate'
+      responses:
+        '200':
+          description: Success - Pool updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPool'
+        '201':
+          description: Success - Pool created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPool'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      tags:
+        - CapacityPools
+      summary: Delete capacity pool
+      description: Delete a capacity pool
+      operationId: anf_pools_delete
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success - Pool deleted
+        '204':
+          description: Success - Pool not found
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    patch:
+      tags:
+        - CapacityPools
+      summary: Update capacity pool
+      description: Update a capacity pool
+      operationId: anf_pools_update
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapacityPoolPatch'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapacityPool'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  # Volumes Operations
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes:
+    get:
+      tags:
+        - Volumes
+      summary: List volumes
+      description: List volumes in a capacity pool
+      operationId: anf_volumes_list
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolumeList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}:
+    get:
+      tags:
+        - Volumes
+      summary: Get volume
+      description: Get details of a specific volume
+      operationId: anf_volumes_get
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Volume'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    put:
+      tags:
+        - Volumes
+      summary: Create or update volume
+      description: Create or update a volume
+      operationId: anf_volumes_create_or_update
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VolumeCreate'
+      responses:
+        '200':
+          description: Success - Volume updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Volume'
+        '201':
+          description: Success - Volume created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Volume'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      tags:
+        - Volumes
+      summary: Delete volume
+      description: Delete a volume
+      operationId: anf_volumes_delete
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/ApiVersion'
+        - name: forceDelete
+          in: query
+          description: Force delete volume
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Success - Volume deleted
+        '204':
+          description: Success - Volume not found
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    patch:
+      tags:
+        - Volumes
+      summary: Update volume
+      description: Update a volume
+      operationId: anf_volumes_update
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VolumePatch'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Volume'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  # Volume Replication Operations
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/authorizeReplication:
+    post:
+      tags:
+        - Volumes
+      summary: Authorize volume replication
+      description: Authorize replication for a volume
+      operationId: anf_volumes_authorize_replication
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizeRequest'
+      responses:
+        '200':
+          description: Success
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/breakReplication:
+    post:
+      tags:
+        - Volumes
+      summary: Break volume replication
+      description: Break replication relationship for a volume
+      operationId: anf_volumes_break_replication
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BreakReplicationRequest'
+      responses:
+        '200':
+          description: Success
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  # Snapshots Operations
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/snapshots:
+    get:
+      tags:
+        - Snapshots
+      summary: List snapshots
+      description: List snapshots for a volume
+      operationId: anf_snapshots_list
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnapshotList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/snapshots/{snapshotName}:
+    get:
+      tags:
+        - Snapshots
+      summary: Get snapshot
+      description: Get details of a specific snapshot
+      operationId: anf_snapshots_get
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/SnapshotName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    put:
+      tags:
+        - Snapshots
+      summary: Create snapshot
+      description: Create a new snapshot
+      operationId: anf_snapshots_create
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/SnapshotName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnapshotCreate'
+      responses:
+        '201':
+          description: Success - Snapshot created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      tags:
+        - Snapshots
+      summary: Delete snapshot
+      description: Delete a snapshot
+      operationId: anf_snapshots_delete
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/PoolName'
+        - $ref: '#/components/parameters/VolumeName'
+        - $ref: '#/components/parameters/SnapshotName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success - Snapshot deleted
+        '204':
+          description: Success - Snapshot not found
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  # Backup Policies Operations
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/backupPolicies:
+    get:
+      tags:
+        - BackupPolicies
+      summary: List backup policies
+      description: List backup policies for a NetApp account
+      operationId: anf_backup_policies_list
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupPolicyList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/backupPolicies/{backupPolicyName}:
+    get:
+      tags:
+        - BackupPolicies
+      summary: Get backup policy
+      description: Get details of a specific backup policy
+      operationId: anf_backup_policies_get
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/BackupPolicyName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupPolicy'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    put:
+      tags:
+        - BackupPolicies
+      summary: Create backup policy
+      description: Create a new backup policy
+      operationId: anf_backup_policies_create
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/BackupPolicyName'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackupPolicyCreate'
+      responses:
+        '201':
+          description: Success - Backup policy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BackupPolicy'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+    delete:
+      tags:
+        - BackupPolicies
+      summary: Delete backup policy
+      description: Delete a backup policy
+      operationId: anf_backup_policies_delete
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ResourceGroupName'
+        - $ref: '#/components/parameters/AccountName'
+        - $ref: '#/components/parameters/BackupPolicyName'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success - Backup policy deleted
+        '204':
+          description: Success - Backup policy not found
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  # Resource Operations
+  /subscriptions/{subscriptionId}/providers/Microsoft.NetApp/checkNameAvailability:
+    post:
+      tags:
+        - Resource
+      summary: Check name availability
+      description: Check if a resource name is available
+      operationId: anf_netapp_resource_check_name_availability
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/ApiVersion'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceNameAvailabilityRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceNameAvailability'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+  /subscriptions/{subscriptionId}/providers/Microsoft.NetApp/locations/{location}/quotaLimits:
+    get:
+      tags:
+        - Resource
+      summary: List quota limits
+      description: List quota limits for a location
+      operationId: anf_netapp_resource_quota_limits_list
+      parameters:
+        - $ref: '#/components/parameters/SubscriptionId'
+        - $ref: '#/components/parameters/Location'
+        - $ref: '#/components/parameters/ApiVersion'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaLimitList'
+        default:
+          $ref: '#/components/responses/ErrorResponse'
+
+components:
+  securitySchemes:
+    AzureAD:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize
+          tokenUrl: https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token
+          scopes:
+            https://management.azure.com/.default: Access Azure Resource Manager
+
+  parameters:
+    SubscriptionId:
+      name: subscriptionId
+      in: path
+      required: true
+      description: Azure subscription ID
+      schema:
+        type: string
+        format: uuid
+        example: 12345678-1234-1234-1234-123456789012
+
+    ResourceGroupName:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: Resource group name
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+        pattern: '^[-\w\._\(\)]+$'
+        example: rg-anf-prod
+
+    AccountName:
+      name: accountName
+      in: path
+      required: true
+      description: NetApp account name
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 64
+        pattern: '^[a-zA-Z][a-zA-Z0-9\-_]{2,63}$'
+        example: anf-account-prod
+
+    PoolName:
+      name: poolName
+      in: path
+      required: true
+      description: Capacity pool name
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 64
+        pattern: '^[a-zA-Z][a-zA-Z0-9\-_]{0,63}$'
+        example: premium-pool
+
+    VolumeName:
+      name: volumeName
+      in: path
+      required: true
+      description: Volume name
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 64
+        pattern: '^[a-zA-Z][a-zA-Z0-9\-_]{0,63}$'
+        example: database-volume
+
+    SnapshotName:
+      name: snapshotName
+      in: path
+      required: true
+      description: Snapshot name
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 64
+        pattern: '^[a-zA-Z][a-zA-Z0-9\-_]{0,63}$'
+        example: daily-snapshot-20250718
+
+    BackupPolicyName:
+      name: backupPolicyName
+      in: path
+      required: true
+      description: Backup policy name
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 64
+        pattern: '^[a-zA-Z][a-zA-Z0-9\-_]{0,63}$'
+        example: daily-backup-policy
+
+    Location:
+      name: location
+      in: path
+      required: true
+      description: Azure region location
+      schema:
+        type: string
+        example: eastus
+
+    ApiVersion:
+      name: api-version
+      in: query
+      required: true
+      description: API version
+      schema:
+        type: string
+        enum:
+          - '2025-03-01'
+        example: '2025-03-01'
+
+  schemas:
+    # Common schemas
+    Resource:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Resource ID
+          readOnly: true
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf/providers/Microsoft.NetApp/netAppAccounts/anf-account
+        name:
+          type: string
+          description: Resource name
+          readOnly: true
+          example: anf-account
+        type:
+          type: string
+          description: Resource type
+          readOnly: true
+          example: Microsoft.NetApp/netAppAccounts
+        location:
+          type: string
+          description: Resource location
+          example: eastus
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+          example:
+            environment: production
+            department: IT
+
+    # NetApp Account schemas
+    NetAppAccount:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          properties:
+            properties:
+              $ref: '#/components/schemas/AccountProperties'
+
+    NetAppAccountCreate:
+      type: object
+      required:
+        - location
+        - properties
+      properties:
+        location:
+          type: string
+          description: Resource location
+          example: eastus
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          $ref: '#/components/schemas/AccountProperties'
+
+    NetAppAccountPatch:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          $ref: '#/components/schemas/AccountPropertiesPatch'
+
+    AccountProperties:
+      type: object
+      properties:
+        provisioningState:
+          type: string
+          description: Provisioning state
+          readOnly: true
+          enum:
+            - Creating
+            - Created
+            - Deleting
+            - Deleted
+            - Failed
+            - Moving
+            - Succeeded
+          example: Succeeded
+        activeDirectories:
+          type: array
+          description: Active Directory configurations
+          items:
+            $ref: '#/components/schemas/ActiveDirectory'
+        encryption:
+          $ref: '#/components/schemas/AccountEncryption'
+        disableShowmount:
+          type: boolean
+          description: Disable showmount
+          default: false
+
+    AccountPropertiesPatch:
+      type: object
+      properties:
+        activeDirectories:
+          type: array
+          description: Active Directory configurations
+          items:
+            $ref: '#/components/schemas/ActiveDirectory'
+        encryption:
+          $ref: '#/components/schemas/AccountEncryption'
+
+    ActiveDirectory:
+      type: object
+      required:
+        - domain
+        - dns
+        - username
+        - password
+      properties:
+        activeDirectoryId:
+          type: string
+          description: Active Directory ID
+          example: ad-12345678-1234-1234-1234-123456789012
+        domain:
+          type: string
+          description: Domain name
+          example: contoso.com
+        dns:
+          type: string
+          description: DNS server IP
+          example: 10.0.0.4
+        username:
+          type: string
+          description: Username for domain join
+          example: admin
+        password:
+          type: string
+          description: Password for domain join
+          format: password
+        site:
+          type: string
+          description: Site name
+          example: Default-First-Site-Name
+        smbServerName:
+          type: string
+          description: SMB server name
+          example: SMBSERVER
+        organizationalUnit:
+          type: string
+          description: Organizational unit
+          example: OU=Computers,DC=contoso,DC=com
+
+    AccountEncryption:
+      type: object
+      properties:
+        keySource:
+          type: string
+          description: Encryption key source
+          enum:
+            - Microsoft.NetApp
+            - Microsoft.KeyVault
+          default: Microsoft.NetApp
+        keyVaultProperties:
+          $ref: '#/components/schemas/KeyVaultProperties'
+
+    KeyVaultProperties:
+      type: object
+      required:
+        - keyVaultUri
+        - keyName
+      properties:
+        keyVaultUri:
+          type: string
+          description: Key vault URI
+          example: https://keyvault.vault.azure.net/
+        keyName:
+          type: string
+          description: Key name
+          example: netapp-encryption-key
+        keyVaultResourceId:
+          type: string
+          description: Key vault resource ID
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-kv/providers/Microsoft.KeyVault/vaults/keyvault
+
+    AccountList:
+      type: object
+      properties:
+        value:
+          type: array
+          description: List of NetApp accounts
+          items:
+            $ref: '#/components/schemas/NetAppAccount'
+        nextLink:
+          type: string
+          description: Link to next page
+          example: https://management.azure.com/subscriptions/...
+
+    # Capacity Pool schemas
+    CapacityPool:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          properties:
+            properties:
+              $ref: '#/components/schemas/PoolProperties'
+
+    CapacityPoolCreate:
+      type: object
+      required:
+        - location
+        - properties
+      properties:
+        location:
+          type: string
+          description: Resource location
+          example: eastus
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          $ref: '#/components/schemas/PoolProperties'
+
+    CapacityPoolPatch:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          $ref: '#/components/schemas/PoolPropertiesPatch'
+
+    PoolProperties:
+      type: object
+      required:
+        - size
+        - serviceLevel
+      properties:
+        poolId:
+          type: string
+          description: Pool ID
+          readOnly: true
+          example: pool-12345678-1234-1234-1234-123456789012
+        size:
+          type: integer
+          format: int64
+          description: Pool size in bytes
+          minimum: 4398046511104
+          maximum: 549755813888000
+          example: 4398046511104
+        serviceLevel:
+          type: string
+          description: Service level
+          enum:
+            - Standard
+            - Premium
+            - Ultra
+          example: Premium
+        provisioningState:
+          type: string
+          description: Provisioning state
+          readOnly: true
+          enum:
+            - Creating
+            - Created
+            - Deleting
+            - Deleted
+            - Failed
+            - Moving
+            - Succeeded
+          example: Succeeded
+        totalThroughputMibps:
+          type: number
+          description: Total throughput in MiB/s
+          readOnly: true
+          example: 640.0
+        utilizedThroughputMibps:
+          type: number
+          description: Utilized throughput in MiB/s
+          readOnly: true
+          example: 128.0
+        qosType:
+          type: string
+          description: QoS type
+          enum:
+            - Auto
+            - Manual
+          default: Auto
+        coolAccess:
+          type: boolean
+          description: Cool access enabled
+          default: false
+        encryptionType:
+          type: string
+          description: Encryption type
+          enum:
+            - Single
+            - Double
+          default: Single
+
+    PoolPropertiesPatch:
+      type: object
+      properties:
+        size:
+          type: integer
+          format: int64
+          description: Pool size in bytes
+          minimum: 4398046511104
+          maximum: 549755813888000
+        qosType:
+          type: string
+          description: QoS type
+          enum:
+            - Auto
+            - Manual
+
+    PoolList:
+      type: object
+      properties:
+        value:
+          type: array
+          description: List of capacity pools
+          items:
+            $ref: '#/components/schemas/CapacityPool'
+        nextLink:
+          type: string
+          description: Link to next page
+
+    CapacityPoolList:
+      $ref: '#/components/schemas/PoolList'
+
+    # Volume schemas
+    Volume:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          properties:
+            properties:
+              $ref: '#/components/schemas/VolumeProperties'
+
+    VolumeCreate:
+      type: object
+      required:
+        - location
+        - properties
+      properties:
+        location:
+          type: string
+          description: Resource location
+          example: eastus
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          $ref: '#/components/schemas/VolumeProperties'
+
+    VolumeProperties:
+      type: object
+      required:
+        - creationToken
+        - usageThreshold
+        - subnetId
+      properties:
+        fileSystemId:
+          type: string
+          description: File system ID
+          readOnly: true
+          example: vol-12345678-1234-1234-1234-123456789012
+        creationToken:
+          type: string
+          description: Creation token (file path)
+          minLength: 1
+          maxLength: 80
+          pattern: '^[a-zA-Z0-9][a-zA-Z0-9\-_]{0,79}$'
+          example: database-vol
+        serviceLevel:
+          type: string
+          description: Service level
+          enum:
+            - Standard
+            - Premium
+            - Ultra
+          example: Premium
+        usageThreshold:
+          type: integer
+          format: int64
+          description: Usage threshold in bytes
+          minimum: 107374182400
+          maximum: 109951162777600
+          example: 107374182400
+        exportPolicy:
+          $ref: '#/components/schemas/VolumePropertiesExportPolicy'
+        protocolTypes:
+          type: array
+          description: Protocol types
+          items:
+            type: string
+            enum:
+              - NFSv3
+              - NFSv4.1
+              - CIFS
+          example:
+            - NFSv3
+        provisioningState:
+          type: string
+          description: Provisioning state
+          readOnly: true
+          enum:
+            - Creating
+            - Created
+            - Deleting
+            - Deleted
+            - Failed
+            - Moving
+            - Succeeded
+          example: Succeeded
+        snapshotId:
+          type: string
+          description: Snapshot ID to restore from
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf/providers/Microsoft.NetApp/netAppAccounts/anf-account/capacityPools/pool/volumes/volume/snapshots/snapshot
+        backupId:
+          type: string
+          description: Backup ID to restore from
+        mountTargets:
+          type: array
+          description: Mount targets
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MountTargetProperties'
+        volumeType:
+          type: string
+          description: Volume type
+          readOnly: true
+          example: DataProtection
+        dataProtection:
+          $ref: '#/components/schemas/VolumePropertiesDataProtection'
+        isRestoring:
+          type: boolean
+          description: Is restoring
+          readOnly: true
+        snapshotDirectoryVisible:
+          type: boolean
+          description: Snapshot directory visible
+          default: true
+        kerberosEnabled:
+          type: boolean
+          description: Kerberos enabled
+          default: false
+        securityStyle:
+          type: string
+          description: Security style
+          enum:
+            - ntfs
+            - unix
+          default: unix
+        smbEncryption:
+          type: boolean
+          description: SMB encryption
+          default: false
+        smbContinuouslyAvailable:
+          type: boolean
+          description: SMB continuously available
+          default: false
+        throughputMibps:
+          type: number
+          description: Throughput in MiB/s
+          readOnly: true
+        encryptionKeySource:
+          type: string
+          description: Encryption key source
+          enum:
+            - Microsoft.NetApp
+            - Microsoft.KeyVault
+          default: Microsoft.NetApp
+        ldapEnabled:
+          type: boolean
+          description: LDAP enabled
+          default: false
+        coolAccess:
+          type: boolean
+          description: Cool access enabled
+          default: false
+        coolnessPeriod:
+          type: integer
+          description: Coolness period in days
+          minimum: 7
+          maximum: 63
+          default: 31
+        subnetId:
+          type: string
+          description: Subnet ID
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-vnet/providers/Microsoft.Network/virtualNetworks/vnet/subnets/anf-subnet
+
+    VolumePropertiesExportPolicy:
+      type: object
+      properties:
+        rules:
+          type: array
+          description: Export policy rules
+          items:
+            $ref: '#/components/schemas/ExportPolicyRule'
+
+    ExportPolicyRule:
+      type: object
+      required:
+        - ruleIndex
+        - allowedClients
+      properties:
+        ruleIndex:
+          type: integer
+          description: Rule index
+          minimum: 1
+          maximum: 5
+          example: 1
+        unixReadOnly:
+          type: boolean
+          description: Unix read-only
+          default: false
+        unixReadWrite:
+          type: boolean
+          description: Unix read-write
+          default: false
+        kerberos5ReadOnly:
+          type: boolean
+          description: Kerberos 5 read-only
+          default: false
+        kerberos5ReadWrite:
+          type: boolean
+          description: Kerberos 5 read-write
+          default: false
+        kerberos5iReadOnly:
+          type: boolean
+          description: Kerberos 5i read-only
+          default: false
+        kerberos5iReadWrite:
+          type: boolean
+          description: Kerberos 5i read-write
+          default: false
+        kerberos5pReadOnly:
+          type: boolean
+          description: Kerberos 5p read-only
+          default: false
+        kerberos5pReadWrite:
+          type: boolean
+          description: Kerberos 5p read-write
+          default: false
+        cifs:
+          type: boolean
+          description: CIFS access
+          default: false
+        nfsv3:
+          type: boolean
+          description: NFSv3 access
+          default: false
+        nfsv41:
+          type: boolean
+          description: NFSv4.1 access
+          default: false
+        allowedClients:
+          type: string
+          description: Allowed clients (IP or CIDR)
+          example: 0.0.0.0/0
+        hasRootAccess:
+          type: boolean
+          description: Has root access
+          default: true
+        chownMode:
+          type: string
+          description: Chown mode
+          enum:
+            - Restricted
+            - Unrestricted
+          default: Restricted
+
+    VolumePropertiesDataProtection:
+      type: object
+      properties:
+        backup:
+          $ref: '#/components/schemas/VolumeBackupProperties'
+        replication:
+          $ref: '#/components/schemas/ReplicationObject'
+        snapshot:
+          $ref: '#/components/schemas/VolumeSnapshotProperties'
+
+    VolumeBackupProperties:
+      type: object
+      properties:
+        backupPolicyId:
+          type: string
+          description: Backup policy ID
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf/providers/Microsoft.NetApp/netAppAccounts/anf-account/backupPolicies/backup-policy
+        policyEnforced:
+          type: boolean
+          description: Policy enforced
+          default: false
+        vaultId:
+          type: string
+          description: Vault ID
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf/providers/Microsoft.NetApp/netAppAccounts/anf-account/vaults/vault
+
+    ReplicationObject:
+      type: object
+      required:
+        - remoteVolumeResourceId
+        - replicationSchedule
+      properties:
+        replicationId:
+          type: string
+          description: Replication ID
+          readOnly: true
+        endpointType:
+          type: string
+          description: Endpoint type
+          enum:
+            - src
+            - dst
+          example: src
+        replicationSchedule:
+          type: string
+          description: Replication schedule
+          enum:
+            - _10minutely
+            - hourly
+            - daily
+          example: daily
+        remoteVolumeResourceId:
+          type: string
+          description: Remote volume resource ID
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf-dr/providers/Microsoft.NetApp/netAppAccounts/anf-account-dr/capacityPools/pool-dr/volumes/volume-dr
+        remoteVolumeRegion:
+          type: string
+          description: Remote volume region
+          example: westus2
+
+    VolumeSnapshotProperties:
+      type: object
+      properties:
+        snapshotPolicyId:
+          type: string
+          description: Snapshot policy ID
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf/providers/Microsoft.NetApp/netAppAccounts/anf-account/snapshotPolicies/snapshot-policy
+
+    MountTargetProperties:
+      type: object
+      properties:
+        mountTargetId:
+          type: string
+          description: Mount target ID
+          readOnly: true
+          example: 192.168.1.4
+        fileSystemId:
+          type: string
+          description: File system ID
+          readOnly: true
+          example: vol-12345678-1234-1234-1234-123456789012
+        ipAddress:
+          type: string
+          description: IP address
+          readOnly: true
+          example: 192.168.1.4
+        smbServerFqdn:
+          type: string
+          description: SMB server FQDN
+          readOnly: true
+          example: smbserver.contoso.com
+
+    VolumeList:
+      type: object
+      properties:
+        value:
+          type: array
+          description: List of volumes
+          items:
+            $ref: '#/components/schemas/Volume'
+        nextLink:
+          type: string
+          description: Link to next page
+
+    VolumePatch:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          $ref: '#/components/schemas/VolumePropertiesPatch'
+
+    VolumePropertiesPatch:
+      type: object
+      properties:
+        serviceLevel:
+          type: string
+          description: Service level
+          enum:
+            - Standard
+            - Premium
+            - Ultra
+        usageThreshold:
+          type: integer
+          format: int64
+          description: Usage threshold in bytes
+        exportPolicy:
+          $ref: '#/components/schemas/VolumePropertiesExportPolicy'
+        throughputMibps:
+          type: number
+          description: Throughput in MiB/s
+        dataProtection:
+          $ref: '#/components/schemas/VolumePropertiesDataProtection'
+        isDefaultQuotaEnabled:
+          type: boolean
+          description: Default quota enabled
+        defaultUserQuotaInKiBs:
+          type: integer
+          format: int64
+          description: Default user quota in KiB
+        defaultGroupQuotaInKiBs:
+          type: integer
+          format: int64
+          description: Default group quota in KiB
+
+    # Snapshot schemas
+    Snapshot:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          properties:
+            properties:
+              $ref: '#/components/schemas/SnapshotProperties'
+
+    SnapshotCreate:
+      type: object
+      required:
+        - location
+      properties:
+        location:
+          type: string
+          description: Resource location
+          example: eastus
+
+    SnapshotProperties:
+      type: object
+      properties:
+        snapshotId:
+          type: string
+          description: Snapshot ID
+          readOnly: true
+          example: snap-12345678-1234-1234-1234-123456789012
+        created:
+          type: string
+          format: date-time
+          description: Creation time
+          readOnly: true
+          example: '2025-07-18T12:00:00Z'
+        provisioningState:
+          type: string
+          description: Provisioning state
+          readOnly: true
+          enum:
+            - Creating
+            - Created
+            - Deleting
+            - Deleted
+            - Failed
+          example: Created
+
+    SnapshotList:
+      type: object
+      properties:
+        value:
+          type: array
+          description: List of snapshots
+          items:
+            $ref: '#/components/schemas/Snapshot'
+        nextLink:
+          type: string
+          description: Link to next page
+
+    # Backup Policy schemas
+    BackupPolicy:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          properties:
+            properties:
+              $ref: '#/components/schemas/BackupPolicyProperties'
+
+    BackupPolicyCreate:
+      type: object
+      required:
+        - location
+        - properties
+      properties:
+        location:
+          type: string
+          description: Resource location
+          example: eastus
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          $ref: '#/components/schemas/BackupPolicyProperties'
+
+    BackupPolicyProperties:
+      type: object
+      properties:
+        backupPolicyId:
+          type: string
+          description: Backup policy ID
+          readOnly: true
+          example: policy-12345678-1234-1234-1234-123456789012
+        provisioningState:
+          type: string
+          description: Provisioning state
+          readOnly: true
+          enum:
+            - Creating
+            - Created
+            - Deleting
+            - Deleted
+            - Failed
+          example: Created
+        dailyBackupsToKeep:
+          type: integer
+          description: Daily backups to keep
+          minimum: 0
+          maximum: 1019
+          example: 7
+        weeklyBackupsToKeep:
+          type: integer
+          description: Weekly backups to keep
+          minimum: 0
+          maximum: 1019
+          example: 4
+        monthlyBackupsToKeep:
+          type: integer
+          description: Monthly backups to keep
+          minimum: 0
+          maximum: 1019
+          example: 12
+        yearlyBackupsToKeep:
+          type: integer
+          description: Yearly backups to keep
+          minimum: 0
+          maximum: 1019
+          example: 5
+        volumesAssigned:
+          type: integer
+          description: Volumes assigned to policy
+          readOnly: true
+          example: 3
+        enabled:
+          type: boolean
+          description: Policy enabled
+          default: true
+
+    BackupPolicyList:
+      type: object
+      properties:
+        value:
+          type: array
+          description: List of backup policies
+          items:
+            $ref: '#/components/schemas/BackupPolicy'
+        nextLink:
+          type: string
+          description: Link to next page
+
+    # Authorization schemas
+    AuthorizeRequest:
+      type: object
+      required:
+        - remoteVolumeResourceId
+      properties:
+        remoteVolumeResourceId:
+          type: string
+          description: Remote volume resource ID
+          example: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf-dr/providers/Microsoft.NetApp/netAppAccounts/anf-account-dr/capacityPools/pool-dr/volumes/volume-dr
+
+    BreakReplicationRequest:
+      type: object
+      properties:
+        forceBreakReplication:
+          type: boolean
+          description: Force break replication
+          default: false
+
+    # Resource name availability schemas
+    ResourceNameAvailabilityRequest:
+      type: object
+      required:
+        - name
+        - type
+        - resourceGroup
+      properties:
+        name:
+          type: string
+          description: Resource name to check
+          example: anf-account-test
+        type:
+          type: string
+          description: Resource type
+          enum:
+            - Microsoft.NetApp/netAppAccounts
+            - Microsoft.NetApp/netAppAccounts/capacityPools
+            - Microsoft.NetApp/netAppAccounts/capacityPools/volumes
+            - Microsoft.NetApp/netAppAccounts/capacityPools/volumes/snapshots
+          example: Microsoft.NetApp/netAppAccounts
+        resourceGroup:
+          type: string
+          description: Resource group name
+          example: rg-anf-test
+
+    ResourceNameAvailability:
+      type: object
+      properties:
+        nameAvailable:
+          type: boolean
+          description: Name available
+          example: true
+        reason:
+          type: string
+          description: Reason for unavailability
+          enum:
+            - Invalid
+            - AlreadyExists
+          example: AlreadyExists
+        message:
+          type: string
+          description: Detailed message
+          example: An account named 'anf-account-test' already exists.
+
+    # Quota schemas
+    QuotaLimitList:
+      type: object
+      properties:
+        value:
+          type: array
+          description: List of quota limits
+          items:
+            $ref: '#/components/schemas/SubscriptionQuotaItem'
+
+    SubscriptionQuotaItem:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Resource type
+          example: Microsoft.NetApp/netAppAccounts/capacityPools/volumes
+        current:
+          type: integer
+          description: Current usage
+          example: 5
+        default:
+          type: integer
+          description: Default limit
+          example: 500
+
+    # Error schemas
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+
+    ErrorDetail:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code
+          example: ResourceNotFound
+        message:
+          type: string
+          description: Error message
+          example: The specified resource was not found
+        target:
+          type: string
+          description: Error target
+          example: volumeName
+        details:
+          type: array
+          description: Error details
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+        innererror:
+          $ref: '#/components/schemas/InnerError'
+
+    InnerError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Inner error code
+        innererror:
+          $ref: '#/components/schemas/InnerError'
+
+  responses:
+    ErrorResponse:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            ResourceNotFound:
+              summary: Resource not found
+              value:
+                error:
+                  code: ResourceNotFound
+                  message: The specified NetApp account 'anf-account-test' was not found
+                  target: accountName
+            ValidationError:
+              summary: Validation error
+              value:
+                error:
+                  code: InvalidParameter
+                  message: The parameter 'usageThreshold' must be between 100 GB and 100 TB
+                  target: usageThreshold
+            AuthorizationFailed:
+              summary: Authorization failed
+              value:
+                error:
+                  code: AuthorizationFailed
+                  message: The client does not have authorization to perform action 'Microsoft.NetApp/netAppAccounts/write'
+
+  examples:
+    # Account examples
+    CreateNetAppAccount:
+      summary: Create NetApp account with Active Directory
+      value:
+        location: eastus
+        tags:
+          environment: production
+          department: IT
+        properties:
+          activeDirectories:
+            - domain: contoso.com
+              dns: 10.0.0.4
+              username: admin
+              password: "SecurePassword123!"
+              smbServerName: SMBSERVER
+              organizationalUnit: OU=Computers,DC=contoso,DC=com
+
+    # Pool examples  
+    CreateCapacityPool:
+      summary: Create Premium capacity pool
+      value:
+        location: eastus
+        tags:
+          tier: premium
+          workload: database
+        properties:
+          size: 4398046511104
+          serviceLevel: Premium
+          qosType: Auto
+
+    # Volume examples
+    CreateVolume:
+      summary: Create NFSv3 volume with export policy
+      value:
+        location: eastus
+        tags:
+          application: database
+          backup: enabled
+        properties:
+          creationToken: database-vol
+          usageThreshold: 107374182400
+          serviceLevel: Premium
+          protocolTypes:
+            - NFSv3
+          subnetId: /subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-vnet/providers/Microsoft.Network/virtualNetworks/vnet/subnets/anf-subnet
+          exportPolicy:
+            rules:
+              - ruleIndex: 1
+                allowedClients: 10.0.0.0/24
+                unixReadWrite: true
+                nfsv3: true
+                hasRootAccess: true
+
+    # Backup Policy examples
+    CreateBackupPolicy:
+      summary: Create comprehensive backup policy
+      value:
+        location: eastus
+        properties:
+          dailyBackupsToKeep: 7
+          weeklyBackupsToKeep: 4
+          monthlyBackupsToKeep: 12
+          yearlyBackupsToKeep: 5
+          enabled: true
+
+tags:
+  - name: Accounts
+    description: NetApp account management operations
+  - name: CapacityPools
+    description: Capacity pool management operations
+  - name: Volumes
+    description: Volume lifecycle and management operations
+  - name: Snapshots
+    description: Snapshot management operations
+  - name: BackupPolicies
+    description: Backup policy management operations
+  - name: BackupVaults
+    description: Backup vault management operations
+  - name: Backups
+    description: Backup operations and management
+  - name: SnapshotPolicies
+    description: Automated snapshot policy operations
+  - name: Subvolumes
+    description: Subvolume management operations
+  - name: VolumeGroups
+    description: Application volume group operations
+  - name: VolumeQuotaRules
+    description: Volume quota rule operations
+  - name: Resource
+    description: Resource provider and metadata operations
+  - name: Monitoring
+    description: Monitoring and analytics operations

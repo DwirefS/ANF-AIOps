@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for NetApp Resource Quota Limits operations
 const NetAppResourceQuotaLimitsCommonSchemas = {
@@ -133,32 +134,80 @@ export const netAppResourceQuotaLimitsTools: Tool[] = [
   {
     name: 'anf_netapp_resource_quota_limits_list',
     description: 'List all quota limits for NetApp resources in a specific Azure region/location',
-    inputSchema: NetAppResourceQuotaLimitsListSchema
+    inputSchema: wrapZodSchema(NetAppResourceQuotaLimitsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_quota_limits_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_quota_limits_get',
     description: 'Get specific quota limit details by quota limit name for NetApp resources',
-    inputSchema: NetAppResourceQuotaLimitsGetSchema
+    inputSchema: wrapZodSchema(NetAppResourceQuotaLimitsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_quota_limits_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_quota_limits_check_availability',
     description: 'Check if a specific resource name is available within quota limits',
-    inputSchema: NetAppResourceQuotaLimitsCheckAvailabilitySchema
+    inputSchema: wrapZodSchema(NetAppResourceQuotaLimitsCheckAvailabilitySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_quota_limits_check_availability is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_quota_limits_usage',
     description: 'Get current quota usage statistics for NetApp resources in a region',
-    inputSchema: NetAppResourceQuotaLimitsUsageSchema
+    inputSchema: wrapZodSchema(NetAppResourceQuotaLimitsUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_quota_limits_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_quota_limits_request_increase',
     description: 'Submit a request to increase quota limits for NetApp resources',
-    inputSchema: NetAppResourceQuotaLimitsRequestIncreaseSchema
+    inputSchema: wrapZodSchema(NetAppResourceQuotaLimitsRequestIncreaseSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_quota_limits_request_increase is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_quota_limits_by_resource_type',
     description: 'Get quota limit details filtered by specific resource type',
-    inputSchema: NetAppResourceQuotaLimitsByResourceTypeSchema
+    inputSchema: wrapZodSchema(NetAppResourceQuotaLimitsByResourceTypeSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_quota_limits_by_resource_type is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

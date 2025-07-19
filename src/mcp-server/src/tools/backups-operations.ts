@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for Backups operations
 const BackupsCommonSchemas = {
@@ -248,77 +249,197 @@ export const backupsOperationsTools: Tool[] = [
   {
     name: 'anf_backups_create',
     description: 'Create a manual backup of a volume',
-    inputSchema: BackupsCreateSchema
+    inputSchema: wrapZodSchema(BackupsCreateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_create is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_delete',
     description: 'Delete a backup from the backup vault',
-    inputSchema: BackupsDeleteSchema
+    inputSchema: wrapZodSchema(BackupsDeleteSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_delete is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get',
     description: 'Get detailed information about a specific backup',
-    inputSchema: BackupsGetSchema
+    inputSchema: wrapZodSchema(BackupsGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_list',
     description: 'List all backups for a volume',
-    inputSchema: BackupsListSchema
+    inputSchema: wrapZodSchema(BackupsListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_update',
     description: 'Update backup metadata such as label',
-    inputSchema: BackupsUpdateSchema
+    inputSchema: wrapZodSchema(BackupsUpdateSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_update is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get_latest_status',
     description: 'Get the latest backup status for a volume',
-    inputSchema: BackupsGetLatestStatusSchema
+    inputSchema: wrapZodSchema(BackupsGetLatestStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get_latest_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get_volume_latest_restore_status',
     description: 'Get the latest restore status for a volume',
-    inputSchema: BackupsGetVolumeLatestRestoreStatusSchema
+    inputSchema: wrapZodSchema(BackupsGetVolumeLatestRestoreStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get_volume_latest_restore_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_list_by_vault',
     description: 'List all backups in a backup vault',
-    inputSchema: BackupsListByVaultSchema
+    inputSchema: wrapZodSchema(BackupsListByVaultSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_list_by_vault is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_restore_files',
     description: 'Restore specific files from a backup',
-    inputSchema: BackupsRestoreFilesSchema
+    inputSchema: wrapZodSchema(BackupsRestoreFilesSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_restore_files is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get_status',
     description: 'Get the current status of a backup',
-    inputSchema: BackupsGetStatusSchema
+    inputSchema: wrapZodSchema(BackupsGetStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get_status is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_copy',
     description: 'Copy a backup to another backup vault',
-    inputSchema: BackupsCopySchema
+    inputSchema: wrapZodSchema(BackupsCopySchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_copy is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_validate_restore',
     description: 'Validate if a backup can be restored to a specific volume',
-    inputSchema: BackupsValidateRestoreSchema
+    inputSchema: wrapZodSchema(BackupsValidateRestoreSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_validate_restore is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_export_metadata',
     description: 'Export backup metadata for compliance or analysis',
-    inputSchema: BackupsExportMetadataSchema
+    inputSchema: wrapZodSchema(BackupsExportMetadataSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_export_metadata is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_restore_to_new_volume',
     description: 'Restore a backup to a new volume',
-    inputSchema: BackupsRestoreToNewVolumeSchema
+    inputSchema: wrapZodSchema(BackupsRestoreToNewVolumeSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_restore_to_new_volume is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_backups_get_restore_status',
     description: 'Get the status of an ongoing restore operation',
-    inputSchema: BackupsGetRestoreStatusSchema
+    inputSchema: wrapZodSchema(BackupsGetRestoreStatusSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_backups_get_restore_status is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

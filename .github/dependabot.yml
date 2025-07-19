@@ -1,0 +1,272 @@
+# Dependabot configuration for ANF-AIOps
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+# Automated dependency updates with security focus
+
+version: 2
+updates:
+  # Enable version updates for npm (TypeScript/JavaScript packages)
+  - package-ecosystem: "npm"
+    directory: "/rag"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "security"
+      - "rag-system"
+    commit-message:
+      prefix: "feat(deps)"
+      include: "scope"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      azure-packages:
+        patterns:
+          - "@azure/*"
+        update-types:
+          - "minor"
+          - "patch"
+      security-packages:
+        patterns:
+          - "*security*"
+          - "*helmet*"
+          - "*sanitize*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Enable version updates for npm (MCP Server)
+  - package-ecosystem: "npm"
+    directory: "/src/mcp-server"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "security"
+      - "mcp-server"
+    commit-message:
+      prefix: "feat(deps)"
+      include: "scope"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    groups:
+      azure-packages:
+        patterns:
+          - "@azure/*"
+        update-types:
+          - "minor"
+          - "patch"
+      mcp-packages:
+        patterns:
+          - "@modelcontextprotocol/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Enable version updates for npm (Teams Bot)
+  - package-ecosystem: "npm"
+    directory: "/src/teams-bot"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "security"
+      - "teams-bot"
+    commit-message:
+      prefix: "feat(deps)"
+      include: "scope"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    groups:
+      botbuilder-packages:
+        patterns:
+          - "botbuilder*"
+          - "botframework*"
+          - "adaptive*"
+        update-types:
+          - "minor"
+          - "patch"
+      azure-packages:
+        patterns:
+          - "@azure/*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Enable version updates for npm (Test suite)
+  - package-ecosystem: "npm"
+    directory: "/tests"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "testing"
+    commit-message:
+      prefix: "feat(deps)"
+      include: "scope"
+
+  # Enable version updates for NuGet (.NET packages)
+  - package-ecosystem: "nuget"
+    directory: "/functions/ANFServer"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "security"
+      - "dotnet"
+      - "azure-functions"
+    commit-message:
+      prefix: "feat(deps)"
+      include: "scope"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      microsoft-packages:
+        patterns:
+          - "Microsoft.*"
+        update-types:
+          - "minor"
+          - "patch"
+      azure-packages:
+        patterns:
+          - "Azure.*"
+        update-types:
+          - "minor"
+          - "patch"
+      security-packages:
+        patterns:
+          - "*Security*"
+          - "*Authentication*"
+          - "*Authorization*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Enable version updates for Terraform
+  - package-ecosystem: "terraform"
+    directory: "/src/infrastructure/bicep"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "infrastructure"
+      - "terraform"
+    commit-message:
+      prefix: "feat(infra)"
+      include: "scope"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "security"
+    commit-message:
+      prefix: "feat(docker)"
+      include: "scope"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "DwirefS"
+    assignees:
+      - "DwirefS"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci-cd"
+    commit-message:
+      prefix: "feat(ci)"
+      include: "scope"
+    groups:
+      actions-security:
+        patterns:
+          - "*security*"
+          - "*audit*"
+          - "*scan*"
+        update-types:
+          - "minor"
+          - "patch"
+
+# Security-focused configuration
+# - Weekly updates to catch security vulnerabilities quickly
+# - Grouped updates to reduce PR noise
+# - Automatic assignment to maintainer
+# - Proper labeling for issue tracking
+# - Major version updates require manual review
+# - Security-related packages get priority grouping

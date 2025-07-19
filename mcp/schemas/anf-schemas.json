@@ -1,0 +1,1820 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Azure NetApp Files JSON Schemas",
+  "description": "Complete JSON schemas for all Azure NetApp Files resources and operations",
+  "version": "1.0.0",
+  "author": "Dwiref Sharma <DwirefS@SapientEdge.io>",
+  "definitions": {
+    "Resource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Resource ID",
+          "readOnly": true,
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+$",
+          "example": "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-anf/providers/Microsoft.NetApp/netAppAccounts/anf-account"
+        },
+        "name": {
+          "type": "string",
+          "description": "Resource name",
+          "readOnly": true,
+          "minLength": 1,
+          "maxLength": 64,
+          "example": "anf-account"
+        },
+        "type": {
+          "type": "string",
+          "description": "Resource type",
+          "readOnly": true,
+          "pattern": "^Microsoft\\.NetApp/.+$",
+          "example": "Microsoft.NetApp/netAppAccounts"
+        },
+        "location": {
+          "type": "string",
+          "description": "Azure region location",
+          "enum": [
+            "eastus", "eastus2", "westus", "westus2", "westus3", "centralus",
+            "northcentralus", "southcentralus", "westcentralus",
+            "northeurope", "westeurope", "uksouth", "ukwest",
+            "francecentral", "francesouth", "germanywestcentral",
+            "switzerlandnorth", "norwayeast", "swedencentral",
+            "australiaeast", "australiasoutheast", "australiacentral",
+            "japaneast", "japanwest", "koreacentral", "koreasouth",
+            "southeastasia", "eastasia", "centralindia", "southindia",
+            "westindia", "canadacentral", "canadaeast",
+            "brazilsouth", "southafricanorth", "uaenorth"
+          ],
+          "example": "eastus"
+        },
+        "tags": {
+          "type": "object",
+          "description": "Resource tags",
+          "additionalProperties": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "maxProperties": 50,
+          "example": {
+            "environment": "production",
+            "department": "IT"
+          }
+        }
+      },
+      "required": ["location"]
+    },
+    "ProvisioningState": {
+      "type": "string",
+      "description": "Resource provisioning state",
+      "enum": [
+        "Creating",
+        "Created", 
+        "Deleting",
+        "Deleted",
+        "Failed",
+        "Moving",
+        "Succeeded",
+        "Updating"
+      ],
+      "example": "Succeeded"
+    },
+    "ServiceLevel": {
+      "type": "string",
+      "description": "Performance service level",
+      "enum": ["Standard", "Premium", "Ultra"],
+      "example": "Premium"
+    },
+    "ProtocolType": {
+      "type": "string",
+      "description": "Network protocol type",
+      "enum": ["NFSv3", "NFSv4.1", "CIFS", "dual-protocol"]
+    },
+    "NetAppAccount": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/AccountProperties"}
+          }
+        }
+      ]
+    },
+    "NetAppAccountCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"},
+        "properties": {"$ref": "#/definitions/AccountProperties"}
+      }
+    },
+    "AccountProperties": {
+      "type": "object",
+      "properties": {
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        },
+        "activeDirectories": {
+          "type": "array",
+          "description": "Active Directory configurations",
+          "maxItems": 10,
+          "items": {"$ref": "#/definitions/ActiveDirectory"}
+        },
+        "encryption": {"$ref": "#/definitions/AccountEncryption"},
+        "disableShowmount": {
+          "type": "boolean",
+          "description": "Disable showmount for NFSv3",
+          "default": false
+        },
+        "identity": {"$ref": "#/definitions/ManagedServiceIdentity"}
+      }
+    },
+    "ActiveDirectory": {
+      "type": "object",
+      "required": ["domain", "dns", "username", "password"],
+      "properties": {
+        "activeDirectoryId": {
+          "type": "string",
+          "description": "Active Directory identifier",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "example": "12345678-1234-1234-1234-123456789012"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Active Directory domain name",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?)*$",
+          "example": "contoso.com"
+        },
+        "dns": {
+          "type": "string",
+          "description": "DNS server IP address",
+          "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+          "example": "10.0.0.4"
+        },
+        "username": {
+          "type": "string",
+          "description": "Username for domain join",
+          "minLength": 1,
+          "maxLength": 255,
+          "example": "admin"
+        },
+        "password": {
+          "type": "string",
+          "description": "Password for domain join",
+          "minLength": 1,
+          "maxLength": 255,
+          "format": "password"
+        },
+        "site": {
+          "type": "string",
+          "description": "Active Directory site name",
+          "maxLength": 255,
+          "example": "Default-First-Site-Name"
+        },
+        "smbServerName": {
+          "type": "string",
+          "description": "SMB server name",
+          "minLength": 1,
+          "maxLength": 15,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\-]{0,14}$",
+          "example": "SMBSERVER"
+        },
+        "organizationalUnit": {
+          "type": "string",
+          "description": "Organizational unit for computer account",
+          "maxLength": 2000,
+          "example": "OU=Computers,DC=contoso,DC=com"
+        },
+        "aesEncryption": {
+          "type": "boolean",
+          "description": "AES encryption enabled",
+          "default": false
+        },
+        "ldapSigning": {
+          "type": "boolean",
+          "description": "LDAP signing enabled",
+          "default": false
+        },
+        "securityOperators": {
+          "type": "array",
+          "description": "Security operators",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "maxItems": 10
+        },
+        "kdcIP": {
+          "type": "string",
+          "description": "KDC server IP address",
+          "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+        },
+        "adName": {
+          "type": "string",
+          "description": "Active Directory name",
+          "maxLength": 255
+        },
+        "serverRootCACertificate": {
+          "type": "string",
+          "description": "Root CA certificate for LDAP over SSL",
+          "maxLength": 10000
+        },
+        "backupOperators": {
+          "type": "array",
+          "description": "Backup operators",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "maxItems": 10
+        },
+        "administrators": {
+          "type": "array",
+          "description": "Domain administrators",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "maxItems": 10
+        },
+        "preferredServersForLdapClient": {
+          "type": "string",
+          "description": "Preferred servers for LDAP client",
+          "maxLength": 255
+        }
+      }
+    },
+    "AccountEncryption": {
+      "type": "object",
+      "properties": {
+        "keySource": {
+          "type": "string",
+          "description": "Encryption key source",
+          "enum": ["Microsoft.NetApp", "Microsoft.KeyVault"],
+          "default": "Microsoft.NetApp"
+        },
+        "keyVaultProperties": {"$ref": "#/definitions/KeyVaultProperties"},
+        "identity": {"$ref": "#/definitions/EncryptionIdentity"}
+      }
+    },
+    "KeyVaultProperties": {
+      "type": "object",
+      "required": ["keyVaultUri", "keyName"],
+      "properties": {
+        "keyVaultUri": {
+          "type": "string",
+          "description": "Key Vault URI",
+          "format": "uri",
+          "pattern": "^https://[a-zA-Z0-9\\-]+\\.vault\\.azure\\.net/$",
+          "example": "https://keyvault.vault.azure.net/"
+        },
+        "keyName": {
+          "type": "string",
+          "description": "Key name in Key Vault",
+          "minLength": 1,
+          "maxLength": 127,
+          "pattern": "^[a-zA-Z0-9\\-]+$",
+          "example": "netapp-encryption-key"
+        },
+        "keyVaultResourceId": {
+          "type": "string",
+          "description": "Key Vault resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.KeyVault/vaults/.+$",
+          "example": "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-kv/providers/Microsoft.KeyVault/vaults/keyvault"
+        }
+      }
+    },
+    "ManagedServiceIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Identity type",
+          "enum": ["None", "SystemAssigned", "UserAssigned", "SystemAssigned,UserAssigned"]
+        },
+        "principalId": {
+          "type": "string",
+          "description": "Principal ID",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Tenant ID",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "userAssignedIdentities": {
+          "type": "object",
+          "description": "User assigned identities",
+          "additionalProperties": {"$ref": "#/definitions/UserAssignedIdentity"}
+        }
+      }
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "description": "Principal ID",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Client ID",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        }
+      }
+    },
+    "EncryptionIdentity": {
+      "type": "object",
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "description": "Principal ID for encryption",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "userAssignedIdentity": {
+          "type": "string",
+          "description": "User assigned identity resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.ManagedIdentity/userAssignedIdentities/.+$"
+        }
+      }
+    },
+    "CapacityPool": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/PoolProperties"}
+          }
+        }
+      ]
+    },
+    "CapacityPoolCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"},
+        "properties": {"$ref": "#/definitions/PoolProperties"}
+      }
+    },
+    "PoolProperties": {
+      "type": "object",
+      "required": ["size", "serviceLevel"],
+      "properties": {
+        "poolId": {
+          "type": "string",
+          "description": "Capacity pool identifier",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "example": "12345678-1234-1234-1234-123456789012"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Capacity pool size in bytes",
+          "format": "int64",
+          "minimum": 4398046511104,
+          "maximum": 549755813888000,
+          "multipleOf": 1099511627776,
+          "example": 4398046511104
+        },
+        "serviceLevel": {"$ref": "#/definitions/ServiceLevel"},
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        },
+        "totalThroughputMibps": {
+          "type": "number",
+          "description": "Total throughput in MiB/s",
+          "readOnly": true,
+          "minimum": 0,
+          "example": 640.0
+        },
+        "utilizedThroughputMibps": {
+          "type": "number",
+          "description": "Utilized throughput in MiB/s",
+          "readOnly": true,
+          "minimum": 0,
+          "example": 128.0
+        },
+        "qosType": {
+          "type": "string",
+          "description": "QoS type for the capacity pool",
+          "enum": ["Auto", "Manual"],
+          "default": "Auto"
+        },
+        "coolAccess": {
+          "type": "boolean",
+          "description": "Cool access tier enabled",
+          "default": false
+        },
+        "encryptionType": {
+          "type": "string",
+          "description": "Encryption type",
+          "enum": ["Single", "Double"],
+          "default": "Single"
+        }
+      }
+    },
+    "Volume": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/VolumeProperties"}
+          }
+        }
+      ]
+    },
+    "VolumeCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"},
+        "properties": {"$ref": "#/definitions/VolumeProperties"}
+      }
+    },
+    "VolumeProperties": {
+      "type": "object",
+      "required": ["creationToken", "usageThreshold", "subnetId"],
+      "properties": {
+        "fileSystemId": {
+          "type": "string",
+          "description": "Unique file system identifier",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "example": "12345678-1234-1234-1234-123456789012"
+        },
+        "creationToken": {
+          "type": "string",
+          "description": "Creation token (file path)",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\-_]{0,79}$",
+          "example": "database-vol"
+        },
+        "serviceLevel": {"$ref": "#/definitions/ServiceLevel"},
+        "usageThreshold": {
+          "type": "integer",
+          "description": "Volume quota in bytes",
+          "format": "int64",
+          "minimum": 107374182400,
+          "maximum": 109951162777600,
+          "example": 107374182400
+        },
+        "exportPolicy": {"$ref": "#/definitions/VolumePropertiesExportPolicy"},
+        "protocolTypes": {
+          "type": "array",
+          "description": "Set of protocol types",
+          "items": {"$ref": "#/definitions/ProtocolType"},
+          "minItems": 1,
+          "maxItems": 3,
+          "example": ["NFSv3"]
+        },
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        },
+        "snapshotId": {
+          "type": "string",
+          "description": "Snapshot resource ID to restore from",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/.+/snapshots/.+$"
+        },
+        "backupId": {
+          "type": "string",
+          "description": "Backup resource ID to restore from",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/.+/backups/.+$"
+        },
+        "mountTargets": {
+          "type": "array",
+          "description": "Mount targets",
+          "readOnly": true,
+          "items": {"$ref": "#/definitions/MountTargetProperties"}
+        },
+        "volumeType": {
+          "type": "string",
+          "description": "Volume type",
+          "readOnly": true,
+          "example": "DataProtection"
+        },
+        "dataProtection": {"$ref": "#/definitions/VolumePropertiesDataProtection"},
+        "isRestoring": {
+          "type": "boolean",
+          "description": "Indicates if volume is being restored",
+          "readOnly": true
+        },
+        "snapshotDirectoryVisible": {
+          "type": "boolean",
+          "description": "Snapshot directory visible to client",
+          "default": true
+        },
+        "kerberosEnabled": {
+          "type": "boolean",
+          "description": "Kerberos authentication enabled",
+          "default": false
+        },
+        "securityStyle": {
+          "type": "string",
+          "description": "Security style of volume",
+          "enum": ["ntfs", "unix"],
+          "default": "unix"
+        },
+        "smbEncryption": {
+          "type": "boolean",
+          "description": "SMB encryption enabled",
+          "default": false
+        },
+        "smbContinuouslyAvailable": {
+          "type": "boolean",
+          "description": "SMB continuously available",
+          "default": false
+        },
+        "smbAccessBasedEnumeration": {
+          "type": "string",
+          "description": "SMB access based enumeration",
+          "enum": ["Disabled", "Enabled"],
+          "default": "Disabled"
+        },
+        "smbNonBrowsable": {
+          "type": "string",
+          "description": "SMB non-browsable",
+          "enum": ["Disabled", "Enabled"],
+          "default": "Disabled"
+        },
+        "throughputMibps": {
+          "type": "number",
+          "description": "Volume throughput in MiB/s",
+          "readOnly": true,
+          "minimum": 0
+        },
+        "volumeSpecName": {
+          "type": "string",
+          "description": "Volume spec name",
+          "maxLength": 64
+        },
+        "capacityPoolResourceId": {
+          "type": "string",
+          "description": "Capacity pool resource ID",
+          "readOnly": true,
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/netAppAccounts/.+/capacityPools/.+$"
+        },
+        "proximityPlacementGroup": {
+          "type": "string",
+          "description": "Proximity placement group resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.Compute/proximityPlacementGroups/.+$"
+        },
+        "t2Network": {
+          "type": "string",
+          "description": "T2 network information",
+          "readOnly": true
+        },
+        "volumeGroupName": {
+          "type": "string",
+          "description": "Volume group name",
+          "readOnly": true,
+          "maxLength": 64
+        },
+        "networkFeatures": {
+          "type": "string",
+          "description": "Network features",
+          "enum": ["Basic", "Standard"],
+          "default": "Basic"
+        },
+        "networkSiblingSetId": {
+          "type": "string",
+          "description": "Network sibling set ID",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "storageToNetworkProximity": {
+          "type": "string",
+          "description": "Storage to network proximity",
+          "readOnly": true,
+          "enum": ["Default", "T1", "T2"]
+        },
+        "ldapEnabled": {
+          "type": "boolean",
+          "description": "LDAP authentication enabled",
+          "default": false
+        },
+        "coolAccess": {
+          "type": "boolean",
+          "description": "Cool access enabled",
+          "default": false
+        },
+        "coolnessPeriod": {
+          "type": "integer",
+          "description": "Coolness period in days",
+          "minimum": 7,
+          "maximum": 63,
+          "default": 31
+        },
+        "unixPermissions": {
+          "type": "string",
+          "description": "Unix permissions for volume root",
+          "pattern": "^[0-7]{4}$",
+          "default": "0755"
+        },
+        "avsDataStore": {
+          "type": "string",
+          "description": "AVS data store enabled",
+          "enum": ["Disabled", "Enabled"],
+          "default": "Disabled"
+        },
+        "isDefaultQuotaEnabled": {
+          "type": "boolean",
+          "description": "Default quota enabled",
+          "default": false
+        },
+        "defaultUserQuotaInKiBs": {
+          "type": "integer",
+          "description": "Default user quota in KiB",
+          "format": "int64",
+          "minimum": 0,
+          "default": 0
+        },
+        "defaultGroupQuotaInKiBs": {
+          "type": "integer",
+          "description": "Default group quota in KiB",
+          "format": "int64",
+          "minimum": 0,
+          "default": 0
+        },
+        "maximumNumberOfFiles": {
+          "type": "integer",
+          "description": "Maximum number of files",
+          "format": "int64",
+          "readOnly": true,
+          "minimum": 0
+        },
+        "subnetId": {
+          "type": "string",
+          "description": "Subnet resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.Network/virtualNetworks/.+/subnets/.+$",
+          "example": "/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/rg-vnet/providers/Microsoft.Network/virtualNetworks/vnet/subnets/anf-subnet"
+        },
+        "encryptionKeySource": {
+          "type": "string",
+          "description": "Encryption key source",
+          "enum": ["Microsoft.NetApp", "Microsoft.KeyVault"],
+          "default": "Microsoft.NetApp"
+        },
+        "keyVaultPrivateEndpointResourceId": {
+          "type": "string",
+          "description": "Key Vault private endpoint resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.Network/privateEndpoints/.+$"
+        }
+      }
+    },
+    "VolumePropertiesExportPolicy": {
+      "type": "object",
+      "properties": {
+        "rules": {
+          "type": "array",
+          "description": "Export policy rules",
+          "maxItems": 5,
+          "items": {"$ref": "#/definitions/ExportPolicyRule"}
+        }
+      }
+    },
+    "ExportPolicyRule": {
+      "type": "object",
+      "required": ["ruleIndex", "allowedClients"],
+      "properties": {
+        "ruleIndex": {
+          "type": "integer",
+          "description": "Rule index (order)",
+          "minimum": 1,
+          "maximum": 5,
+          "example": 1
+        },
+        "unixReadOnly": {
+          "type": "boolean",
+          "description": "Unix read-only access",
+          "default": false
+        },
+        "unixReadWrite": {
+          "type": "boolean",
+          "description": "Unix read-write access",
+          "default": false
+        },
+        "kerberos5ReadOnly": {
+          "type": "boolean",
+          "description": "Kerberos 5 read-only access",
+          "default": false
+        },
+        "kerberos5ReadWrite": {
+          "type": "boolean",
+          "description": "Kerberos 5 read-write access",
+          "default": false
+        },
+        "kerberos5iReadOnly": {
+          "type": "boolean",
+          "description": "Kerberos 5i read-only access",
+          "default": false
+        },
+        "kerberos5iReadWrite": {
+          "type": "boolean",
+          "description": "Kerberos 5i read-write access",
+          "default": false
+        },
+        "kerberos5pReadOnly": {
+          "type": "boolean",
+          "description": "Kerberos 5p read-only access",
+          "default": false
+        },
+        "kerberos5pReadWrite": {
+          "type": "boolean",
+          "description": "Kerberos 5p read-write access",
+          "default": false
+        },
+        "cifs": {
+          "type": "boolean",
+          "description": "CIFS/SMB access",
+          "default": false
+        },
+        "nfsv3": {
+          "type": "boolean",
+          "description": "NFSv3 access",
+          "default": false
+        },
+        "nfsv41": {
+          "type": "boolean",
+          "description": "NFSv4.1 access",
+          "default": false
+        },
+        "allowedClients": {
+          "type": "string",
+          "description": "Allowed clients (IP addresses or CIDR blocks)",
+          "maxLength": 1024,
+          "example": "0.0.0.0/0"
+        },
+        "hasRootAccess": {
+          "type": "boolean",
+          "description": "Has root access",
+          "default": true
+        },
+        "chownMode": {
+          "type": "string",
+          "description": "Chown mode for ownership changes",
+          "enum": ["Restricted", "Unrestricted"],
+          "default": "Restricted"
+        }
+      }
+    },
+    "VolumePropertiesDataProtection": {
+      "type": "object",
+      "properties": {
+        "backup": {"$ref": "#/definitions/VolumeBackupProperties"},
+        "replication": {"$ref": "#/definitions/ReplicationObject"},
+        "snapshot": {"$ref": "#/definitions/VolumeSnapshotProperties"}
+      }
+    },
+    "VolumeBackupProperties": {
+      "type": "object",
+      "properties": {
+        "backupPolicyId": {
+          "type": "string",
+          "description": "Backup policy resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/netAppAccounts/.+/backupPolicies/.+$"
+        },
+        "policyEnforced": {
+          "type": "boolean",
+          "description": "Backup policy enforced",
+          "default": false
+        },
+        "vaultId": {
+          "type": "string",
+          "description": "Backup vault resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/netAppAccounts/.+/vaults/.+$"
+        },
+        "backupEnabled": {
+          "type": "boolean",
+          "description": "Backup enabled for volume",
+          "default": false
+        }
+      }
+    },
+    "ReplicationObject": {
+      "type": "object",
+      "required": ["remoteVolumeResourceId", "replicationSchedule"],
+      "properties": {
+        "replicationId": {
+          "type": "string",
+          "description": "Replication identifier",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "endpointType": {
+          "type": "string",
+          "description": "Replication endpoint type",
+          "enum": ["src", "dst"],
+          "example": "src"
+        },
+        "replicationSchedule": {
+          "type": "string",
+          "description": "Replication schedule",
+          "enum": ["_10minutely", "hourly", "daily"],
+          "example": "daily"
+        },
+        "remoteVolumeResourceId": {
+          "type": "string",
+          "description": "Remote volume resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/netAppAccounts/.+/capacityPools/.+/volumes/.+$"
+        },
+        "remoteVolumeRegion": {
+          "type": "string",
+          "description": "Remote volume region",
+          "enum": [
+            "eastus", "eastus2", "westus", "westus2", "westus3", "centralus",
+            "northcentralus", "southcentralus", "westcentralus",
+            "northeurope", "westeurope", "uksouth", "ukwest",
+            "francecentral", "francesouth", "germanywestcentral",
+            "switzerlandnorth", "norwayeast", "swedencentral",
+            "australiaeast", "australiasoutheast", "australiacentral",
+            "japaneast", "japanwest", "koreacentral", "koreasouth",
+            "southeastasia", "eastasia", "centralindia", "southindia",
+            "westindia", "canadacentral", "canadaeast",
+            "brazilsouth", "southafricanorth", "uaenorth"
+          ]
+        }
+      }
+    },
+    "VolumeSnapshotProperties": {
+      "type": "object",
+      "properties": {
+        "snapshotPolicyId": {
+          "type": "string",
+          "description": "Snapshot policy resource ID",
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/netAppAccounts/.+/snapshotPolicies/.+$"
+        }
+      }
+    },
+    "MountTargetProperties": {
+      "type": "object",
+      "properties": {
+        "mountTargetId": {
+          "type": "string",
+          "description": "Mount target identifier",
+          "readOnly": true,
+          "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+          "example": "192.168.1.4"
+        },
+        "fileSystemId": {
+          "type": "string",
+          "description": "File system identifier",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "ipAddress": {
+          "type": "string",
+          "description": "Mount target IP address",
+          "readOnly": true,
+          "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+          "example": "192.168.1.4"
+        },
+        "smbServerFqdn": {
+          "type": "string",
+          "description": "SMB server FQDN",
+          "readOnly": true,
+          "maxLength": 255,
+          "example": "smbserver.contoso.com"
+        }
+      }
+    },
+    "Snapshot": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/SnapshotProperties"}
+          }
+        }
+      ]
+    },
+    "SnapshotCreate": {
+      "type": "object",
+      "required": ["location"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"}
+      }
+    },
+    "SnapshotProperties": {
+      "type": "object",
+      "properties": {
+        "snapshotId": {
+          "type": "string",
+          "description": "Snapshot identifier",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "created": {
+          "type": "string",
+          "description": "Snapshot creation time",
+          "format": "date-time",
+          "readOnly": true,
+          "example": "2025-07-18T12:00:00Z"
+        },
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        }
+      }
+    },
+    "BackupPolicy": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/BackupPolicyProperties"}
+          }
+        }
+      ]
+    },
+    "BackupPolicyCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"},
+        "properties": {"$ref": "#/definitions/BackupPolicyProperties"}
+      }
+    },
+    "BackupPolicyProperties": {
+      "type": "object",
+      "properties": {
+        "backupPolicyId": {
+          "type": "string",
+          "description": "Backup policy identifier",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        },
+        "dailyBackupsToKeep": {
+          "type": "integer",
+          "description": "Daily backups to keep",
+          "minimum": 0,
+          "maximum": 1019,
+          "default": 0,
+          "example": 7
+        },
+        "weeklyBackupsToKeep": {
+          "type": "integer",
+          "description": "Weekly backups to keep",
+          "minimum": 0,
+          "maximum": 1019,
+          "default": 0,
+          "example": 4
+        },
+        "monthlyBackupsToKeep": {
+          "type": "integer",
+          "description": "Monthly backups to keep",
+          "minimum": 0,
+          "maximum": 1019,
+          "default": 0,
+          "example": 12
+        },
+        "yearlyBackupsToKeep": {
+          "type": "integer",
+          "description": "Yearly backups to keep",
+          "minimum": 0,
+          "maximum": 1019,
+          "default": 0,
+          "example": 5
+        },
+        "volumesAssigned": {
+          "type": "integer",
+          "description": "Number of volumes assigned to policy",
+          "readOnly": true,
+          "minimum": 0,
+          "example": 3
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Backup policy enabled",
+          "default": true
+        }
+      }
+    },
+    "BackupVault": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/BackupVaultProperties"}
+          }
+        }
+      ]
+    },
+    "BackupVaultCreate": {
+      "type": "object",
+      "required": ["location"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"}
+      }
+    },
+    "BackupVaultProperties": {
+      "type": "object",
+      "properties": {
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        }
+      }
+    },
+    "Backup": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/BackupProperties"}
+          }
+        }
+      ]
+    },
+    "BackupCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "properties": {"$ref": "#/definitions/BackupProperties"}
+      }
+    },
+    "BackupProperties": {
+      "type": "object",
+      "properties": {
+        "backupId": {
+          "type": "string",
+          "description": "Backup identifier",
+          "readOnly": true,
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        },
+        "creationDate": {
+          "type": "string",
+          "description": "Backup creation date",
+          "format": "date-time",
+          "readOnly": true,
+          "example": "2025-07-18T12:00:00Z"
+        },
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        },
+        "size": {
+          "type": "integer",
+          "description": "Backup size in bytes",
+          "format": "int64",
+          "readOnly": true,
+          "minimum": 0
+        },
+        "label": {
+          "type": "string",
+          "description": "Backup label",
+          "maxLength": 1024,
+          "example": "Daily backup - July 18, 2025"
+        },
+        "backupType": {
+          "type": "string",
+          "description": "Backup type",
+          "readOnly": true,
+          "enum": ["Manual", "Scheduled"]
+        },
+        "failureReason": {
+          "type": "string",
+          "description": "Backup failure reason",
+          "readOnly": true,
+          "maxLength": 1024
+        },
+        "volumeResourceId": {
+          "type": "string",
+          "description": "Volume resource ID",
+          "readOnly": true,
+          "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/.+/providers/Microsoft\\.NetApp/netAppAccounts/.+/capacityPools/.+/volumes/.+$"
+        },
+        "useExistingSnapshot": {
+          "type": "boolean",
+          "description": "Use existing snapshot for backup",
+          "default": false
+        }
+      }
+    },
+    "SnapshotPolicy": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/SnapshotPolicyProperties"}
+          }
+        }
+      ]
+    },
+    "SnapshotPolicyCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"},
+        "properties": {"$ref": "#/definitions/SnapshotPolicyProperties"}
+      }
+    },
+    "SnapshotPolicyProperties": {
+      "type": "object",
+      "properties": {
+        "hourlySchedule": {"$ref": "#/definitions/HourlySchedule"},
+        "dailySchedule": {"$ref": "#/definitions/DailySchedule"},
+        "weeklySchedule": {"$ref": "#/definitions/WeeklySchedule"},
+        "monthlySchedule": {"$ref": "#/definitions/MonthlySchedule"},
+        "enabled": {
+          "type": "boolean",
+          "description": "Snapshot policy enabled",
+          "default": true
+        },
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        }
+      }
+    },
+    "HourlySchedule": {
+      "type": "object",
+      "properties": {
+        "snapshotsToKeep": {
+          "type": "integer",
+          "description": "Hourly snapshots to keep",
+          "minimum": 0,
+          "maximum": 255,
+          "example": 24
+        },
+        "minute": {
+          "type": "integer",
+          "description": "Minute of hour to take snapshot",
+          "minimum": 0,
+          "maximum": 59,
+          "example": 0
+        },
+        "usedBytes": {
+          "type": "integer",
+          "description": "Used bytes by hourly snapshots",
+          "format": "int64",
+          "readOnly": true,
+          "minimum": 0
+        }
+      }
+    },
+    "DailySchedule": {
+      "type": "object",
+      "properties": {
+        "snapshotsToKeep": {
+          "type": "integer",
+          "description": "Daily snapshots to keep",
+          "minimum": 0,
+          "maximum": 255,
+          "example": 7
+        },
+        "hour": {
+          "type": "integer",
+          "description": "Hour of day to take snapshot",
+          "minimum": 0,
+          "maximum": 23,
+          "example": 2
+        },
+        "minute": {
+          "type": "integer",
+          "description": "Minute of hour to take snapshot",
+          "minimum": 0,
+          "maximum": 59,
+          "example": 0
+        },
+        "usedBytes": {
+          "type": "integer",
+          "description": "Used bytes by daily snapshots",
+          "format": "int64",
+          "readOnly": true,
+          "minimum": 0
+        }
+      }
+    },
+    "WeeklySchedule": {
+      "type": "object",
+      "properties": {
+        "snapshotsToKeep": {
+          "type": "integer",
+          "description": "Weekly snapshots to keep",
+          "minimum": 0,
+          "maximum": 255,
+          "example": 4
+        },
+        "day": {
+          "type": "string",
+          "description": "Day of week to take snapshot",
+          "enum": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "example": "Sunday"
+        },
+        "hour": {
+          "type": "integer",
+          "description": "Hour of day to take snapshot",
+          "minimum": 0,
+          "maximum": 23,
+          "example": 2
+        },
+        "minute": {
+          "type": "integer",
+          "description": "Minute of hour to take snapshot",
+          "minimum": 0,
+          "maximum": 59,
+          "example": 0
+        },
+        "usedBytes": {
+          "type": "integer",
+          "description": "Used bytes by weekly snapshots",
+          "format": "int64",
+          "readOnly": true,
+          "minimum": 0
+        }
+      }
+    },
+    "MonthlySchedule": {
+      "type": "object",
+      "properties": {
+        "snapshotsToKeep": {
+          "type": "integer",
+          "description": "Monthly snapshots to keep",
+          "minimum": 0,
+          "maximum": 255,
+          "example": 12
+        },
+        "daysOfMonth": {
+          "type": "string",
+          "description": "Days of month to take snapshot (comma-separated)",
+          "pattern": "^([1-9]|[12][0-9]|3[01])(,([1-9]|[12][0-9]|3[01]))*$",
+          "example": "1,15"
+        },
+        "hour": {
+          "type": "integer",
+          "description": "Hour of day to take snapshot",
+          "minimum": 0,
+          "maximum": 23,
+          "example": 2
+        },
+        "minute": {
+          "type": "integer",
+          "description": "Minute of hour to take snapshot",
+          "minimum": 0,
+          "maximum": 59,
+          "example": 0
+        },
+        "usedBytes": {
+          "type": "integer",
+          "description": "Used bytes by monthly snapshots",
+          "format": "int64",
+          "readOnly": true,
+          "minimum": 0
+        }
+      }
+    },
+    "Subvolume": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/SubvolumeProperties"}
+          }
+        }
+      ]
+    },
+    "SubvolumeCreate": {
+      "type": "object",
+      "required": ["properties"],
+      "properties": {
+        "properties": {"$ref": "#/definitions/SubvolumeProperties"}
+      }
+    },
+    "SubvolumeProperties": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to the subvolume",
+          "minLength": 1,
+          "maxLength": 255,
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\-_/]{0,254}$",
+          "example": "/subvolume1"
+        },
+        "size": {
+          "type": "integer",
+          "description": "Subvolume size in bytes",
+          "format": "int64",
+          "minimum": 107374182400,
+          "maximum": 109951162777600
+        },
+        "parentPath": {
+          "type": "string",
+          "description": "Parent path",
+          "readOnly": true,
+          "maxLength": 255
+        },
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        }
+      }
+    },
+    "VolumeGroup": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/VolumeGroupProperties"}
+          }
+        }
+      ]
+    },
+    "VolumeGroupCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"},
+        "properties": {"$ref": "#/definitions/VolumeGroupProperties"}
+      }
+    },
+    "VolumeGroupProperties": {
+      "type": "object",
+      "properties": {
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        },
+        "groupMetaData": {"$ref": "#/definitions/VolumeGroupMetaData"},
+        "volumes": {
+          "type": "array",
+          "description": "List of volumes in the group",
+          "items": {"$ref": "#/definitions/VolumeGroupVolumeProperties"}
+        }
+      }
+    },
+    "VolumeGroupMetaData": {
+      "type": "object",
+      "properties": {
+        "groupDescription": {
+          "type": "string",
+          "description": "Volume group description",
+          "maxLength": 1024,
+          "example": "SAP HANA volume group for production"
+        },
+        "applicationType": {
+          "type": "string",
+          "description": "Application type",
+          "enum": ["SAP-HANA", "ORACLE", "SQL-SERVER"],
+          "example": "SAP-HANA"
+        },
+        "applicationIdentifier": {
+          "type": "string",
+          "description": "Application identifier",
+          "maxLength": 64,
+          "example": "SAP-HANA-PROD-001"
+        },
+        "globalPlacementRules": {
+          "type": "array",
+          "description": "Global placement rules",
+          "items": {"$ref": "#/definitions/PlacementKeyValuePairs"}
+        },
+        "deploymentSpecId": {
+          "type": "string",
+          "description": "Deployment specification ID",
+          "readOnly": true,
+          "maxLength": 255
+        }
+      }
+    },
+    "PlacementKeyValuePairs": {
+      "type": "object",
+      "required": ["key", "value"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Placement rule key",
+          "maxLength": 255,
+          "example": "zone"
+        },
+        "value": {
+          "type": "string",
+          "description": "Placement rule value",
+          "maxLength": 255,
+          "example": "1"
+        }
+      }
+    },
+    "VolumeGroupVolumeProperties": {
+      "allOf": [
+        {"$ref": "#/definitions/VolumeProperties"},
+        {
+          "type": "object",
+          "properties": {
+            "volumeSpecName": {
+              "type": "string",
+              "description": "Volume specification name",
+              "maxLength": 64,
+              "example": "data"
+            }
+          }
+        }
+      ]
+    },
+    "VolumeQuotaRule": {
+      "allOf": [
+        {"$ref": "#/definitions/Resource"},
+        {
+          "type": "object",
+          "properties": {
+            "properties": {"$ref": "#/definitions/VolumeQuotaRuleProperties"}
+          }
+        }
+      ]
+    },
+    "VolumeQuotaRuleCreate": {
+      "type": "object",
+      "required": ["location", "properties"],
+      "properties": {
+        "location": {"$ref": "#/definitions/Resource/properties/location"},
+        "tags": {"$ref": "#/definitions/Resource/properties/tags"},
+        "properties": {"$ref": "#/definitions/VolumeQuotaRuleProperties"}
+      }
+    },
+    "VolumeQuotaRuleProperties": {
+      "type": "object",
+      "properties": {
+        "quotaSizeInKiBs": {
+          "type": "integer",
+          "description": "Quota size in KiB",
+          "format": "int64",
+          "minimum": 1,
+          "maximum": 4398046511104,
+          "example": 1048576
+        },
+        "quotaType": {
+          "type": "string",
+          "description": "Quota type",
+          "enum": ["DefaultUserQuota", "DefaultGroupQuota", "IndividualUserQuota", "IndividualGroupQuota"],
+          "example": "IndividualUserQuota"
+        },
+        "quotaTarget": {
+          "type": "string",
+          "description": "Quota target (user or group)",
+          "maxLength": 255,
+          "example": "user1"
+        },
+        "provisioningState": {
+          "allOf": [
+            {"$ref": "#/definitions/ProvisioningState"},
+            {"readOnly": true}
+          ]
+        }
+      }
+    },
+    "ResourceNameAvailabilityRequest": {
+      "type": "object",
+      "required": ["name", "type", "resourceGroup"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Resource name to check",
+          "minLength": 1,
+          "maxLength": 64,
+          "example": "anf-account-test"
+        },
+        "type": {
+          "type": "string",
+          "description": "Resource type",
+          "enum": [
+            "Microsoft.NetApp/netAppAccounts",
+            "Microsoft.NetApp/netAppAccounts/capacityPools",
+            "Microsoft.NetApp/netAppAccounts/capacityPools/volumes",
+            "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/snapshots"
+          ],
+          "example": "Microsoft.NetApp/netAppAccounts"
+        },
+        "resourceGroup": {
+          "type": "string",
+          "description": "Resource group name",
+          "minLength": 1,
+          "maxLength": 90,
+          "pattern": "^[-\\w\\._\\(\\)]+$",
+          "example": "rg-anf-test"
+        }
+      }
+    },
+    "ResourceNameAvailability": {
+      "type": "object",
+      "properties": {
+        "nameAvailable": {
+          "type": "boolean",
+          "description": "Name availability status",
+          "example": false
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for unavailability",
+          "enum": ["Invalid", "AlreadyExists"],
+          "example": "AlreadyExists"
+        },
+        "message": {
+          "type": "string",
+          "description": "Detailed message",
+          "maxLength": 1024,
+          "example": "An account named 'anf-account-test' already exists."
+        }
+      }
+    },
+    "SubscriptionQuotaItem": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Resource type",
+          "example": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes"
+        },
+        "current": {
+          "type": "integer",
+          "description": "Current usage",
+          "minimum": 0,
+          "example": 5
+        },
+        "default": {
+          "type": "integer",
+          "description": "Default limit",
+          "minimum": 0,
+          "example": 500
+        }
+      }
+    },
+    "Operation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Operation name",
+          "example": "Microsoft.NetApp/netAppAccounts/read"
+        },
+        "display": {"$ref": "#/definitions/OperationDisplay"},
+        "origin": {
+          "type": "string",
+          "description": "Operation origin",
+          "example": "user"
+        },
+        "isDataAction": {
+          "type": "boolean",
+          "description": "Is data action",
+          "example": false
+        },
+        "properties": {"$ref": "#/definitions/OperationProperties"}
+      }
+    },
+    "OperationDisplay": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Provider name",
+          "example": "Microsoft.NetApp"
+        },
+        "resource": {
+          "type": "string",
+          "description": "Resource name",
+          "example": "NetApp Account"
+        },
+        "operation": {
+          "type": "string",
+          "description": "Operation name",
+          "example": "Read NetApp Account"
+        },
+        "description": {
+          "type": "string",
+          "description": "Operation description",
+          "example": "Read NetApp account resource"
+        }
+      }
+    },
+    "OperationProperties": {
+      "type": "object",
+      "properties": {
+        "serviceSpecification": {"$ref": "#/definitions/ServiceSpecification"}
+      }
+    },
+    "ServiceSpecification": {
+      "type": "object",
+      "properties": {
+        "metricSpecifications": {
+          "type": "array",
+          "description": "Metric specifications",
+          "items": {"$ref": "#/definitions/MetricSpecification"}
+        }
+      }
+    },
+    "MetricSpecification": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Metric name",
+          "example": "VolumeLogicalSize"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name",
+          "example": "Volume logical size"
+        },
+        "displayDescription": {
+          "type": "string",
+          "description": "Display description",
+          "example": "Logical size of the volume"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Metric unit",
+          "example": "Bytes"
+        },
+        "aggregationType": {
+          "type": "string",
+          "description": "Aggregation type",
+          "example": "Average"
+        },
+        "fillGapWithZero": {
+          "type": "boolean",
+          "description": "Fill gap with zero",
+          "example": false
+        },
+        "category": {
+          "type": "string",
+          "description": "Metric category",
+          "example": "Capacity"
+        },
+        "resourceIdDimensionNameOverride": {
+          "type": "string",
+          "description": "Resource ID dimension name override",
+          "example": "NetAppAccount"
+        },
+        "dimensions": {
+          "type": "array",
+          "description": "Metric dimensions",
+          "items": {"$ref": "#/definitions/Dimension"}
+        }
+      }
+    },
+    "Dimension": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Dimension name",
+          "example": "Volume"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name",
+          "example": "Volume"
+        },
+        "internalName": {
+          "type": "string",
+          "description": "Internal name",
+          "example": "Volume"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {"$ref": "#/definitions/ErrorDetail"}
+      }
+    },
+    "ErrorDetail": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Error code",
+          "example": "ResourceNotFound"
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message",
+          "example": "The specified resource was not found"
+        },
+        "target": {
+          "type": "string",
+          "description": "Error target",
+          "example": "volumeName"
+        },
+        "details": {
+          "type": "array",
+          "description": "Error details",
+          "items": {"$ref": "#/definitions/ErrorDetail"}
+        },
+        "innererror": {"$ref": "#/definitions/InnerError"}
+      }
+    },
+    "InnerError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Inner error code"
+        },
+        "innererror": {"$ref": "#/definitions/InnerError"}
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Operation success status",
+          "example": true
+        },
+        "data": {
+          "description": "Response data",
+          "oneOf": [
+            {"$ref": "#/definitions/NetAppAccount"},
+            {"$ref": "#/definitions/CapacityPool"},
+            {"$ref": "#/definitions/Volume"},
+            {"$ref": "#/definitions/Snapshot"},
+            {"$ref": "#/definitions/BackupPolicy"},
+            {"$ref": "#/definitions/BackupVault"},
+            {"$ref": "#/definitions/Backup"},
+            {"$ref": "#/definitions/SnapshotPolicy"},
+            {"$ref": "#/definitions/Subvolume"},
+            {"$ref": "#/definitions/VolumeGroup"},
+            {"$ref": "#/definitions/VolumeQuotaRule"}
+          ]
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if operation failed"
+        },
+        "details": {
+          "type": "object",
+          "description": "Additional details",
+          "additionalProperties": true
+        },
+        "requestId": {
+          "type": "string",
+          "description": "Request tracking ID",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+          "example": "12345678-1234-1234-1234-123456789012"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Response timestamp",
+          "format": "date-time",
+          "example": "2025-07-18T12:00:00Z"
+        }
+      }
+    }
+  }
+}

@@ -8,8 +8,9 @@
  * API Version: 2025-03-01
  */
 
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { Tool } from '../types/tool';
 import { z } from 'zod';
+import { wrapZodSchema } from '../utils/zod-to-json-schema';
 
 // Common schemas for NetApp Resource Usages operations
 const NetAppResourceUsagesCommonSchemas = {
@@ -159,47 +160,119 @@ export const netAppResourceUsagesTools: Tool[] = [
   {
     name: 'anf_netapp_resource_usages_list',
     description: 'List current resource usage statistics for all NetApp resources in a location',
-    inputSchema: NetAppResourceUsagesListSchema
+    inputSchema: wrapZodSchema(NetAppResourceUsagesListSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_usages_list is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_usages_get',
     description: 'Get specific resource usage details by usage name',
-    inputSchema: NetAppResourceUsagesGetSchema
+    inputSchema: wrapZodSchema(NetAppResourceUsagesGetSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_usages_get is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_capacity_usage',
     description: 'Get detailed capacity usage statistics with time-based metrics',
-    inputSchema: NetAppResourceCapacityUsageSchema
+    inputSchema: wrapZodSchema(NetAppResourceCapacityUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_capacity_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_performance_usage',
     description: 'Get performance usage metrics including throughput, IOPS, and latency',
-    inputSchema: NetAppResourcePerformanceUsageSchema
+    inputSchema: wrapZodSchema(NetAppResourcePerformanceUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_performance_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_count_usage',
     description: 'Get resource count usage across different NetApp resource types',
-    inputSchema: NetAppResourceCountUsageSchema
+    inputSchema: wrapZodSchema(NetAppResourceCountUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_count_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_cost_usage',
     description: 'Get cost usage and billing information for NetApp resources',
-    inputSchema: NetAppResourceCostUsageSchema
+    inputSchema: wrapZodSchema(NetAppResourceCostUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_cost_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_account_usage',
     description: 'Get detailed usage statistics for a specific NetApp account',
-    inputSchema: NetAppResourceAccountUsageSchema
+    inputSchema: wrapZodSchema(NetAppResourceAccountUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_account_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_usage_trends',
     description: 'Get usage trends and forecasting data for capacity planning',
-    inputSchema: NetAppResourceUsageTrendsSchema
+    inputSchema: wrapZodSchema(NetAppResourceUsageTrendsSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_usage_trends is not yet implemented',
+        placeholder: true
+      };
+    }
   },
   {
     name: 'anf_netapp_resource_export_usage',
     description: 'Export usage data in various formats for reporting and analytics',
-    inputSchema: NetAppResourceExportUsageSchema
+    inputSchema: wrapZodSchema(NetAppResourceExportUsageSchema)
+  ,
+    handler: async (context) => {
+      return {
+        success: false,
+        message: 'anf_netapp_resource_export_usage is not yet implemented',
+        placeholder: true
+      };
+    }
   }
 ];
 

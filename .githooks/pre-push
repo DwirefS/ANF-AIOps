@@ -1,0 +1,306 @@
+#!/bin/bash
+# Pre-push hook for ANF-AIOps
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+# Additional validation before pushing to remote repository
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Hook parameters
+protected_branch='main'
+remote="$1"
+url="$2"
+
+print_status "Running pre-push validation for remote: $remote"
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Track if any checks failed
+CHECKS_FAILED=0
+
+# Get the current branch
+current_branch=$(git symbolic-ref --short HEAD)
+print_status "Current branch: $current_branch"
+
+# Read the push information
+while read local_ref local_sha remote_ref remote_sha; do
+    # Skip deleted refs
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+        continue
+    fi
+    
+    # Extract branch name
+    branch_name=$(echo "$remote_ref" | sed 's|refs/heads/||')
+    
+    print_status "Validating push to branch: $branch_name"
+    
+    # 1. Protected branch checks
+    if [ "$branch_name" = "$protected_branch" ]; then
+        print_status "Pushing to protected branch '$protected_branch' - running additional checks..."
+        
+        # Check if this is a force push
+        if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+            # Check if this would be a force push
+            if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+                print_error "Force push to protected branch '$protected_branch' is not allowed"
+                CHECKS_FAILED=1
+                continue
+            fi
+        fi
+        
+        # Ensure no direct commits to main (should come through PR)
+        if [ "$current_branch" = "$protected_branch" ]; then
+            print_warning "Direct commits to '$protected_branch' detected. Consider using feature branches and pull requests."
+        fi
+    fi
+    
+    # 2. Check for secrets in commits being pushed
+    if command_exists gitleaks; then
+        print_status "Scanning commits for secrets..."
+        if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+            # New branch, scan all commits
+            if ! gitleaks detect --source . --log-level error; then
+                print_error "Secrets detected in commits"
+                CHECKS_FAILED=1
+            fi
+        else
+            # Existing branch, scan only new commits
+            if ! git log --oneline "$remote_sha..$local_sha" | while read commit; do
+                commit_sha=$(echo "$commit" | cut -d' ' -f1)
+                if ! gitleaks detect --source . --log-level error --commit "$commit_sha"; then
+                    print_error "Secrets detected in commit $commit_sha"
+                    exit 1
+                fi
+            done; then
+                CHECKS_FAILED=1
+            fi
+        fi
+        
+        if [ $CHECKS_FAILED -eq 0 ]; then
+            print_success "No secrets detected in commits"
+        fi
+    else
+        print_warning "gitleaks not found, skipping secret detection"
+    fi
+    
+    # 3. Run tests for critical branches
+    if [ "$branch_name" = "$protected_branch" ] || [ "$branch_name" = "develop" ] || [ "$branch_name" = "staging" ]; then
+        print_status "Running tests for critical branch..."
+        
+        # TypeScript/JavaScript tests
+        if [ -f "package.json" ] && command_exists npm; then
+            print_status "Running npm tests..."
+            if ! npm test; then
+                print_error "npm tests failed"
+                CHECKS_FAILED=1
+            else
+                print_success "npm tests passed"
+            fi
+        fi
+        
+        # .NET tests
+        if find . -name "*.csproj" -not -path "*/node_modules/*" | grep -q .; then
+            if command_exists dotnet; then
+                print_status "Running .NET tests..."
+                if ! dotnet test --configuration Release --no-build --verbosity normal; then
+                    print_error ".NET tests failed"
+                    CHECKS_FAILED=1
+                else
+                    print_success ".NET tests passed"
+                fi
+            else
+                print_warning ".NET CLI not found, skipping .NET tests"
+            fi
+        fi
+    fi
+    
+    # 4. Security scanning for new commits
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+        NEW_COMMITS=$(git log --oneline "$remote_sha..$local_sha")
+        if [ -n "$NEW_COMMITS" ]; then
+            print_status "Analyzing $(echo "$NEW_COMMITS" | wc -l) new commits..."
+            
+            # Check for security-related changes
+            SECURITY_FILES=$(git diff --name-only "$remote_sha..$local_sha" | grep -E "(auth|security|jwt|token|password|secret|key)" || true)
+            if [ -n "$SECURITY_FILES" ]; then
+                print_warning "Security-related files modified:"
+                echo "$SECURITY_FILES"
+                print_warning "Ensure security changes have been reviewed"
+            fi
+            
+            # Check for infrastructure changes
+            INFRA_FILES=$(git diff --name-only "$remote_sha..$local_sha" | grep -E "(terraform|bicep|\.tf$|\.bicep$|infrastructure)" || true)
+            if [ -n "$INFRA_FILES" ]; then
+                print_warning "Infrastructure files modified:"
+                echo "$INFRA_FILES"
+                print_warning "Ensure infrastructure changes have been tested"
+            fi
+            
+            # Check for database migration files
+            DB_FILES=$(git diff --name-only "$remote_sha..$local_sha" | grep -E "(migration|schema|\.sql$)" || true)
+            if [ -n "$DB_FILES" ]; then
+                print_warning "Database files modified:"
+                echo "$DB_FILES"
+                print_warning "Ensure database changes are backward compatible"
+            fi
+        fi
+    fi
+    
+    # 5. Large file detection
+    print_status "Checking for large files in new commits..."
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+        LARGE_FILES=$(git diff --name-only "$remote_sha..$local_sha" | xargs ls -la 2>/dev/null | awk '$5 > 1048576 {print $9, "(" $5 " bytes)"}' || true)
+        if [ -n "$LARGE_FILES" ]; then
+            print_error "Large files detected (>1MB):"
+            echo "$LARGE_FILES"
+            CHECKS_FAILED=1
+        fi
+    fi
+    
+    # 6. Check for proper commit message format in new commits
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+        print_status "Validating commit messages..."
+        INVALID_COMMITS=$(git log --format="%H %s" "$remote_sha..$local_sha" | while read commit_hash commit_msg; do
+            # Skip merge commits
+            if echo "$commit_msg" | grep -q "^Merge "; then
+                continue
+            fi
+            
+            # Check conventional commit format
+            if ! echo "$commit_msg" | grep -qE "^(feat|fix|docs|style|refactor|test|chore|ci|perf|build|security)(\([a-z0-9-]+\))?: .{1,50}$"; then
+                echo "$commit_hash: $commit_msg"
+            fi
+        done)
+        
+        if [ -n "$INVALID_COMMITS" ]; then
+            print_error "Invalid commit message format found:"
+            echo "$INVALID_COMMITS"
+            CHECKS_FAILED=1
+        else
+            print_success "All commit messages follow conventional format"
+        fi
+    fi
+    
+    # 7. ANF-specific validations
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+        ANF_CHANGES=$(git diff --name-only "$remote_sha..$local_sha" | grep -iE "(anf|netapp|volume|snapshot|capacity)" || true)
+        if [ -n "$ANF_CHANGES" ]; then
+            print_status "ANF-related changes detected, running additional validations..."
+            
+            # Check for hardcoded resource names in production
+            HARDCODED_RESOURCES=$(git diff "$remote_sha..$local_sha" | grep -E "\+.*prod.*netapp|production.*volume" || true)
+            if [ -n "$HARDCODED_RESOURCES" ]; then
+                print_error "Hardcoded production resource names detected:"
+                echo "$HARDCODED_RESOURCES"
+                CHECKS_FAILED=1
+            fi
+            
+            # Check for proper error handling in ANF operations
+            ANF_FUNCTION_FILES=$(echo "$ANF_CHANGES" | grep -E "\.(ts|cs)$" || true)
+            if [ -n "$ANF_FUNCTION_FILES" ]; then
+                for file in $ANF_FUNCTION_FILES; do
+                    if git show "$local_sha:$file" | grep -q "netapp\|volume\|snapshot" && ! git show "$local_sha:$file" | grep -qE "try|catch|Exception|error"; then
+                        print_warning "ANF operation file without proper error handling: $file"
+                    fi
+                done
+            fi
+        fi
+    fi
+    
+    # 8. Check for environment-specific configurations
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+        ENV_FILES=$(git diff --name-only "$remote_sha..$local_sha" | grep -E "(\.env|config|settings)" || true)
+        if [ -n "$ENV_FILES" ]; then
+            print_warning "Environment configuration files modified:"
+            echo "$ENV_FILES"
+            
+            # Check for production configurations
+            PROD_CONFIGS=$(git diff "$remote_sha..$local_sha" | grep -E "\+.*prod|production" || true)
+            if [ -n "$PROD_CONFIGS" ]; then
+                print_warning "Production configuration changes detected. Ensure these are intentional."
+            fi
+        fi
+    fi
+    
+    # 9. Performance impact check
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+        PERF_SENSITIVE_FILES=$(git diff --name-only "$remote_sha..$local_sha" | grep -E "(query|database|cache|index|search)" || true)
+        if [ -n "$PERF_SENSITIVE_FILES" ]; then
+            print_warning "Performance-sensitive files modified:"
+            echo "$PERF_SENSITIVE_FILES"
+            print_warning "Consider performance testing for these changes"
+        fi
+    fi
+    
+    # 10. License and compliance check
+    print_status "Checking license compliance..."
+    if [ "$remote_sha" != "0000000000000000000000000000000000000000" ]; then
+        # Check for new dependencies
+        PACKAGE_CHANGES=$(git diff --name-only "$remote_sha..$local_sha" | grep -E "(package\.json|\.csproj|requirements\.txt)" || true)
+        if [ -n "$PACKAGE_CHANGES" ]; then
+            print_warning "Dependency files modified:"
+            echo "$PACKAGE_CHANGES"
+            print_warning "Ensure new dependencies are license-compatible and security-scanned"
+        fi
+    fi
+    
+done
+
+# Final validation
+echo ""
+if [ $CHECKS_FAILED -eq 0 ]; then
+    print_success "All pre-push validations passed!"
+    
+    # Additional success message for protected branches
+    if [ "$current_branch" = "$protected_branch" ]; then
+        echo ""
+        print_status "🚀 Push to $protected_branch approved!"
+        print_status "Remember to:"
+        print_status "  - Monitor deployment status"
+        print_status "  - Watch for any alerts or issues"
+        print_status "  - Update documentation if needed"
+    fi
+    
+    exit 0
+else
+    print_error "Pre-push validation failed!"
+    echo ""
+    print_error "❌ Push rejected. Please fix the issues above."
+    echo ""
+    print_status "Common fixes:"
+    print_status "  - Remove secrets from commits"
+    print_status "  - Fix failing tests"
+    print_status "  - Remove large files"
+    print_status "  - Fix commit message format"
+    echo ""
+    print_status "To skip these checks (not recommended for $protected_branch):"
+    print_status "  git push --no-verify"
+    echo ""
+    exit 1
+fi

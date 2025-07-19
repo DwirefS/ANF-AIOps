@@ -1,0 +1,547 @@
+{
+  "$schema": "https://aka.ms/copilot-connector-schema",
+  "name": "Azure NetApp Files AI-Ops Connector",
+  "version": "1.0.0",
+  "author": "Dwiref Sharma <DwirefS@SapientEdge.io>",
+  "description": "Comprehensive Microsoft Copilot Connector for Azure NetApp Files management through natural language interactions in Microsoft Teams",
+  "metadata": {
+    "created": "2025-07-18T00:00:00Z",
+    "updated": "2025-07-18T00:00:00Z",
+    "apiVersion": "2025-03-01",
+    "tags": ["azure", "netapp", "storage", "enterprise", "ai-ops"],
+    "category": "Storage Management",
+    "compliance": ["SOC2", "HIPAA", "ISO27001", "PCI-DSS", "GDPR"]
+  },
+  "authentication": {
+    "type": "oauth2",
+    "authorizationUrl": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/authorize",
+    "tokenUrl": "https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token",
+    "scopes": [
+      "https://management.azure.com/.default"
+    ],
+    "clientRegistration": {
+      "redirectUri": "https://your-domain.com/auth/callback",
+      "responseType": "code",
+      "grantType": "authorization_code"
+    }
+  },
+  "baseUrl": "https://management.azure.com",
+  "apiPath": "/subscriptions/{subscriptionId}/providers/Microsoft.NetApp",
+  "apiVersion": "2025-03-01",
+  "capabilities": [
+    {
+      "name": "AccountManagement",
+      "description": "Create, manage, and monitor Azure NetApp Files accounts",
+      "operations": [
+        "anf_accounts_create_or_update",
+        "anf_accounts_delete",
+        "anf_accounts_get",
+        "anf_accounts_list",
+        "anf_accounts_list_by_subscription",
+        "anf_accounts_update",
+        "anf_accounts_change_key_vault",
+        "anf_accounts_get_change_key_vault_information",
+        "anf_accounts_renew_credentials",
+        "anf_accounts_transition_to_cmk"
+      ]
+    },
+    {
+      "name": "CapacityPoolManagement",
+      "description": "Manage capacity pools with different service levels",
+      "operations": [
+        "anf_pools_create_or_update",
+        "anf_pools_delete",
+        "anf_pools_get",
+        "anf_pools_list",
+        "anf_pools_update"
+      ]
+    },
+    {
+      "name": "VolumeManagement",
+      "description": "Comprehensive volume lifecycle management including replication and relocation",
+      "operations": [
+        "anf_volumes_create_or_update",
+        "anf_volumes_delete",
+        "anf_volumes_get",
+        "anf_volumes_list",
+        "anf_volumes_update",
+        "anf_volumes_authorize_replication",
+        "anf_volumes_break_replication",
+        "anf_volumes_delete_replication",
+        "anf_volumes_list_replications",
+        "anf_volumes_replication_status",
+        "anf_volumes_resync_replication",
+        "anf_volumes_revert",
+        "anf_volumes_pool_change",
+        "anf_volumes_relocate",
+        "anf_volumes_finalize_relocation",
+        "anf_volumes_revert_relocation",
+        "anf_volumes_reset_cifs_password",
+        "anf_volumes_break_file_locks"
+      ]
+    },
+    {
+      "name": "SnapshotManagement",
+      "description": "Point-in-time snapshots and recovery operations",
+      "operations": [
+        "anf_snapshots_create",
+        "anf_snapshots_delete",
+        "anf_snapshots_get",
+        "anf_snapshots_list",
+        "anf_snapshots_update",
+        "anf_snapshots_restore_files",
+        "anf_snapshots_revert_volume",
+        "anf_snapshots_get_status"
+      ]
+    },
+    {
+      "name": "BackupManagement",
+      "description": "Enterprise backup management with policies and vaults",
+      "operations": [
+        "anf_backup_policies_create",
+        "anf_backup_policies_delete",
+        "anf_backup_policies_get",
+        "anf_backup_policies_list",
+        "anf_backup_policies_update",
+        "anf_backup_vaults_create_or_update",
+        "anf_backup_vaults_delete",
+        "anf_backup_vaults_get",
+        "anf_backup_vaults_list",
+        "anf_backup_vaults_update",
+        "anf_backups_create",
+        "anf_backups_delete",
+        "anf_backups_get",
+        "anf_backups_list",
+        "anf_backups_update",
+        "anf_backups_restore_files"
+      ]
+    },
+    {
+      "name": "AdvancedManagement",
+      "description": "Advanced features including subvolumes, volume groups, and quotas",
+      "operations": [
+        "anf_snapshot_policies_create",
+        "anf_snapshot_policies_delete",
+        "anf_snapshot_policies_get",
+        "anf_snapshot_policies_list",
+        "anf_snapshot_policies_update",
+        "anf_subvolumes_create",
+        "anf_subvolumes_delete",
+        "anf_subvolumes_get",
+        "anf_subvolumes_list",
+        "anf_subvolumes_update",
+        "anf_volume_groups_create",
+        "anf_volume_groups_delete",
+        "anf_volume_groups_get",
+        "anf_volume_groups_list",
+        "anf_volume_groups_update",
+        "anf_volume_quota_rules_create",
+        "anf_volume_quota_rules_delete",
+        "anf_volume_quota_rules_get",
+        "anf_volume_quota_rules_list",
+        "anf_volume_quota_rules_update"
+      ]
+    },
+    {
+      "name": "ResourceManagement",
+      "description": "Resource provider and quota management",
+      "operations": [
+        "anf_netapp_resource_check_name_availability",
+        "anf_netapp_resource_check_file_path_availability",
+        "anf_netapp_resource_list_skus",
+        "anf_netapp_resource_get_sku",
+        "anf_netapp_resource_validate_network",
+        "anf_netapp_resource_quota_limits_list",
+        "anf_netapp_resource_quota_limits_get",
+        "anf_netapp_resource_region_infos_list",
+        "anf_netapp_resource_region_infos_get",
+        "anf_netapp_resource_usages_list",
+        "anf_netapp_resource_usages_get"
+      ]
+    }
+  ],
+  "intents": [
+    {
+      "name": "CreateStorage",
+      "description": "Create and configure Azure NetApp Files storage infrastructure",
+      "examples": [
+        "Create a new NetApp account in East US",
+        "Set up a 4TB Premium capacity pool",
+        "Create a new volume with 1TB capacity",
+        "Deploy storage infrastructure for production workloads"
+      ],
+      "entities": [
+        "accountName",
+        "location",
+        "poolSize",
+        "serviceLevel",
+        "volumeSize",
+        "protocolType"
+      ],
+      "actions": [
+        "anf_accounts_create_or_update",
+        "anf_pools_create_or_update",
+        "anf_volumes_create_or_update"
+      ]
+    },
+    {
+      "name": "ManageBackups",
+      "description": "Manage backup policies, vaults, and restore operations",
+      "examples": [
+        "Create a daily backup policy with 30-day retention",
+        "Set up backup vault for disaster recovery",
+        "Restore files from yesterday's backup",
+        "Show backup status for all volumes"
+      ],
+      "entities": [
+        "backupPolicyName",
+        "retentionDays",
+        "scheduleType",
+        "vaultName",
+        "restorePath"
+      ],
+      "actions": [
+        "anf_backup_policies_create",
+        "anf_backup_vaults_create_or_update",
+        "anf_backups_create",
+        "anf_backups_restore_files"
+      ]
+    },
+    {
+      "name": "OptimizePerformance",
+      "description": "Optimize storage performance and manage service levels",
+      "examples": [
+        "Move volume to Ultra performance tier",
+        "Relocate volume to different region",
+        "Optimize capacity pool utilization",
+        "Analyze performance metrics"
+      ],
+      "entities": [
+        "volumeName",
+        "targetServiceLevel",
+        "targetRegion",
+        "poolName"
+      ],
+      "actions": [
+        "anf_volumes_pool_change",
+        "anf_volumes_relocate",
+        "anf_pools_update",
+        "anf_netapp_resource_usages_get"
+      ]
+    },
+    {
+      "name": "ManageCosts",
+      "description": "Monitor and optimize storage costs",
+      "examples": [
+        "Show capacity usage across all pools",
+        "Calculate cost for storage expansion",
+        "Optimize resource allocation",
+        "Show quota utilization"
+      ],
+      "entities": [
+        "resourceGroup",
+        "timeRange",
+        "costThreshold"
+      ],
+      "actions": [
+        "anf_netapp_resource_usages_list",
+        "anf_netapp_resource_quota_limits_list",
+        "anf_pools_list",
+        "anf_volumes_list"
+      ]
+    },
+    {
+      "name": "ManageReplication",
+      "description": "Set up and manage cross-region replication",
+      "examples": [
+        "Set up replication to West US region",
+        "Check replication status",
+        "Break replication relationship",
+        "Resync replication"
+      ],
+      "entities": [
+        "sourceVolume",
+        "targetRegion",
+        "replicationType"
+      ],
+      "actions": [
+        "anf_volumes_authorize_replication",
+        "anf_volumes_replication_status",
+        "anf_volumes_break_replication",
+        "anf_volumes_resync_replication"
+      ]
+    },
+    {
+      "name": "ManageSnapshots",
+      "description": "Create and manage volume snapshots",
+      "examples": [
+        "Create snapshot of database volume",
+        "Set up automated snapshot policy",
+        "Restore volume from snapshot",
+        "List all snapshots from last week"
+      ],
+      "entities": [
+        "volumeName",
+        "snapshotName",
+        "policyName",
+        "scheduleFrequency"
+      ],
+      "actions": [
+        "anf_snapshots_create",
+        "anf_snapshot_policies_create",
+        "anf_snapshots_revert_volume",
+        "anf_snapshots_list"
+      ]
+    },
+    {
+      "name": "ManageCompliance",
+      "description": "Ensure security and compliance requirements",
+      "examples": [
+        "Enable customer-managed encryption",
+        "Check compliance status",
+        "Update security policies",
+        "Generate audit reports"
+      ],
+      "entities": [
+        "accountName",
+        "encryptionType",
+        "complianceStandard"
+      ],
+      "actions": [
+        "anf_accounts_transition_to_cmk",
+        "anf_accounts_change_key_vault",
+        "anf_accounts_get_change_key_vault_information"
+      ]
+    },
+    {
+      "name": "ManageSubvolumes",
+      "description": "Manage subvolumes and quota rules",
+      "examples": [
+        "Create subvolume for department data",
+        "Set user quota limits",
+        "Resize subvolume",
+        "Change subvolume permissions"
+      ],
+      "entities": [
+        "subvolumeName",
+        "parentVolume",
+        "quotaLimit",
+        "userName"
+      ],
+      "actions": [
+        "anf_subvolumes_create",
+        "anf_volume_quota_rules_create",
+        "anf_subvolumes_resize",
+        "anf_subvolumes_change_permissions"
+      ]
+    },
+    {
+      "name": "ManageVolumeGroups",
+      "description": "Manage application volume groups for SAP HANA, Oracle, SQL Server",
+      "examples": [
+        "Create SAP HANA volume group",
+        "Deploy Oracle database storage layout",
+        "Set up SQL Server volume configuration",
+        "Get volume group deployment specification"
+      ],
+      "entities": [
+        "groupName",
+        "applicationType",
+        "deploymentType"
+      ],
+      "actions": [
+        "anf_volume_groups_create",
+        "anf_volume_groups_get_deployment_spec",
+        "anf_volume_groups_update"
+      ]
+    },
+    {
+      "name": "TroubleshootIssues",
+      "description": "Troubleshoot and resolve storage issues",
+      "examples": [
+        "Break file locks on volume",
+        "Reset CIFS password",
+        "Check volume health",
+        "Resolve connectivity issues"
+      ],
+      "entities": [
+        "volumeName",
+        "errorType",
+        "issueCategory"
+      ],
+      "actions": [
+        "anf_volumes_break_file_locks",
+        "anf_volumes_reset_cifs_password",
+        "anf_volumes_get",
+        "anf_operations_list"
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "name": "accountName",
+      "type": "string",
+      "description": "Azure NetApp Files account name",
+      "validation": {
+        "pattern": "^[a-zA-Z][a-zA-Z0-9\\-_]{2,63}$",
+        "minLength": 3,
+        "maxLength": 64
+      }
+    },
+    {
+      "name": "location",
+      "type": "string",
+      "description": "Azure region location",
+      "enum": [
+        "eastus", "eastus2", "westus", "westus2", "westus3", "centralus",
+        "northcentralus", "southcentralus", "westcentralus",
+        "northeurope", "westeurope", "uksouth", "ukwest",
+        "francecentral", "francesouth", "germanywestcentral",
+        "switzerlandnorth", "norwayeast", "swedencentral",
+        "australiaeast", "australiasoutheast", "australiacentral",
+        "japaneast", "japanwest", "koreacentral", "koreasouth",
+        "southeastasia", "eastasia", "centralindia", "southindia",
+        "westindia", "canadacentral", "canadaeast",
+        "brazilsouth", "southafricanorth", "uaenorth"
+      ]
+    },
+    {
+      "name": "serviceLevel",
+      "type": "string",
+      "description": "Performance service level",
+      "enum": ["Standard", "Premium", "Ultra"]
+    },
+    {
+      "name": "protocolType",
+      "type": "array",
+      "description": "Supported protocols",
+      "items": {
+        "type": "string",
+        "enum": ["NFSv3", "NFSv4.1", "CIFS", "dual-protocol"]
+      }
+    },
+    {
+      "name": "poolSize",
+      "type": "integer",
+      "description": "Capacity pool size in TiB",
+      "minimum": 4,
+      "maximum": 500
+    },
+    {
+      "name": "volumeSize",
+      "type": "integer",
+      "description": "Volume size in GiB",
+      "minimum": 100,
+      "maximum": 102400
+    }
+  ],
+  "security": {
+    "rateLimiting": {
+      "requestsPerMinute": 1000,
+      "burstAllowance": 100,
+      "backoffStrategy": "exponential"
+    },
+    "encryption": {
+      "inTransit": "TLS1.3",
+      "atRest": "AES256"
+    },
+    "headers": {
+      "required": [
+        "Authorization",
+        "Content-Type",
+        "X-Request-ID"
+      ],
+      "security": [
+        "X-Content-Type-Options: nosniff",
+        "X-Frame-Options: DENY",
+        "X-XSS-Protection: 1; mode=block"
+      ]
+    },
+    "ipWhitelist": {
+      "enabled": true,
+      "ranges": [
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16"
+      ]
+    }
+  },
+  "monitoring": {
+    "healthCheck": {
+      "endpoint": "/health",
+      "interval": 30,
+      "timeout": 10
+    },
+    "metrics": {
+      "enabled": true,
+      "endpoint": "/metrics",
+      "format": "prometheus"
+    },
+    "logging": {
+      "level": "info",
+      "destination": "applicationInsights",
+      "includeRequestBody": false,
+      "includeResponseBody": false,
+      "retention": "90 days"
+    },
+    "alerting": {
+      "enabled": true,
+      "rules": [
+        {
+          "name": "HighErrorRate",
+          "condition": "error_rate > 0.05",
+          "duration": "5m",
+          "severity": "warning"
+        },
+        {
+          "name": "HighLatency",
+          "condition": "avg_response_time > 2000ms",
+          "duration": "5m",
+          "severity": "warning"
+        },
+        {
+          "name": "QuotaExceeded",
+          "condition": "quota_usage > 0.9",
+          "duration": "1m",
+          "severity": "critical"
+        }
+      ]
+    }
+  },
+  "errorHandling": {
+    "retryPolicy": {
+      "maxRetries": 3,
+      "backoffStrategy": "exponential",
+      "retryableStatusCodes": [429, 500, 502, 503, 504]
+    },
+    "circuitBreaker": {
+      "enabled": true,
+      "failureThreshold": 5,
+      "recoveryTimeout": 30000
+    },
+    "fallback": {
+      "enabled": true,
+      "message": "Azure NetApp Files service is temporarily unavailable. Please try again later."
+    }
+  },
+  "documentation": {
+    "openApiSpec": "./openapi/anf-api.yaml",
+    "examples": "./examples/",
+    "guides": {
+      "quickStart": "./docs/quick-start.md",
+      "authentication": "./docs/authentication.md",
+      "troubleshooting": "./docs/troubleshooting.md"
+    }
+  },
+  "support": {
+    "contact": {
+      "email": "DwirefS@SapientEdge.io",
+      "documentation": "https://github.com/your-org/anf-aiops/tree/main/mcp"
+    },
+    "sla": {
+      "availability": "99.99%",
+      "responseTime": "< 1s for 99% of requests",
+      "supportHours": "24/7"
+    }
+  }
+}

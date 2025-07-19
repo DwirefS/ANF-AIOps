@@ -1,0 +1,400 @@
+# Azure Pipelines CD Configuration
+# Author: Dwiref Sharma <DwirefS@SapientEdge.io>
+
+trigger: none
+
+resources:
+  pipelines:
+  - pipeline: ci-pipeline
+    source: ANF-AIOps-CI
+    trigger: 
+      branches:
+        include:
+          - main
+          - develop
+
+parameters:
+  - name: environment
+    displayName: 'Target Environment'
+    type: string
+    default: 'dev'
+    values:
+      - dev
+      - test
+      - prod
+  - name: deployInfrastructure
+    displayName: 'Deploy Infrastructure'
+    type: boolean
+    default: false
+  - name: deployFunctions
+    displayName: 'Deploy Azure Functions'
+    type: boolean
+    default: true
+  - name: deployNodeApps
+    displayName: 'Deploy Node.js Applications'
+    type: boolean
+    default: true
+
+variables:
+  - group: anf-aiops-${{ parameters.environment }}
+  - name: serviceConnection
+    value: 'ANF-AIOps-${{ parameters.environment }}-ServiceConnection'
+  - name: resourceGroup
+    value: 'rg-anf-aiops-${{ parameters.environment }}'
+  - name: location
+    value: 'eastus'
+  - name: terraformStateStorageAccount
+    value: 'tfstate${{ parameters.environment }}anf'
+  - name: vmImage
+    value: 'ubuntu-latest'
+
+stages:
+  - stage: PreDeploymentValidation
+    displayName: 'Pre-Deployment Validation'
+    jobs:
+      - job: ValidateEnvironment
+        displayName: 'Validate Target Environment'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Validate Azure Environment'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Validating environment: ${{ parameters.environment }}"
+                
+                # Check if resource group exists
+                if az group show --name $(resourceGroup) &>/dev/null; then
+                  echo "Resource group $(resourceGroup) exists"
+                else
+                  echo "Resource group $(resourceGroup) does not exist"
+                  if [ "${{ parameters.environment }}" == "prod" ]; then
+                    echo "ERROR: Production resource group must exist before deployment"
+                    exit 1
+                  fi
+                fi
+                
+                # Check service principal permissions
+                echo "Checking service principal permissions..."
+                az role assignment list --assignee $(az account show --query user.name -o tsv)
+
+      - job: BackupCurrentState
+        displayName: 'Backup Current State'
+        condition: eq('${{ parameters.environment }}', 'prod')
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Backup Terraform State'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                DATE=$(date +%Y%m%d-%H%M%S)
+                BACKUP_NAME="backup-$DATE-$(Build.BuildId).tfstate"
+                
+                az storage blob copy start \
+                  --source-container tfstate \
+                  --source-blob "${{ parameters.environment }}.terraform.tfstate" \
+                  --destination-container tfstate-backups \
+                  --destination-blob "$BACKUP_NAME" \
+                  --account-name $(terraformStateStorageAccount)
+
+  - stage: DeployInfrastructure
+    displayName: 'Deploy Infrastructure'
+    dependsOn: PreDeploymentValidation
+    condition: and(succeeded(), eq('${{ parameters.deployInfrastructure }}', 'true'))
+    jobs:
+      - deployment: DeployTerraform
+        displayName: 'Deploy with Terraform'
+        pool:
+          vmImage: $(vmImage)
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                  persistCredentials: true
+
+                - task: TerraformInstaller@0
+                  displayName: 'Install Terraform'
+                  inputs:
+                    terraformVersion: '1.5.7'
+
+                - task: TerraformTaskV4@4
+                  displayName: 'Terraform Init'
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'init'
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/infra'
+                    backendServiceArm: $(serviceConnection)
+                    backendAzureRmResourceGroupName: $(resourceGroup)
+                    backendAzureRmStorageAccountName: $(terraformStateStorageAccount)
+                    backendAzureRmContainerName: 'tfstate'
+                    backendAzureRmKey: '${{ parameters.environment }}.terraform.tfstate'
+
+                - task: TerraformTaskV4@4
+                  displayName: 'Terraform Plan'
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'plan'
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/infra'
+                    commandOptions: '-var="environment=${{ parameters.environment }}" -var="location=$(location)" -out=tfplan'
+                    environmentServiceNameAzureRM: $(serviceConnection)
+
+                - task: TerraformTaskV4@4
+                  displayName: 'Terraform Apply'
+                  condition: eq('${{ parameters.environment }}', 'prod')
+                  inputs:
+                    provider: 'azurerm'
+                    command: 'apply'
+                    workingDirectory: '$(System.DefaultWorkingDirectory)/infra'
+                    commandOptions: 'tfplan'
+                    environmentServiceNameAzureRM: $(serviceConnection)
+
+                - task: AzureCLI@2
+                  displayName: 'Export Infrastructure Outputs'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      cd infra
+                      terraform output -json > $(Pipeline.Workspace)/terraform-outputs.json
+                      
+                      # Set pipeline variables
+                      echo "##vso[task.setvariable variable=functionAppName;isOutput=true]$(terraform output -raw function_app_name)"
+                      echo "##vso[task.setvariable variable=apimGatewayUrl;isOutput=true]$(terraform output -raw apim_gateway_url)"
+                      echo "##vso[task.setvariable variable=keyVaultName;isOutput=true]$(terraform output -raw key_vault_name)"
+                  name: TerraformOutputs
+
+  - stage: DeployApplications
+    displayName: 'Deploy Applications'
+    dependsOn: 
+      - PreDeploymentValidation
+      - DeployInfrastructure
+    condition: |
+      and(
+        not(failed()),
+        or(
+          eq('${{ parameters.deployFunctions }}', 'true'),
+          eq('${{ parameters.deployNodeApps }}', 'true')
+        )
+      )
+    variables:
+      functionAppName: $[ stageDependencies.DeployInfrastructure.DeployTerraform.outputs['TerraformOutputs.functionAppName'] ]
+      keyVaultName: $[ stageDependencies.DeployInfrastructure.DeployTerraform.outputs['TerraformOutputs.keyVaultName'] ]
+    jobs:
+      - deployment: DeployFunctions
+        displayName: 'Deploy Azure Functions'
+        condition: eq('${{ parameters.deployFunctions }}', 'true')
+        pool:
+          vmImage: $(vmImage)
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  displayName: 'Download Functions Package'
+                  inputs:
+                    buildType: 'specific'
+                    project: '$(System.TeamProject)'
+                    definition: '$(ci-pipeline)'
+                    buildVersionToDownload: 'latest'
+                    artifactName: 'deployment-packages'
+                    targetPath: '$(Pipeline.Workspace)/packages'
+
+                - task: AzureFunctionApp@1
+                  displayName: 'Deploy to Function App Slot'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    appType: 'functionApp'
+                    appName: '$(functionAppName)'
+                    package: '$(Pipeline.Workspace)/packages/functions-*.zip'
+                    deployToSlotOrASE: true
+                    resourceGroupName: $(resourceGroup)
+                    slotName: 'staging'
+
+                - task: AzureCLI@2
+                  displayName: 'Configure Function App Settings'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az functionapp config appsettings set \
+                        --name $(functionAppName) \
+                        --resource-group $(resourceGroup) \
+                        --slot staging \
+                        --settings \
+                          "Environment=${{ parameters.environment }}" \
+                          "KeyVaultName=$(keyVaultName)" \
+                          "ApplicationInsightsConnectionString=$(ApplicationInsightsConnectionString)" \
+                          "FUNCTIONS_WORKER_RUNTIME=dotnet-isolated" \
+                          "FUNCTIONS_EXTENSION_VERSION=~4"
+
+                - task: AzureCLI@2
+                  displayName: 'Run Smoke Tests on Staging'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      STAGING_URL="https://$(functionAppName)-staging.azurewebsites.net"
+                      
+                      # Health check
+                      response=$(curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/api/health")
+                      if [ $response -ne 200 ]; then
+                        echo "Health check failed with status $response"
+                        exit 1
+                      fi
+                      
+                      echo "Staging slot health check passed"
+
+                - task: AzureAppServiceManage@0
+                  displayName: 'Swap Slots'
+                  condition: succeeded()
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    action: 'Swap Slots'
+                    webAppName: $(functionAppName)
+                    resourceGroupName: $(resourceGroup)
+                    sourceSlot: 'staging'
+                    targetSlot: 'production'
+
+      - deployment: DeployNodeApplications
+        displayName: 'Deploy Node.js Applications'
+        condition: eq('${{ parameters.deployNodeApps }}', 'true')
+        pool:
+          vmImage: $(vmImage)
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadPipelineArtifact@2
+                  displayName: 'Download Application Packages'
+                  inputs:
+                    buildType: 'specific'
+                    project: '$(System.TeamProject)'
+                    definition: '$(ci-pipeline)'
+                    buildVersionToDownload: 'latest'
+                    artifactName: 'deployment-packages'
+                    targetPath: '$(Pipeline.Workspace)/packages'
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy MCP Server'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    appType: 'webAppLinux'
+                    appName: 'anf-aiops-mcp-${{ parameters.environment }}'
+                    package: '$(Pipeline.Workspace)/packages/mcp-server-*.zip'
+                    deployToSlotOrASE: true
+                    resourceGroupName: $(resourceGroup)
+                    slotName: 'staging'
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy Teams Bot'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    appType: 'webAppLinux'
+                    appName: 'anf-aiops-teams-${{ parameters.environment }}'
+                    package: '$(Pipeline.Workspace)/packages/teams-bot-*.zip'
+                    deployToSlotOrASE: true
+                    resourceGroupName: $(resourceGroup)
+                    slotName: 'staging'
+
+                - task: AzureCLI@2
+                  displayName: 'Configure App Settings and Swap Slots'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      # Configure MCP Server
+                      az webapp config appsettings set \
+                        --name anf-aiops-mcp-${{ parameters.environment }} \
+                        --resource-group $(resourceGroup) \
+                        --slot staging \
+                        --settings \
+                          "NODE_ENV=${{ parameters.environment }}" \
+                          "KEY_VAULT_NAME=$(keyVaultName)"
+                      
+                      # Configure Teams Bot
+                      az webapp config appsettings set \
+                        --name anf-aiops-teams-${{ parameters.environment }} \
+                        --resource-group $(resourceGroup) \
+                        --slot staging \
+                        --settings \
+                          "NODE_ENV=${{ parameters.environment }}" \
+                          "KEY_VAULT_NAME=$(keyVaultName)" \
+                          "TEAMS_APP_ID=$(TeamsAppId)"
+                      
+                      # Swap slots
+                      az webapp deployment slot swap \
+                        --name anf-aiops-mcp-${{ parameters.environment }} \
+                        --resource-group $(resourceGroup) \
+                        --slot staging
+                      
+                      az webapp deployment slot swap \
+                        --name anf-aiops-teams-${{ parameters.environment }} \
+                        --resource-group $(resourceGroup) \
+                        --slot staging
+
+  - stage: PostDeploymentValidation
+    displayName: 'Post-Deployment Validation'
+    dependsOn: DeployApplications
+    condition: succeeded()
+    jobs:
+      - job: ValidateDeployment
+        displayName: 'Validate Deployment'
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Run Integration Tests'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                cd $(System.DefaultWorkingDirectory)/ci-cd/scripts
+                chmod +x run-integration-tests.sh
+                ./run-integration-tests.sh ${{ parameters.environment }}
+
+          - task: AzureCLI@2
+            displayName: 'Performance Baseline Check'
+            condition: eq('${{ parameters.environment }}', 'prod')
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                echo "Running performance baseline checks..."
+                # Add performance testing logic here
+
+      - job: UpdateDocumentation
+        displayName: 'Update Documentation'
+        condition: eq('${{ parameters.environment }}', 'prod')
+        pool:
+          vmImage: $(vmImage)
+        steps:
+          - script: |
+              echo "# Deployment Record" > deployment-record.md
+              echo "Date: $(date)" >> deployment-record.md
+              echo "Environment: ${{ parameters.environment }}" >> deployment-record.md
+              echo "Build ID: $(Build.BuildId)" >> deployment-record.md
+              echo "Deployed by: $(Build.RequestedFor)" >> deployment-record.md
+            displayName: 'Create Deployment Record'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Deployment Record'
+            inputs:
+              PathtoPublish: 'deployment-record.md'
+              ArtifactName: 'deployment-record'
