@@ -70,7 +70,7 @@
     "turndown": "^7.1.2",
     "cheerio": "^1.0.0-rc.12",
     "marked": "^11.1.0",
-    "langchain": "^0.0.205",
+    "langchain": "^0.3.30",
     "redis": "^4.6.10",
     "node-cache": "^5.1.2",
     "rate-limiter-flexible": "^4.0.1",
