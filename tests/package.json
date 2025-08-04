@@ -57,7 +57,7 @@
     "inquirer": "^8.2.6"
   },
   "optionalDependencies": {
-    "puppeteer": "^21.6.1",
+    "puppeteer": "^24.15.0",
     "playwright": "^1.40.1"
   },
   "engines": {
