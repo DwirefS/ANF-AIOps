@@ -96,7 +96,7 @@
     "rimraf": "^5.0.5",
     "nodemon": "^3.0.1",
     "husky": "^8.0.3",
-    "lint-staged": "^15.1.0"
+    "lint-staged": "^16.1.5"
   },
   "lint-staged": {
     "*.ts": [
