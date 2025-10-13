@@ -74,7 +74,7 @@
     "redis": "^4.6.10",
     "node-cache": "^5.1.2",
     "rate-limiter-flexible": "^4.0.1",
-    "tiktoken": "^1.0.10",
+    "tiktoken": "^1.0.22",
     "natural": "^6.7.0",
     "compromise": "^14.10.0",
     "stopword": "^2.0.8"
