@@ -1,6 +1,6 @@
 # Azure NetApp Files MCP (Microsoft Copilot Connector) Integration
 
-**Author:** Dwiref Sharma <DwirefS@SapientEdge.io>  
+**Author:** Dwiref Sharma 
 **Version:** 1.0.0  
 **Date:** July 18, 2025  
 **API Version:** 2025-03-01
