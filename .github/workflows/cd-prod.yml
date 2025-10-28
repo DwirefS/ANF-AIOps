@@ -247,7 +247,7 @@ jobs:
           path: ./${{ matrix.app.name }}-dist
 
       - name: Deploy to staging slot
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ matrix.app.app_name }}
           package: ./${{ matrix.app.name }}-dist
